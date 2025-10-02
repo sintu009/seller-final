@@ -186,16 +186,44 @@ const SignupPage = () => {
           </form>
 
           {/* Footer */}
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center space-y-4">
             <p className="text-gray-600">
               Already have an account?{' '}
-              <Link 
+              <Link
                 to={`/login/${role}`}
                 className={`text-${config.color}-600 hover:text-${config.color}-700 font-semibold`}
               >
-                Sign in
+                Sign in here
               </Link>
             </p>
+
+            <div className="border-t pt-4 space-y-2">
+              <p className="text-sm text-gray-500 mb-3">Need different access?</p>
+              {role !== 'seller' && (
+                <Link
+                  to="/signup/seller"
+                  className="block text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Need seller access? Seller Signup
+                </Link>
+              )}
+              {role !== 'supplier' && (
+                <Link
+                  to="/signup/supplier"
+                  className="block text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                >
+                  Need supplier access? Supplier Signup
+                </Link>
+              )}
+              {role !== 'admin' && (
+                <Link
+                  to="/signup/admin"
+                  className="block text-sm text-orange-600 hover:text-orange-700 font-medium"
+                >
+                  Admin access? Admin Signup
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>

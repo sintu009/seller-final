@@ -129,16 +129,44 @@ const LoginPage = () => {
           </form>
 
           {/* Footer */}
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center space-y-4">
             <p className="text-gray-600">
               Don't have an account?{' '}
-              <Link 
+              <Link
                 to={`/signup/${role}`}
                 className={`text-${config.color}-600 hover:text-${config.color}-700 font-semibold`}
               >
-                Sign up
+                Sign up here
               </Link>
             </p>
+
+            <div className="border-t pt-4 space-y-2">
+              <p className="text-sm text-gray-500 mb-3">Need different access?</p>
+              {role !== 'seller' && (
+                <Link
+                  to="/login/seller"
+                  className="block text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Need seller access? Seller Login
+                </Link>
+              )}
+              {role !== 'supplier' && (
+                <Link
+                  to="/login/supplier"
+                  className="block text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                >
+                  Need supplier access? Supplier Login
+                </Link>
+              )}
+              {role !== 'admin' && (
+                <Link
+                  to="/login/admin"
+                  className="block text-sm text-orange-600 hover:text-orange-700 font-medium"
+                >
+                  Admin access? Admin Login
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>

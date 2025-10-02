@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const AuthContext = createContext();
 
@@ -58,11 +59,14 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok && data.success) {
         setUser(data.data);
+        toast.success('Login successful!');
         return { success: true };
       } else {
+        toast.error(data.message || 'Login failed');
         return { success: false, message: data.message || 'Login failed' };
       }
     } catch (error) {
+      toast.error('Network error. Please try again.');
       return { success: false, message: 'Network error. Please try again.' };
     }
   };
@@ -82,11 +86,14 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok && data.success) {
         setUser(data.data);
+        toast.success('Account created successfully!');
         return { success: true };
       } else {
+        toast.error(data.message || 'Registration failed');
         return { success: false, message: data.message || 'Registration failed' };
       }
     } catch (error) {
+      toast.error('Network error. Please try again.');
       return { success: false, message: 'Network error. Please try again.' };
     }
   };
@@ -101,6 +108,7 @@ export const AuthProvider = ({ children }) => {
         },
       });
       setUser(null);
+      toast.success('Logged out successfully!');
     } catch (error) {
       console.error('Logout failed:', error);
       setUser(null);
