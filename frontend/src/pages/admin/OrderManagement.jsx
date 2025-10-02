@@ -1,0 +1,404 @@
+import React, { useState } from 'react';
+import {
+    Search,
+    Filter,
+    Download,
+    Package,
+    Truck,
+    CheckCircle,
+    Clock,
+    XCircle,
+    AlertTriangle,
+    MapPin,
+    User,
+    Calendar,
+    Edit3,
+    Eye
+} from 'lucide-react';
+
+const OrderManagement = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('all');
+    const [selectedPlatform, setSelectedPlatform] = useState('all');
+
+    // Mock orders data
+    const orders = [
+        {
+            id: '#AMZ-12345',
+            platform: 'Amazon',
+            seller: 'TechStore India',
+            customer: 'Rajesh Kumar',
+            product: 'Wireless Bluetooth Headphones Pro',
+            supplier: 'Kumar Electronics Manufacturing',
+            quantity: 2,
+            amount: 5998,
+            status: 'Processing',
+            paymentStatus: 'Paid',
+            orderDate: '2024-01-15',
+            deliveryDate: '2024-01-18',
+            address: '123 Linking Road, Bandra West, Mumbai, Maharashtra 400050'
+        },
+        {
+            id: '#FLK-12346',
+            platform: 'Flipkart',
+            seller: 'ElectroMart',
+            customer: 'Priya Sharma',
+            product: 'Smart Fitness Watch',
+            supplier: 'Health Tech Solutions',
+            quantity: 1,
+            amount: 7999,
+            status: 'In Transit',
+            paymentStatus: 'Paid',
+            orderDate: '2024-01-14',
+            deliveryDate: '2024-01-17',
+            address: '456 Sector 18, Noida, Uttar Pradesh 201301'
+        },
+        {
+            id: '#MSH-12347',
+            platform: 'Meesho',
+            seller: 'GadgetHub',
+            customer: 'Amit Patel',
+            product: 'Bluetooth Speaker Premium',
+            supplier: 'Kumar Electronics Manufacturing',
+            quantity: 1,
+            amount: 2499,
+            status: 'Delivered',
+            paymentStatus: 'Paid',
+            orderDate: '2024-01-12',
+            deliveryDate: '2024-01-15',
+            address: '789 Koregaon Park, Pune, Maharashtra 411001'
+        },
+        {
+            id: '#AMZ-12348',
+            platform: 'Amazon',
+            seller: 'MobileWorld',
+            customer: 'Sneha Reddy',
+            product: 'Ergonomic Laptop Stand',
+            supplier: 'Premium Accessories Ltd',
+            quantity: 1,
+            amount: 1899,
+            status: 'Pending',
+            paymentStatus: 'Pending',
+            orderDate: '2024-01-16',
+            deliveryDate: '2024-01-19',
+            address: '321 Hitech City, Hyderabad, Telangana 500081'
+        },
+        {
+            id: '#FLK-12349',
+            platform: 'Flipkart',
+            seller: 'SmartTech Solutions',
+            customer: 'Vikram Singh',
+            product: 'Premium Phone Case Set',
+            supplier: 'Mobile Accessories Co',
+            quantity: 1,
+            amount: 899,
+            status: 'Cancelled',
+            paymentStatus: 'Refunded',
+            orderDate: '2024-01-13',
+            deliveryDate: null,
+            address: '654 MG Road, Bangalore, Karnataka 560001'
+        }
+    ];
+
+    const statuses = ['all', 'Pending', 'Processing', 'In Transit', 'Delivered', 'Cancelled'];
+    const platforms = ['all', 'Amazon', 'Flipkart', 'Meesho'];
+
+    const getStatusIcon = (status) => {
+        switch (status) {
+            case 'Pending': return <Clock className="w-4 h-4" />;
+            case 'Processing': return <Package className="w-4 h-4" />;
+            case 'In Transit': return <Truck className="w-4 h-4" />;
+            case 'Delivered': return <CheckCircle className="w-4 h-4" />;
+            case 'Cancelled': return <XCircle className="w-4 h-4" />;
+            default: return <Clock className="w-4 h-4" />;
+        }
+    };
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'Pending': return 'bg-yellow-100 text-yellow-800';
+            case 'Processing': return 'bg-blue-100 text-blue-800';
+            case 'In Transit': return 'bg-purple-100 text-purple-800';
+            case 'Delivered': return 'bg-green-100 text-green-800';
+            case 'Cancelled': return 'bg-red-100 text-red-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const getPaymentStatusColor = (status) => {
+        switch (status) {
+            case 'Paid': return 'bg-green-100 text-green-800';
+            case 'Pending': return 'bg-yellow-100 text-yellow-800';
+            case 'Refunded': return 'bg-gray-100 text-gray-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const getPlatformColor = (platform) => {
+        switch (platform) {
+            case 'Amazon': return 'bg-orange-100 text-orange-800';
+            case 'Flipkart': return 'bg-blue-100 text-blue-800';
+            case 'Meesho': return 'bg-purple-100 text-purple-800';
+            default: return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const filteredOrders = orders.filter(order => {
+        const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.seller.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.product.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
+        const matchesPlatform = selectedPlatform === 'all' || order.platform === selectedPlatform;
+
+        return matchesSearch && matchesStatus && matchesPlatform;
+    });
+
+    const orderStats = {
+        total: orders.length,
+        pending: orders.filter(o => o.status === 'Pending').length,
+        processing: orders.filter(o => o.status === 'Processing').length,
+        inTransit: orders.filter(o => o.status === 'In Transit').length,
+        delivered: orders.filter(o => o.status === 'Delivered').length,
+        cancelled: orders.filter(o => o.status === 'Cancelled').length,
+        totalRevenue: orders.filter(o => o.paymentStatus === 'Paid').reduce((sum, order) => sum + order.amount, 0)
+    };
+
+    const handleStatusChange = (orderId, newStatus) => {
+        console.log(`Changing order ${orderId} status to ${newStatus}`);
+    };
+
+    return (
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
+                    <p className="text-gray-600 mt-1">Master order list from all platforms and sellers</p>
+                </div>
+                <div className="flex items-center space-x-3">
+                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+                        <Download className="w-4 h-4 mr-2" />
+                        Export Orders
+                    </button>
+                </div>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="text-sm text-gray-600 mb-1">Total Orders</div>
+                    <div className="text-2xl font-bold text-gray-900">{orderStats.total}</div>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="text-sm text-gray-600 mb-1">Pending</div>
+                    <div className="text-2xl font-bold text-yellow-600">{orderStats.pending}</div>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="text-sm text-gray-600 mb-1">Processing</div>
+                    <div className="text-2xl font-bold text-blue-600">{orderStats.processing}</div>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="text-sm text-gray-600 mb-1">In Transit</div>
+                    <div className="text-2xl font-bold text-purple-600">{orderStats.inTransit}</div>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="text-sm text-gray-600 mb-1">Delivered</div>
+                    <div className="text-2xl font-bold text-green-600">{orderStats.delivered}</div>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="text-sm text-gray-600 mb-1">Total Revenue</div>
+                    <div className="text-2xl font-bold text-orange-600">₹{orderStats.totalRevenue.toLocaleString()}</div>
+                </div>
+            </div>
+
+            {/* Filters and Search */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="flex flex-col lg:flex-row gap-4">
+                    {/* Search */}
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search by Order ID, Seller, Customer, or Product..."
+                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+
+                    {/* Filters */}
+                    <div className="flex gap-3">
+                        <select
+                            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            value={selectedStatus}
+                            onChange={(e) => setSelectedStatus(e.target.value)}
+                        >
+                            {statuses.map(status => (
+                                <option key={status} value={status}>
+                                    {status === 'all' ? 'All Status' : status}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
+                            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            value={selectedPlatform}
+                            onChange={(e) => setSelectedPlatform(e.target.value)}
+                        >
+                            {platforms.map(platform => (
+                                <option key={platform} value={platform}>
+                                    {platform === 'all' ? 'All Platforms' : platform}
+                                </option>
+                            ))}
+                        </select>
+
+                        <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                            <Filter className="w-4 h-4 mr-2" />
+                            More Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Orders Table */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Order ID</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Platform</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Seller</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Customer</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Product</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Supplier</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Amount</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Status</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Date</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {filteredOrders.map((order) => (
+                                <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="py-4 px-6">
+                                        <div className="font-mono text-sm font-medium text-orange-600">{order.id}</div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${getPlatformColor(order.platform)}`}>
+                                            {order.platform}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div className="flex items-center">
+                                            <User className="w-4 h-4 mr-2 text-gray-400" />
+                                            <span className="text-gray-900">{order.seller}</span>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div>
+                                            <div className="font-medium text-gray-900">{order.customer}</div>
+                                            <div className="text-xs text-gray-500 flex items-center mt-1">
+                                                <MapPin className="w-3 h-3 mr-1" />
+                                                {order.address.split(',')[0]}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div>
+                                            <div className="font-medium text-gray-900">{order.product}</div>
+                                            <div className="text-sm text-gray-500">Qty: {order.quantity}</div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div className="text-sm text-gray-600">{order.supplier}</div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div>
+                                            <div className="font-semibold text-gray-900">₹{order.amount.toLocaleString()}</div>
+                                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${getPaymentStatusColor(order.paymentStatus)}`}>
+                                                {order.paymentStatus}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(order.status)}`}>
+                                            {getStatusIcon(order.status)}
+                                            <span className="ml-2">{order.status}</span>
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div className="flex items-center text-sm text-gray-600">
+                                            <Calendar className="w-4 h-4 mr-2" />
+                                            <div>
+                                                <div>{order.orderDate}</div>
+                                                {order.deliveryDate && (
+                                                    <div className="text-xs text-gray-500">Due: {order.deliveryDate}</div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div className="flex items-center space-x-2">
+                                            <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                                <Eye className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleStatusChange(order.id, 'Processing')}
+                                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                title="Manual Override"
+                                            >
+                                                <Edit3 className="w-4 h-4" />
+                                            </button>
+                                            {order.status === 'Pending' && (
+                                                <button className="px-3 py-1 bg-orange-600 text-white text-xs rounded-lg hover:bg-orange-700 transition-colors">
+                                                    Override
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {filteredOrders.length === 0 && (
+                    <div className="text-center py-12">
+                        <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                        <div className="text-gray-500 text-lg mb-2">No orders found</div>
+                        <p className="text-gray-400">Try adjusting your search filters</p>
+                    </div>
+                )}
+            </div>
+
+            {/* Pagination */}
+            {filteredOrders.length > 0 && (
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="flex items-center justify-between">
+                        <div className="text-gray-600">
+                            Showing {filteredOrders.length} of {orders.length} orders
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                                Previous
+                            </button>
+                            <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                                1
+                            </button>
+                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                                2
+                            </button>
+                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default OrderManagement;

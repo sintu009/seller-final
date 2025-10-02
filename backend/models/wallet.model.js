@@ -1,0 +1,3 @@
+<script>
+    wallet
+</script>
