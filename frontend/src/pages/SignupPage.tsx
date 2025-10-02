@@ -43,12 +43,18 @@ const SignupPage = () => {
       return;
     }
 
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const success = await signup(formData.email, formData.password, formData.name, role!);
-      if (success) {
+      const result = await signup(formData.email, formData.password, formData.name, role!);
+      if (result.success) {
         navigate(`/${role}/dashboard`);
       } else {
-        setError('Account creation failed');
+        setError(result.message || 'Account creation failed');
       }
     } catch (err) {
       setError('Signup failed. Please try again.');

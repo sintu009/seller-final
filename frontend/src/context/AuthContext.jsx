@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -15,70 +17,94 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored auth token
-    const token = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('userData');
-    
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-    }
-    setLoading(false);
+    checkAuth();
   }, []);
 
-  const login = async (email, password, role) => {
+  const checkAuth = async () => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful login
-      const mockUser = {
-        id: '1',
-        email,
-        role: role,
-        name: email.split('@')[0],
-        avatar: `https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop`
-      };
-      
-      const token = 'mock-jwt-token';
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('userData', JSON.stringify(mockUser));
-      setUser(mockUser);
-      
-      return true;
+      const response = await fetch(`${API_URL}/api/auth/profile`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setUser(data.data);
+        }
+      }
     } catch (error) {
-      return false;
+      console.error('Auth check failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (email, password) => {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setUser(data.data);
+        return { success: true };
+      } else {
+        return { success: false, message: data.message || 'Login failed' };
+      }
+    } catch (error) {
+      return { success: false, message: 'Network error. Please try again.' };
     }
   };
 
   const signup = async (email, password, name, role) => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful signup
-      const mockUser = {
-        id: '1',
-        email,
-        role: role,
-        name,
-        avatar: `https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop`
-      };
-      
-      const token = 'mock-jwt-token';
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('userData', JSON.stringify(mockUser));
-      setUser(mockUser);
-      
-      return true;
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, name, role }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setUser(data.data);
+        return { success: true };
+      } else {
+        return { success: false, message: data.message || 'Registration failed' };
+      }
     } catch (error) {
-      return false;
+      return { success: false, message: 'Network error. Please try again.' };
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
-    setUser(null);
+  const logout = async () => {
+    try {
+      await fetch(`${API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setUser(null);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      setUser(null);
+    }
   };
 
   return (

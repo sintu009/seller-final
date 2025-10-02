@@ -27,11 +27,11 @@ const LoginPage = () => {
     setError('');
 
     try {
-      const success = await login(email, password, role!);
-      if (success) {
+      const result = await login(email, password);
+      if (result.success) {
         navigate(`/${role}/dashboard`);
       } else {
-        setError('Invalid email or password');
+        setError(result.message || 'Invalid email or password');
       }
     } catch (err) {
       setError('Login failed. Please try again.');
