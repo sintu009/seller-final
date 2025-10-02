@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { Store, Truck, Shield, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { Store, Truck, Shield, Eye, EyeOff, ArrowLeft } from "lucide-react";
 
 const SignupPage = () => {
   const { role } = useParams<{ role: string }>();
   const navigate = useNavigate();
   const { signup } = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const roleConfig = {
-    seller: { icon: Store, color: 'blue', title: 'Seller Dashboard' },
-    supplier: { icon: Truck, color: 'emerald', title: 'Supplier Dashboard' },
-    admin: { icon: Shield, color: 'orange', title: 'Admin Dashboard' }
+    seller: { icon: Store, color: "blue", title: "Seller Dashboard" },
+    supplier: { icon: Truck, color: "emerald", title: "Supplier Dashboard" },
+    admin: { icon: Shield, color: "orange", title: "Admin Dashboard" },
   };
 
   const config = roleConfig[role as keyof typeof roleConfig];
@@ -28,36 +28,41 @@ const SignupPage = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       setLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError("Password must be at least 6 characters long");
       setLoading(false);
       return;
     }
 
     try {
-      const result = await signup(formData.email, formData.password, formData.name, role!);
+      const result = await signup(
+        formData.email,
+        formData.password,
+        formData.name,
+        role!
+      );
       if (result.success) {
         navigate(`/${role}/dashboard`);
       } else {
-        setError(result.message || 'Account creation failed');
+        setError(result.message || "Account creation failed");
       }
     } catch (err) {
-      setError('Signup failed. Please try again.');
+      setError("Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -73,7 +78,7 @@ const SignupPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Back Button */}
-        <Link 
+        <Link
           to="/"
           className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-8 transition-colors"
         >
@@ -84,17 +89,24 @@ const SignupPage = () => {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className={`w-16 h-16 bg-${config.color}-600 rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+            <div
+              className={`w-16 h-16 bg-${config.color}-600 rounded-2xl flex items-center justify-center mx-auto mb-4`}
+            >
               <IconComponent className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Create Account
+            </h2>
             <p className="text-gray-600">Join our {config.title}</p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Full Name
               </label>
               <input
@@ -110,7 +122,10 @@ const SignupPage = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email Address
               </label>
               <input
@@ -126,12 +141,15 @@ const SignupPage = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Password
               </label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
                   value={formData.password}
@@ -145,13 +163,20 @@ const SignupPage = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Confirm Password
               </label>
               <input
@@ -180,7 +205,7 @@ const SignupPage = () => {
               {loading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               ) : (
-                'Create Account'
+                "Create Account"
               )}
             </button>
           </form>
@@ -188,7 +213,7 @@ const SignupPage = () => {
           {/* Footer */}
           <div className="mt-8 text-center space-y-4">
             <p className="text-gray-600">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link
                 to={`/login/${role}`}
                 className={`text-${config.color}-600 hover:text-${config.color}-700 font-semibold`}
@@ -198,8 +223,10 @@ const SignupPage = () => {
             </p>
 
             <div className="border-t pt-4 space-y-2">
-              <p className="text-sm text-gray-500 mb-3">Need different access?</p>
-              {role !== 'seller' && (
+              <p className="text-sm text-gray-500 mb-3">
+                Need different access?
+              </p>
+              {role !== "seller" && (
                 <Link
                   to="/signup/seller"
                   className="block text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -207,7 +234,7 @@ const SignupPage = () => {
                   Need seller access? Seller Signup
                 </Link>
               )}
-              {role !== 'supplier' && (
+              {role !== "supplier" && (
                 <Link
                   to="/signup/supplier"
                   className="block text-sm text-emerald-600 hover:text-emerald-700 font-medium"
@@ -215,7 +242,7 @@ const SignupPage = () => {
                   Need supplier access? Supplier Signup
                 </Link>
               )}
-              {role !== 'admin' && (
+              {role !== "admin" && (
                 <Link
                   to="/signup/admin"
                   className="block text-sm text-orange-600 hover:text-orange-700 font-medium"

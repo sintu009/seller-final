@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -12,12 +12,25 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
+  const handleLogin = async () => {
+    try {
+      // ...login logic...
+      if (loginSuccess) {
+        toast.success('Login successful!');
+      } else {
+        toast.error('Invalid credentials. Please try again.');
+      }
+    } catch (error) {
+      toast.error('Login failed. Please check your credentials.');
+    }
+  };
+
   return (
     <AuthProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
           <ToastContainer
-            position="top-right"
+            position="bottom-right"
             autoClose={3000}
             hideProgressBar={false}
             newestOnTop={false}

@@ -20,6 +20,7 @@ const OrderManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [selectedPlatform, setSelectedPlatform] = useState('all');
+    const [selectedStore, setSelectedStore] = useState('all');
 
     // Mock orders data
     const orders = [
@@ -97,11 +98,15 @@ const OrderManagement = () => {
             orderDate: '2024-01-13',
             deliveryDate: null,
             address: '654 MG Road, Bangalore, Karnataka 560001'
-        }
+        },
+
     ];
 
     const statuses = ['all', 'Pending', 'Processing', 'In Transit', 'Delivered', 'Cancelled'];
     const platforms = ['all', 'Amazon', 'Flipkart', 'Meesho'];
+
+    // Get unique sellers
+    const uniqueSellers = ['all', ...new Set(orders.map(order => order.seller))];
 
     const getStatusIcon = (status) => {
         switch (status) {
@@ -150,8 +155,9 @@ const OrderManagement = () => {
             order.product.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
         const matchesPlatform = selectedPlatform === 'all' || order.platform === selectedPlatform;
+        const matchesStore = selectedStore === 'all' || order.seller === selectedStore;
 
-        return matchesSearch && matchesStatus && matchesPlatform;
+        return matchesSearch && matchesStatus && matchesPlatform && matchesStore;
     });
 
     const orderStats = {
@@ -209,6 +215,31 @@ const OrderManagement = () => {
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Total Revenue</div>
                     <div className="text-2xl font-bold text-orange-600">₹{orderStats.totalRevenue.toLocaleString()}</div>
+                </div>
+            </div>
+
+            {/* Select Seller */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 text-gray-700 font-medium">
+                        <Package className="w-5 h-5" />
+                        <span>Select Seller:</span>
+                    </div>
+                    <select
+                        className="px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent min-w-[200px]"
+                        value={selectedStore}
+                        onChange={(e) => setSelectedStore(e.target.value)}
+                    >
+                        <option value="all">All Sellers</option>
+                        {uniqueSellers.filter(seller => seller !== 'all').map(seller => (
+                            <option key={seller} value={seller}>
+                                {seller}
+                            </option>
+                        ))}
+                    </select>
+                    <span className="text-gray-500">
+                        {filteredOrders.length} {filteredOrders.length === 1 ? 'order' : 'orders'} loaded
+                    </span>
                 </div>
             </div>
 
