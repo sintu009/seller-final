@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Store, Truck, Shield, Eye, EyeOff, ArrowLeft, Upload, CheckCircle } from "lucide-react";
+import { Store, Truck, Shield, Eye, EyeOff, ArrowLeft, Upload, CircleCheck as CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 
 const SignupPage = () => {
