@@ -1,391 +1,356 @@
-import React, { useState } from 'react';
-import {
-  Plus,
-  Search,
-  Filter,
-  Upload,
-  Download,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Filter, ShoppingCart, Package, Eye, X } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const ProductManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 20;
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [orderQuantity, setOrderQuantity] = useState(1);
+  const [orderNotes, setOrderNotes] = useState('');
+  const [ordering, setOrdering] = useState(false);
 
-  // Mock product data - 50 products for pagination demo
-  const allProducts = Array.from({ length: 50 }, (_, index) => ({
-    id: index + 1,
-    name: `Product ${index + 1}`,
-    title: [
-      'Wireless Bluetooth Headphones Pro Max',
-      'Ergonomic Laptop Stand Premium',
-      'Premium Phone Case with Screen Guard',
-      'Bluetooth Speaker Waterproof',
-      'Smart Fitness Tracker Watch',
-      'USB-C Fast Charging Cable',
-      'Portable Power Bank 20000mAh',
-      'Gaming Mouse RGB Wireless',
-      'Mechanical Keyboard Backlit',
-      'HD Webcam 1080p with Microphone',
-      'Wireless Charging Pad Fast',
-      'Bluetooth Earbuds Noise Cancelling',
-      'Phone Holder Car Mount',
-      'LED Desk Lamp Adjustable',
-      'Portable Bluetooth Speaker Mini',
-      'Screen Protector Tempered Glass',
-      'Wireless Mouse Optical',
-      'USB Hub 4 Port 3.0',
-      'Phone Case Shockproof Clear',
-      'Tablet Stand Adjustable Aluminum'
-    ][index % 20],
-    description: [
-      'High-quality wireless headphones with premium sound',
-      'Adjustable laptop stand for better ergonomics',
-      'Durable phone case with complete protection',
-      'Waterproof speaker with excellent bass',
-      'Advanced fitness tracker with heart rate monitor',
-      'Fast charging cable with durable build',
-      'High capacity power bank for all devices',
-      'Professional gaming mouse with RGB lighting',
-      'Mechanical keyboard with backlit keys',
-      'Crystal clear webcam for video calls',
-      'Fast wireless charging for all devices',
-      'Premium earbuds with noise cancellation',
-      'Secure car mount for safe driving',
-      'Adjustable LED lamp for perfect lighting',
-      'Compact speaker with powerful sound',
-      'Premium tempered glass protection',
-      'Smooth wireless mouse for productivity',
-      'Multi-port USB hub for connectivity',
-      'Clear protective case with shock absorption',
-      'Sturdy aluminum stand for tablets'
-    ][index % 20],
-    price: Math.floor(Math.random() * 5000) + 500,
-    category: ['Electronics', 'Accessories', 'Office', 'Gaming', 'Mobile'][index % 5],
-    image: `https://images.pexels.com/photos/${[
-      '3394650', '7974', '788946', '1841841', '437037',
-      '163117', '1038628', '2115256', '1029757', '4158',
-      '163117', '3394650', '788946', '7974', '1841841',
-      '437037', '2115256', '1029757', '4158', '163117'
-    ][index % 20]}/pexels-photo-${[
-      '3394650', '7974', '788946', '1841841', '437037',
-      '163117', '1038628', '2115256', '1029757', '4158',
-      '163117', '3394650', '788946', '7974', '1841841',
-      '437037', '2115256', '1029757', '4158', '163117'
-    ][index % 20]}.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop`,
-    synced: Math.random() > 0.3, // 70% synced, 30% not synced
-    platforms: Math.random() > 0.5 ? ['Amazon', 'Flipkart'] : ['Amazon']
-  }));
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  const categories = ['all', 'Electronics', 'Accessories', 'Office', 'Gaming', 'Mobile'];
+  const categories = ['all', 'Electronics', 'Accessories', 'Office', 'Gaming', 'Mobile', 'Home', 'Fashion', 'Health'];
 
-  // Filter products
-  const filteredProducts = allProducts.filter(product => {
-    const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/api/products`, {
+        credentials: 'include',
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setProducts(data.data);
+      } else {
+        toast.error('Failed to fetch products');
+      }
+    } catch (error) {
+      toast.error('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOrderClick = (product) => {
+    setSelectedProduct(product);
+    setOrderQuantity(1);
+    setOrderNotes('');
+    setShowOrderModal(true);
+  };
+
+  const handleCreateOrder = async () => {
+    if (!selectedProduct) return;
+
+    if (orderQuantity <= 0) {
+      toast.error('Please enter a valid quantity');
+      return;
+    }
+
+    if (orderQuantity > selectedProduct.stock) {
+      toast.error(`Only ${selectedProduct.stock} units available in stock`);
+      return;
+    }
+
+    try {
+      setOrdering(true);
+      const response = await fetch(`${API_URL}/api/orders`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: selectedProduct._id,
+          quantity: orderQuantity,
+          notes: orderNotes,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Order created successfully!');
+        setShowOrderModal(false);
+        setSelectedProduct(null);
+        setOrderQuantity(1);
+        setOrderNotes('');
+      } else {
+        toast.error(data.message || 'Failed to create order');
+      }
+    } catch (error) {
+      toast.error('Network error. Please try again.');
+    } finally {
+      setOrdering(false);
+    }
+  };
+
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
 
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesCategory && product.isAvailable;
   });
 
-  // Pagination
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const startIndex = (currentPage - 1) * productsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, startIndex + productsPerPage);
-
-  // Handle product selection
-  const handleProductSelect = (productId) => {
-    setSelectedProducts(prev =>
-      prev.includes(productId)
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
-    );
-  };
-
-  const handleSelectAll = () => {
-    if (selectedProducts.length === currentProducts.length) {
-      setSelectedProducts([]);
-    } else {
-      setSelectedProducts(currentProducts.map(p => p.id));
-    }
-  };
-
-  const handlePush = (productId) => {
-    // Handle push functionality
-    console.log('Pushing product:', productId);
-  };
-
-  const handleBulkPush = () => {
-    if (selectedProducts.length > 0) {
-      console.log('Bulk pushing products:', selectedProducts);
-    }
+  const productStats = {
+    total: products.length,
+    available: products.filter(p => p.isAvailable && p.stock > 0).length,
+    lowStock: products.filter(p => p.stock > 0 && p.stock < 10).length,
+    outOfStock: products.filter(p => p.stock === 0).length
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
-          <p className="text-gray-600 mt-1">
-            Total Products: <span className="font-semibold text-blue-600">{filteredProducts.length}</span>
-          </p>
-        </div>
-        <div className="flex items-center space-x-3">
-
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-semibold flex items-center transition-colors">
-            <Plus className="w-4 h-4 mr-2" />
-            Connect Amazon
-          </button>
+          <h1 className="text-3xl font-bold text-gray-900">Browse Products</h1>
+          <p className="text-gray-600 mt-1">Discover products from suppliers and place orders</p>
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Total Products</div>
-          <div className="text-2xl font-bold text-gray-900">{allProducts.length}</div>
-          <div className="text-xs text-gray-500 mt-1">All categories</div>
+          <div className="text-2xl font-bold text-gray-900">{productStats.total}</div>
         </div>
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="text-sm text-gray-600 mb-1">Synced Products</div>
-          <div className="text-2xl font-bold text-green-600">
-            {allProducts.filter(p => p.synced).length}
-          </div>
-          <div className="text-xs text-gray-500 mt-1">Ready to sell</div>
+          <div className="text-sm text-gray-600 mb-1">Available</div>
+          <div className="text-2xl font-bold text-green-600">{productStats.available}</div>
         </div>
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="text-sm text-gray-600 mb-1">Not Synced</div>
-          <div className="text-2xl font-bold text-red-600">
-            {allProducts.filter(p => !p.synced).length}
-          </div>
-          <div className="text-xs text-gray-500 mt-1">Need sync</div>
+          <div className="text-sm text-gray-600 mb-1">Low Stock</div>
+          <div className="text-2xl font-bold text-yellow-600">{productStats.lowStock}</div>
         </div>
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="text-sm text-gray-600 mb-1">Selected</div>
-          <div className="text-2xl font-bold text-blue-600">{selectedProducts.length}</div>
-          <div className="text-xs text-gray-500 mt-1">For bulk actions</div>
+          <div className="text-sm text-gray-600 mb-1">Out of Stock</div>
+          <div className="text-2xl font-bold text-red-600">{productStats.outOfStock}</div>
         </div>
       </div>
 
-      {/* Filters and Search */}
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Search */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search products by name or description..."
+              placeholder="Search products..."
               className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
-          {/* Filters */}
-          <div className="flex gap-3">
-            <select
-              className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >
-              {categories.map(category => (
-                <option key={category} value={category}>
-                  {category === 'all' ? 'All Categories' : category}
-                </option>
-              ))}
-            </select>
-
-            <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
-              <Filter className="w-4 h-4 mr-2" />
-              More Filters
-            </button>
-          </div>
+          <select
+            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categories.map(category => (
+              <option key={category} value={category}>
+                {category === 'all' ? 'All Categories' : category}
+              </option>
+            ))}
+          </select>
         </div>
-
-        {/* Bulk Actions */}
-        {selectedProducts.length > 0 && (
-          <div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
-            <div className="flex items-center justify-between">
-              <div className="text-blue-800">
-                <span className="font-semibold">{selectedProducts.length}</span> products selected
-              </div>
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={handleBulkPush}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                  Push Selected
-                </button>
-                <button
-                  onClick={() => setSelectedProducts([])}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                  Clear Selection
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Select All Checkbox */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-        <label className="flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            checked={selectedProducts.length === currentProducts.length && currentProducts.length > 0}
-            onChange={handleSelectAll}
-            className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-          />
-          <span className="ml-3 text-gray-700 font-medium">
-            Select All Products on This Page ({currentProducts.length})
-          </span>
-        </label>
-      </div>
-
-      {/* Product Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {currentProducts.map((product) => (
-          <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group">
-            {/* Product Image */}
-            <div className="relative">
-              <img
-                src={product.image}
-                alt={product.title}
-                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              {/* Sync Status Badge */}
-              <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${product.synced
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredProducts.map((product) => (
+            <div key={product._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group">
+              <div className="relative">
+                {product.images && product.images.length > 0 ? (
+                  <img
+                    src={`${API_URL}/${product.images[0]}`}
+                    alt={product.name}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+                    <Package className="w-16 h-16 text-gray-400" />
+                  </div>
+                )}
+                <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${
+                  product.stock > 10 ? 'bg-green-100 text-green-800' :
+                  product.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-red-100 text-red-800'
                 }`}>
-                {product.synced ? 'Synced' : 'Not Synced'}
-              </div>
-              {/* Checkbox */}
-              <div className="absolute top-3 left-3">
-                <input
-                  type="checkbox"
-                  checked={selectedProducts.includes(product.id)}
-                  onChange={() => handleProductSelect(product.id)}
-                  className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 bg-white"
-                />
-              </div>
-            </div>
-
-            {/* Product Info */}
-            <div className="p-6">
-              {/* Product Title */}
-              <h3 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                {product.title}
-              </h3>
-
-              {/* Product Description */}
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                {product.description}
-              </p>
-
-              {/* Product Price */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-2xl font-bold text-green-600">
-                  ₹{product.price.toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-500">
-                  {product.category}
+                  {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                 </div>
               </div>
 
-              {/* Platforms */}
-              <div className="flex flex-wrap gap-1 mb-4">
-                {product.platforms.map((platform, idx) => (
-                  <span key={idx} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                    {platform}
-                  </span>
-                ))}
-              </div>
+              <div className="p-6">
+                <h3 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                  {product.name}
+                </h3>
 
-              {/* Push Button */}
-              <button
-                onClick={() => handlePush(product.id)}
-                className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${product.synced
-                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                  : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg'
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  {product.description}
+                </p>
+
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-2xl font-bold text-green-600">
+                    ₹{product.price.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-gray-500 px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
+                    {product.category}
+                  </div>
+                </div>
+
+                <div className="text-xs text-gray-500 mb-4">
+                  Supplier: {product.supplier?.name || 'Unknown'}
+                </div>
+
+                <button
+                  onClick={() => handleOrderClick(product)}
+                  disabled={product.stock === 0}
+                  className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center ${
+                    product.stock > 0
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
-              >
-                {product.synced ? 'Update Product' : 'Push to Platforms'}
-              </button>
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  {product.stock > 0 ? 'Order Now' : 'Out of Stock'}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {/* No Products Found */}
-      {currentProducts.length === 0 && (
+      {!loading && filteredProducts.length === 0 && (
         <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100">
+          <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <div className="text-gray-500 text-lg mb-2">No products found</div>
           <p className="text-gray-400">Try adjusting your search or filters</p>
         </div>
       )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div className="text-gray-600">
-              Showing {startIndex + 1} to {Math.min(startIndex + productsPerPage, filteredProducts.length)} of {filteredProducts.length} products
+      {showOrderModal && selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-gray-900">Create Order</h3>
+                <button
+                  onClick={() => setShowOrderModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="flex items-center px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" />
-                Previous
-              </button>
 
-              {/* Page Numbers */}
-              <div className="flex items-center space-x-1">
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  let pageNum;
-                  if (totalPages <= 5) {
-                    pageNum = i + 1;
-                  } else if (currentPage <= 3) {
-                    pageNum = i + 1;
-                  } else if (currentPage >= totalPages - 2) {
-                    pageNum = totalPages - 4 + i;
-                  } else {
-                    pageNum = currentPage - 2 + i;
-                  }
-
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => setCurrentPage(pageNum)}
-                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${currentPage === pageNum
-                        ? 'bg-blue-600 text-white'
-                        : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
-                        }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
+            <div className="p-6 space-y-6">
+              <div className="flex items-start space-x-4">
+                {selectedProduct.images && selectedProduct.images.length > 0 ? (
+                  <img
+                    src={`${API_URL}/${selectedProduct.images[0]}`}
+                    alt={selectedProduct.name}
+                    className="w-24 h-24 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center">
+                    <Package className="w-12 h-12 text-gray-400" />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 text-lg mb-1">{selectedProduct.name}</h4>
+                  <p className="text-gray-600 text-sm mb-2">{selectedProduct.description}</p>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-xl font-bold text-green-600">₹{selectedProduct.price.toLocaleString()}</span>
+                    <span className="text-sm text-gray-500">{selectedProduct.stock} available</span>
+                  </div>
+                </div>
               </div>
 
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="flex items-center px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quantity *
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max={selectedProduct.stock}
+                  value={orderQuantity}
+                  onChange={(e) => setOrderQuantity(parseInt(e.target.value) || 1)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter quantity"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Order Notes (Optional)
+                </label>
+                <textarea
+                  value={orderNotes}
+                  onChange={(e) => setOrderNotes(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={4}
+                  placeholder="Add any special instructions or notes..."
+                />
+              </div>
+
+              <div className="bg-gray-50 rounded-xl p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">Unit Price:</span>
+                  <span className="font-semibold">₹{selectedProduct.price.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">Quantity:</span>
+                  <span className="font-semibold">{orderQuantity}</span>
+                </div>
+                <div className="border-t pt-2 mt-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold text-gray-900">Total Amount:</span>
+                    <span className="text-2xl font-bold text-green-600">
+                      ₹{(selectedProduct.price * orderQuantity).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => setShowOrderModal(false)}
+                  className="px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateOrder}
+                  disabled={ordering}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                >
+                  {ordering ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Creating Order...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Place Order
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

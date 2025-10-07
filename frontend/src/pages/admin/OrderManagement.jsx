@@ -1,196 +1,165 @@
-import React, { useState } from 'react';
-import {
-    Search,
-    Filter,
-    Download,
-    Package,
-    Truck,
-    CheckCircle,
-    Clock,
-    XCircle,
-    AlertTriangle,
-    MapPin,
-    User,
-    Calendar,
-    Edit3,
-    Eye
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, Download, Package, CheckCircle, Clock, XCircle, Eye, X } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const OrderManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
-    const [selectedPlatform, setSelectedPlatform] = useState('all');
-    const [selectedStore, setSelectedStore] = useState('all');
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [showRejectModal, setShowRejectModal] = useState(false);
+    const [rejectionReason, setRejectionReason] = useState('');
+    const [actionLoading, setActionLoading] = useState(false);
 
-    // Mock orders data
-    const orders = [
-        {
-            id: '#AMZ-12345',
-            platform: 'Amazon',
-            seller: 'TechStore India',
-            customer: 'Rajesh Kumar',
-            product: 'Wireless Bluetooth Headphones Pro',
-            supplier: 'Kumar Electronics Manufacturing',
-            quantity: 2,
-            amount: 5998,
-            status: 'Processing',
-            paymentStatus: 'Paid',
-            orderDate: '2024-01-15',
-            deliveryDate: '2024-01-18',
-            address: '123 Linking Road, Bandra West, Mumbai, Maharashtra 400050'
-        },
-        {
-            id: '#FLK-12346',
-            platform: 'Flipkart',
-            seller: 'ElectroMart',
-            customer: 'Priya Sharma',
-            product: 'Smart Fitness Watch',
-            supplier: 'Health Tech Solutions',
-            quantity: 1,
-            amount: 7999,
-            status: 'In Transit',
-            paymentStatus: 'Paid',
-            orderDate: '2024-01-14',
-            deliveryDate: '2024-01-17',
-            address: '456 Sector 18, Noida, Uttar Pradesh 201301'
-        },
-        {
-            id: '#MSH-12347',
-            platform: 'Meesho',
-            seller: 'GadgetHub',
-            customer: 'Amit Patel',
-            product: 'Bluetooth Speaker Premium',
-            supplier: 'Kumar Electronics Manufacturing',
-            quantity: 1,
-            amount: 2499,
-            status: 'Delivered',
-            paymentStatus: 'Paid',
-            orderDate: '2024-01-12',
-            deliveryDate: '2024-01-15',
-            address: '789 Koregaon Park, Pune, Maharashtra 411001'
-        },
-        {
-            id: '#AMZ-12348',
-            platform: 'Amazon',
-            seller: 'MobileWorld',
-            customer: 'Sneha Reddy',
-            product: 'Ergonomic Laptop Stand',
-            supplier: 'Premium Accessories Ltd',
-            quantity: 1,
-            amount: 1899,
-            status: 'Pending',
-            paymentStatus: 'Pending',
-            orderDate: '2024-01-16',
-            deliveryDate: '2024-01-19',
-            address: '321 Hitech City, Hyderabad, Telangana 500081'
-        },
-        {
-            id: '#FLK-12349',
-            platform: 'Flipkart',
-            seller: 'SmartTech Solutions',
-            customer: 'Vikram Singh',
-            product: 'Premium Phone Case Set',
-            supplier: 'Mobile Accessories Co',
-            quantity: 1,
-            amount: 899,
-            status: 'Cancelled',
-            paymentStatus: 'Refunded',
-            orderDate: '2024-01-13',
-            deliveryDate: null,
-            address: '654 MG Road, Bangalore, Karnataka 560001'
-        },
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-    ];
+    const statuses = ['all', 'pending', 'supplier_processing', 'seller_processing', 'admin_review', 'admin_approved', 'admin_rejected', 'completed', 'cancelled'];
 
-    const statuses = ['all', 'Pending', 'Processing', 'In Transit', 'Delivered', 'Cancelled'];
-    const platforms = ['all', 'Amazon', 'Flipkart', 'Meesho'];
+    useEffect(() => {
+        fetchOrders();
+    }, []);
 
-    // Get unique sellers
-    const uniqueSellers = ['all', ...new Set(orders.map(order => order.seller))];
+    const fetchOrders = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${API_URL}/api/orders`, {
+                credentials: 'include',
+            });
+            const data = await response.json();
 
-    const getStatusIcon = (status) => {
-        switch (status) {
-            case 'Pending': return <Clock className="w-4 h-4" />;
-            case 'Processing': return <Package className="w-4 h-4" />;
-            case 'In Transit': return <Truck className="w-4 h-4" />;
-            case 'Delivered': return <CheckCircle className="w-4 h-4" />;
-            case 'Cancelled': return <XCircle className="w-4 h-4" />;
-            default: return <Clock className="w-4 h-4" />;
+            if (data.success) {
+                setOrders(data.data);
+            } else {
+                toast.error('Failed to fetch orders');
+            }
+        } catch (error) {
+            toast.error('Network error. Please try again.');
+        } finally {
+            setLoading(false);
         }
+    };
+
+    const handleApprove = async (orderId) => {
+        try {
+            setActionLoading(true);
+            const response = await fetch(`${API_URL}/api/orders/${orderId}/approve`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                toast.success('Order approved successfully!');
+                fetchOrders();
+                setShowDetailModal(false);
+            } else {
+                toast.error(data.message || 'Failed to approve order');
+            }
+        } catch (error) {
+            toast.error('Network error. Please try again.');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleReject = async (orderId) => {
+        if (!rejectionReason.trim()) {
+            toast.error('Please provide a rejection reason');
+            return;
+        }
+
+        try {
+            setActionLoading(true);
+            const response = await fetch(`${API_URL}/api/orders/${orderId}/reject`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ reason: rejectionReason }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                toast.success('Order rejected');
+                fetchOrders();
+                setShowRejectModal(false);
+                setShowDetailModal(false);
+                setRejectionReason('');
+            } else {
+                toast.error(data.message || 'Failed to reject order');
+            }
+        } catch (error) {
+            toast.error('Network error. Please try again.');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const openDetailModal = (order) => {
+        setSelectedOrder(order);
+        setShowDetailModal(true);
+    };
+
+    const openRejectModal = (order) => {
+        setSelectedOrder(order);
+        setShowRejectModal(true);
     };
 
     const getStatusColor = (status) => {
-        switch (status) {
-            case 'Pending': return 'bg-yellow-100 text-yellow-800';
-            case 'Processing': return 'bg-blue-100 text-blue-800';
-            case 'In Transit': return 'bg-purple-100 text-purple-800';
-            case 'Delivered': return 'bg-green-100 text-green-800';
-            case 'Cancelled': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
-        }
+        const colors = {
+            pending: 'bg-yellow-100 text-yellow-800',
+            supplier_processing: 'bg-blue-100 text-blue-800',
+            seller_processing: 'bg-purple-100 text-purple-800',
+            admin_review: 'bg-orange-100 text-orange-800',
+            admin_approved: 'bg-green-100 text-green-800',
+            admin_rejected: 'bg-red-100 text-red-800',
+            completed: 'bg-green-100 text-green-800',
+            cancelled: 'bg-red-100 text-red-800'
+        };
+        return colors[status] || 'bg-gray-100 text-gray-800';
     };
 
-    const getPaymentStatusColor = (status) => {
-        switch (status) {
-            case 'Paid': return 'bg-green-100 text-green-800';
-            case 'Pending': return 'bg-yellow-100 text-yellow-800';
-            case 'Refunded': return 'bg-gray-100 text-gray-800';
-            default: return 'bg-gray-100 text-gray-800';
-        }
-    };
-
-    const getPlatformColor = (platform) => {
-        switch (platform) {
-            case 'Amazon': return 'bg-orange-100 text-orange-800';
-            case 'Flipkart': return 'bg-blue-100 text-blue-800';
-            case 'Meesho': return 'bg-purple-100 text-purple-800';
-            default: return 'bg-gray-100 text-gray-800';
-        }
+    const getStatusIcon = (status) => {
+        if (status === 'admin_approved' || status === 'completed') return <CheckCircle className="w-4 h-4" />;
+        if (status === 'admin_rejected' || status === 'cancelled') return <XCircle className="w-4 h-4" />;
+        return <Clock className="w-4 h-4" />;
     };
 
     const filteredOrders = orders.filter(order => {
-        const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.seller.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.product.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch = order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            order.seller?.name?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = selectedStatus === 'all' || order.status === selectedStatus;
-        const matchesPlatform = selectedPlatform === 'all' || order.platform === selectedPlatform;
-        const matchesStore = selectedStore === 'all' || order.seller === selectedStore;
 
-        return matchesSearch && matchesStatus && matchesPlatform && matchesStore;
+        return matchesSearch && matchesStatus;
     });
 
     const orderStats = {
         total: orders.length,
-        pending: orders.filter(o => o.status === 'Pending').length,
-        processing: orders.filter(o => o.status === 'Processing').length,
-        inTransit: orders.filter(o => o.status === 'In Transit').length,
-        delivered: orders.filter(o => o.status === 'Delivered').length,
-        cancelled: orders.filter(o => o.status === 'Cancelled').length,
-        totalRevenue: orders.filter(o => o.paymentStatus === 'Paid').reduce((sum, order) => sum + order.amount, 0)
-    };
-
-    const handleStatusChange = (orderId, newStatus) => {
-        console.log(`Changing order ${orderId} status to ${newStatus}`);
+        pending: orders.filter(o => o.status === 'pending').length,
+        adminReview: orders.filter(o => o.status === 'admin_review').length,
+        approved: orders.filter(o => o.status === 'admin_approved').length,
+        rejected: orders.filter(o => o.status === 'admin_rejected').length,
+        totalRevenue: orders.filter(o => o.status === 'admin_approved' || o.status === 'completed').reduce((sum, order) => sum + order.totalAmount, 0)
     };
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
+        <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
-                    <p className="text-gray-600 mt-1">Master order list from all platforms and sellers</p>
-                </div>
-                <div className="flex items-center space-x-3">
-                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
-                        <Download className="w-4 h-4 mr-2" />
-                        Export Orders
-                    </button>
+                    <p className="text-gray-600 mt-1">Review and manage all orders</p>
                 </div>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Total Orders</div>
@@ -201,229 +170,276 @@ const OrderManagement = () => {
                     <div className="text-2xl font-bold text-yellow-600">{orderStats.pending}</div>
                 </div>
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="text-sm text-gray-600 mb-1">Processing</div>
-                    <div className="text-2xl font-bold text-blue-600">{orderStats.processing}</div>
+                    <div className="text-sm text-gray-600 mb-1">Admin Review</div>
+                    <div className="text-2xl font-bold text-orange-600">{orderStats.adminReview}</div>
                 </div>
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="text-sm text-gray-600 mb-1">In Transit</div>
-                    <div className="text-2xl font-bold text-purple-600">{orderStats.inTransit}</div>
+                    <div className="text-sm text-gray-600 mb-1">Approved</div>
+                    <div className="text-2xl font-bold text-green-600">{orderStats.approved}</div>
                 </div>
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="text-sm text-gray-600 mb-1">Delivered</div>
-                    <div className="text-2xl font-bold text-green-600">{orderStats.delivered}</div>
+                    <div className="text-sm text-gray-600 mb-1">Rejected</div>
+                    <div className="text-2xl font-bold text-red-600">{orderStats.rejected}</div>
                 </div>
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="text-sm text-gray-600 mb-1">Total Revenue</div>
+                    <div className="text-sm text-gray-600 mb-1">Revenue</div>
                     <div className="text-2xl font-bold text-orange-600">₹{orderStats.totalRevenue.toLocaleString()}</div>
                 </div>
             </div>
 
-            {/* Select Seller */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-3 text-gray-700 font-medium">
-                        <Package className="w-5 h-5" />
-                        <span>Select Seller:</span>
-                    </div>
-                    <select
-                        className="px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent min-w-[200px]"
-                        value={selectedStore}
-                        onChange={(e) => setSelectedStore(e.target.value)}
-                    >
-                        <option value="all">All Sellers</option>
-                        {uniqueSellers.filter(seller => seller !== 'all').map(seller => (
-                            <option key={seller} value={seller}>
-                                {seller}
-                            </option>
-                        ))}
-                    </select>
-                    <span className="text-gray-500">
-                        {filteredOrders.length} {filteredOrders.length === 1 ? 'order' : 'orders'} loaded
-                    </span>
-                </div>
-            </div>
-
-            {/* Filters and Search */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <div className="flex flex-col lg:flex-row gap-4">
-                    {/* Search */}
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="Search by Order ID, Seller, Customer, or Product..."
+                            placeholder="Search orders..."
                             className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
 
-                    {/* Filters */}
-                    <div className="flex gap-3">
-                        <select
-                            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                            value={selectedStatus}
-                            onChange={(e) => setSelectedStatus(e.target.value)}
-                        >
-                            {statuses.map(status => (
-                                <option key={status} value={status}>
-                                    {status === 'all' ? 'All Status' : status}
-                                </option>
-                            ))}
-                        </select>
-
-                        <select
-                            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                            value={selectedPlatform}
-                            onChange={(e) => setSelectedPlatform(e.target.value)}
-                        >
-                            {platforms.map(platform => (
-                                <option key={platform} value={platform}>
-                                    {platform === 'all' ? 'All Platforms' : platform}
-                                </option>
-                            ))}
-                        </select>
-
-                        <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
-                            <Filter className="w-4 h-4 mr-2" />
-                            More Filters
-                        </button>
-                    </div>
+                    <select
+                        className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        value={selectedStatus}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                    >
+                        <option value="all">All Status</option>
+                        {statuses.filter(s => s !== 'all').map(status => (
+                            <option key={status} value={status}>
+                                {status.replace('_', ' ').toUpperCase()}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </div>
 
-            {/* Orders Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 border-b border-gray-200">
-                            <tr>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Order ID</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Platform</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Seller</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Customer</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Product</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Supplier</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Amount</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Status</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Date</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {filteredOrders.map((order) => (
-                                <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="py-4 px-6">
-                                        <div className="font-mono text-sm font-medium text-orange-600">{order.id}</div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${getPlatformColor(order.platform)}`}>
-                                            {order.platform}
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-center">
-                                            <User className="w-4 h-4 mr-2 text-gray-400" />
-                                            <span className="text-gray-900">{order.seller}</span>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <div>
-                                            <div className="font-medium text-gray-900">{order.customer}</div>
-                                            <div className="text-xs text-gray-500 flex items-center mt-1">
-                                                <MapPin className="w-3 h-3 mr-1" />
-                                                {order.address.split(',')[0]}
+            {loading ? (
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+                </div>
+            ) : (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Order ID</th>
+                                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Product</th>
+                                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Seller</th>
+                                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Supplier</th>
+                                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Quantity</th>
+                                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Amount</th>
+                                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Status</th>
+                                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                                {filteredOrders.map((order) => (
+                                    <tr key={order._id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="py-4 px-6">
+                                            <div className="font-mono text-sm font-medium text-orange-600">
+                                                #{order._id.slice(-8)}
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <div>
-                                            <div className="font-medium text-gray-900">{order.product}</div>
-                                            <div className="text-sm text-gray-500">Qty: {order.quantity}</div>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <div className="text-sm text-gray-600">{order.supplier}</div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <div>
-                                            <div className="font-semibold text-gray-900">₹{order.amount.toLocaleString()}</div>
-                                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${getPaymentStatusColor(order.paymentStatus)}`}>
-                                                {order.paymentStatus}
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="font-medium text-gray-900">{order.product?.name || 'N/A'}</div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="text-gray-900">{order.seller?.name || 'N/A'}</div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="text-sm text-gray-600">{order.supplier?.name || 'N/A'}</div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="text-gray-900">{order.quantity}</div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="font-semibold text-gray-900">₹{order.totalAmount.toLocaleString()}</div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(order.status)}`}>
+                                                {getStatusIcon(order.status)}
+                                                <span className="ml-2">{order.status.replace('_', ' ').toUpperCase()}</span>
                                             </span>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(order.status)}`}>
-                                            {getStatusIcon(order.status)}
-                                            <span className="ml-2">{order.status}</span>
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-center text-sm text-gray-600">
-                                            <Calendar className="w-4 h-4 mr-2" />
-                                            <div>
-                                                <div>{order.orderDate}</div>
-                                                {order.deliveryDate && (
-                                                    <div className="text-xs text-gray-500">Due: {order.deliveryDate}</div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center space-x-2">
+                                                <button
+                                                    onClick={() => openDetailModal(order)}
+                                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                </button>
+                                                {(order.status === 'admin_review' || order.status === 'pending') && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => handleApprove(order._id)}
+                                                            className="px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-colors flex items-center"
+                                                        >
+                                                            <CheckCircle className="w-3 h-3 mr-1" />
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            onClick={() => openRejectModal(order)}
+                                                            className="px-3 py-1 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700 transition-colors flex items-center"
+                                                        >
+                                                            <XCircle className="w-3 h-3 mr-1" />
+                                                            Reject
+                                                        </button>
+                                                    </>
                                                 )}
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-center space-x-2">
-                                            <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                                                <Eye className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleStatusChange(order.id, 'Processing')}
-                                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                                title="Manual Override"
-                                            >
-                                                <Edit3 className="w-4 h-4" />
-                                            </button>
-                                            {order.status === 'Pending' && (
-                                                <button className="px-3 py-1 bg-orange-600 text-white text-xs rounded-lg hover:bg-orange-700 transition-colors">
-                                                    Override
-                                                </button>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                {filteredOrders.length === 0 && (
-                    <div className="text-center py-12">
-                        <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <div className="text-gray-500 text-lg mb-2">No orders found</div>
-                        <p className="text-gray-400">Try adjusting your search filters</p>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                )}
-            </div>
 
-            {/* Pagination */}
-            {filteredOrders.length > 0 && (
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between">
-                        <div className="text-gray-600">
-                            Showing {filteredOrders.length} of {orders.length} orders
+                    {filteredOrders.length === 0 && (
+                        <div className="text-center py-12">
+                            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                            <div className="text-gray-500 text-lg mb-2">No orders found</div>
+                            <p className="text-gray-400">Try adjusting your search filters</p>
                         </div>
-                        <div className="flex items-center space-x-2">
-                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
-                                Previous
-                            </button>
-                            <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
-                                1
-                            </button>
-                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
-                                2
-                            </button>
-                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
-                                Next
-                            </button>
+                    )}
+                </div>
+            )}
+
+            {showDetailModal && selectedOrder && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold text-gray-900">Order Details</h3>
+                                <button onClick={() => setShowDetailModal(false)} className="text-gray-400 hover:text-gray-600">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm text-gray-500">Order ID</p>
+                                    <p className="font-mono font-medium">#{selectedOrder._id.slice(-8)}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Status</p>
+                                    <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedOrder.status)}`}>
+                                        {selectedOrder.status.replace('_', ' ').toUpperCase()}
+                                    </span>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Product</p>
+                                    <p className="font-medium">{selectedOrder.product?.name || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Quantity</p>
+                                    <p className="font-medium">{selectedOrder.quantity}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Unit Price</p>
+                                    <p className="font-medium">₹{selectedOrder.product?.price?.toLocaleString() || 0}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Total Amount</p>
+                                    <p className="font-bold text-green-600">₹{selectedOrder.totalAmount.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Seller</p>
+                                    <p className="font-medium">{selectedOrder.seller?.name || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Supplier</p>
+                                    <p className="font-medium">{selectedOrder.supplier?.name || 'N/A'}</p>
+                                </div>
+                            </div>
+
+                            {selectedOrder.notes && (
+                                <div>
+                                    <p className="text-sm text-gray-500 mb-2">Order Notes</p>
+                                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{selectedOrder.notes}</p>
+                                </div>
+                            )}
+
+                            {(selectedOrder.status === 'admin_review' || selectedOrder.status === 'pending') && (
+                                <div className="flex space-x-3 pt-6 border-t border-gray-200">
+                                    <button
+                                        onClick={() => handleApprove(selectedOrder._id)}
+                                        disabled={actionLoading}
+                                        className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 flex items-center justify-center"
+                                    >
+                                        {actionLoading ? (
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                        ) : (
+                                            <>
+                                                <CheckCircle className="w-5 h-5 mr-2" />
+                                                Approve Order
+                                            </>
+                                        )}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setShowDetailModal(false);
+                                            openRejectModal(selectedOrder);
+                                        }}
+                                        disabled={actionLoading}
+                                        className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 flex items-center justify-center"
+                                    >
+                                        <XCircle className="w-5 h-5 mr-2" />
+                                        Reject Order
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showRejectModal && selectedOrder && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl max-w-lg w-full">
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xl font-bold text-gray-900">Reject Order</h3>
+                                <button onClick={() => setShowRejectModal(false)} className="text-gray-400 hover:text-gray-600">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                            <p className="text-gray-600">Please provide a reason for rejecting this order:</p>
+                            <textarea
+                                value={rejectionReason}
+                                onChange={(e) => setRejectionReason(e.target.value)}
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+                                rows={4}
+                                placeholder="Enter rejection reason..."
+                            />
+
+                            <div className="flex space-x-3">
+                                <button
+                                    onClick={() => setShowRejectModal(false)}
+                                    className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => handleReject(selectedOrder._id)}
+                                    disabled={actionLoading}
+                                    className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50"
+                                >
+                                    {actionLoading ? (
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>
+                                    ) : (
+                                        'Reject Order'
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
