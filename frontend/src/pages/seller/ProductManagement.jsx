@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter, ShoppingCart, Package, Eye, X } from 'lucide-react';
+import { Plus, Search, ListFilter as Filter, ShoppingCart, Package, Eye, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const ProductManagement = () => {
