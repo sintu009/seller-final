@@ -33,6 +33,38 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  kycStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: function() {
+      return this.role === 'admin' ? 'approved' : 'pending';
+    }
+  },
+  kycDocuments: {
+    businessName: { type: String },
+    businessRegistration: { type: String },
+    taxId: { type: String },
+    idProof: { type: String },
+    addressProof: { type: String },
+    bankDetails: {
+      accountNumber: { type: String },
+      bankName: { type: String },
+      ifscCode: { type: String }
+    }
+  },
+  kycRejectionReason: {
+    type: String
+  },
+  phone: {
+    type: String
+  },
+  address: {
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
+    zipCode: { type: String },
+    country: { type: String }
+  },
   createdAt: {
     type: Date,
     default: Date.now

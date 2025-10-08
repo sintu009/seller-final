@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, ListFilter as Filter, Upload, CreditCard as Edit3, Trash2, Eye, Clock, CircleCheck as CheckCircle, Circle as XCircle, Image as ImageIcon, Package } from 'lucide-react';
+import { Plus, Search, ListFilter as Filter, Upload, CreditCard as Edit3, Trash2, Eye, Clock, CheckCircle, Circle as XCircle, Image as ImageIcon, Package } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const SupplierProductManagement = () => {

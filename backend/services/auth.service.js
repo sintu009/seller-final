@@ -22,11 +22,23 @@ const registerUser = async (name, email, password, role) => {
   });
 
   if (user) {
+    if (role !== 'admin' && user.kycStatus !== 'approved') {
+      return {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        kycStatus: user.kycStatus,
+        message: 'Registration successful. Your account is pending admin approval.'
+      };
+    }
+
     return {
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
+      kycStatus: user.kycStatus,
       token: generateToken(user._id)
     };
   } else {
@@ -45,6 +57,10 @@ const loginUser = async (email, password) => {
     throw new Error('Account is deactivated');
   }
 
+  if (user.role !== 'admin' && user.kycStatus !== 'approved') {
+    throw new Error('Your account is pending approval. Please wait for admin verification.');
+  }
+
   const isPasswordMatch = await user.matchPassword(password);
 
   if (!isPasswordMatch) {
@@ -56,6 +72,7 @@ const loginUser = async (email, password) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    kycStatus: user.kycStatus,
     token: generateToken(user._id)
   };
 };
