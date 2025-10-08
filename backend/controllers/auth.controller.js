@@ -20,21 +20,25 @@ const register = async (req, res) => {
 
     const user = await authService.registerUser(name, email, password, role);
 
-    res.cookie('token', user.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    if (user.token) {
+      res.cookie('token', user.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      });
+    }
 
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
+      message: user.message || 'User registered successfully',
       data: {
         _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        kycStatus: user.kycStatus,
+        requiresApproval: user.kycStatus === 'pending'
       }
     });
   } catch (error) {
