@@ -31,19 +31,17 @@ const SupplierProductManagement = () => {
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${API_URL}/supplier/products`, {
+            const response = await fetch(`${API_URL}/api/products/supplier`, {
                 method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                credentials: 'include'
             });
+
             const data = await response.json();
 
             if (data.success) {
                 setProducts(data.data);
             } else {
-                toast.error('Failed to fetch products');
+                toast.error(data.message || 'Failed to fetch products');
             }
         } catch (error) {
             toast.error('Network error. Please try again.');
@@ -51,6 +49,7 @@ const SupplierProductManagement = () => {
             setLoading(false);
         }
     };
+
 
     const handleChange = (e) => {
         setFormData({
@@ -118,7 +117,7 @@ const SupplierProductManagement = () => {
                 formDataToSend.append('images', image);
             });
 
-            const response = await fetch(`${API_URL}/supplier/products`, {
+            const response = await fetch(`${API_URL}/api/products`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formDataToSend,
@@ -151,17 +150,12 @@ const SupplierProductManagement = () => {
     };
 
     const handleDelete = async (productId) => {
-        if (!window.confirm('Are you sure you want to delete this product?')) {
-            return;
-        }
+        if (!window.confirm('Are you sure you want to delete this product?')) return;
 
         try {
-            const response = await fetch(`${API_URL}/supplier/products/${productId}`, {
+            const response = await fetch(`${API_URL}/api/products/${productId}`, {
                 method: 'DELETE',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                credentials: 'include'
             });
 
             const data = await response.json();
@@ -310,16 +304,15 @@ const SupplierProductManagement = () => {
                                             </span>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
-                                                product.approvalStatus === 'approved' ? 'bg-green-100 text-green-800' :
+                                            <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${product.approvalStatus === 'approved' ? 'bg-green-100 text-green-800' :
                                                 product.approvalStatus === 'rejected' ? 'bg-red-100 text-red-800' :
-                                                'bg-yellow-100 text-yellow-800'
+                                                    'bg-yellow-100 text-yellow-800'
                                                 }`}>
                                                 {product.approvalStatus === 'approved' && <CheckCircle className="w-4 h-4 mr-1" />}
                                                 {product.approvalStatus === 'rejected' && <XCircle className="w-4 h-4 mr-1" />}
                                                 {product.approvalStatus === 'pending' && <Clock className="w-4 h-4 mr-1" />}
                                                 {product.approvalStatus === 'approved' ? 'Approved' :
-                                                 product.approvalStatus === 'rejected' ? 'Rejected' : 'Pending'}
+                                                    product.approvalStatus === 'rejected' ? 'Rejected' : 'Pending'}
                                             </span>
                                             {product.rejectionReason && (
                                                 <div className="text-xs text-red-600 mt-1">

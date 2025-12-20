@@ -24,7 +24,7 @@ const ProductManagement = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/seller/products`, {
+      const response = await fetch(`${API_URL}/api/products`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -188,11 +188,10 @@ const ProductManagement = () => {
                     <Package className="w-16 h-16 text-gray-400" />
                   </div>
                 )}
-                <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${
-                  product.stock > 10 ? 'bg-green-100 text-green-800' :
+                <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${product.stock > 10 ? 'bg-green-100 text-green-800' :
                   product.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
+                    'bg-red-100 text-red-800'
+                  }`}>
                   {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                 </div>
               </div>
@@ -231,11 +230,10 @@ const ProductManagement = () => {
                 <button
                   onClick={() => handleOrderClick(product)}
                   disabled={product.stock === 0}
-                  className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center ${
-                    product.stock > 0
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
+                  className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center ${product.stock > 0
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   {product.stock > 0 ? 'Order Now' : 'Out of Stock'}
