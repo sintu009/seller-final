@@ -24,8 +24,12 @@ const ProductManagement = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/api/products`, {
+      const response = await fetch(`${API_URL}/seller/products`, {
+        method: 'GET',
         credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       const data = await response.json();
 
@@ -99,12 +103,12 @@ const ProductManagement = () => {
       product.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
 
-    return matchesSearch && matchesCategory && product.isAvailable;
+    return matchesSearch && matchesCategory;
   });
 
   const productStats = {
     total: products.length,
-    available: products.filter(p => p.isAvailable && p.stock > 0).length,
+    available: products.filter(p => p.stock > 0).length,
     lowStock: products.filter(p => p.stock > 0 && p.stock < 10).length,
     outOfStock: products.filter(p => p.stock === 0).length
   };
@@ -202,17 +206,26 @@ const ProductManagement = () => {
                   {product.description}
                 </p>
 
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-2xl font-bold text-green-600">
-                    ₹{product.price.toLocaleString()}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <div className="text-sm text-gray-500 line-through">₹{product.price.toLocaleString()}</div>
+                      <div className="text-2xl font-bold text-green-600">
+                        ₹{product.finalPrice ? product.finalPrice.toLocaleString() : product.price.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
+                      {product.category}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-500 px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
-                    {product.category}
+                  {product.margin > 0 && (
+                    <div className="text-xs text-gray-500 mb-1">
+                      (Includes ₹{product.margin.toLocaleString()} platform fee)
+                    </div>
+                  )}
+                  <div className="text-xs text-gray-600">
+                    Supplier: {product.supplier?.businessName || product.supplier?.name || 'Unknown'}
                   </div>
-                </div>
-
-                <div className="text-xs text-gray-500 mb-4">
-                  Supplier: {product.supplier?.name || 'Unknown'}
                 </div>
 
                 <button
@@ -273,9 +286,16 @@ const ProductManagement = () => {
                   <h4 className="font-semibold text-gray-900 text-lg mb-1">{selectedProduct.name}</h4>
                   <p className="text-gray-600 text-sm mb-2">{selectedProduct.description}</p>
                   <div className="flex items-center space-x-4">
-                    <span className="text-xl font-bold text-green-600">₹{selectedProduct.price.toLocaleString()}</span>
+                    <span className="text-xl font-bold text-green-600">
+                      ₹{selectedProduct.finalPrice ? selectedProduct.finalPrice.toLocaleString() : selectedProduct.price.toLocaleString()}
+                    </span>
                     <span className="text-sm text-gray-500">{selectedProduct.stock} available</span>
                   </div>
+                  {selectedProduct.margin > 0 && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      Base: ₹{selectedProduct.price.toLocaleString()} + Platform Fee: ₹{selectedProduct.margin.toLocaleString()}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -310,7 +330,9 @@ const ProductManagement = () => {
               <div className="bg-gray-50 rounded-xl p-4">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Unit Price:</span>
-                  <span className="font-semibold">₹{selectedProduct.price.toLocaleString()}</span>
+                  <span className="font-semibold">
+                    ₹{(selectedProduct.finalPrice || selectedProduct.price).toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Quantity:</span>
@@ -320,7 +342,7 @@ const ProductManagement = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold text-gray-900">Total Amount:</span>
                     <span className="text-2xl font-bold text-green-600">
-                      ₹{(selectedProduct.price * orderQuantity).toLocaleString()}
+                      ₹{((selectedProduct.finalPrice || selectedProduct.price) * orderQuantity).toLocaleString()}
                     </span>
                   </div>
                 </div>

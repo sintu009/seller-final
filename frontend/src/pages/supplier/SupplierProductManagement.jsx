@@ -13,6 +13,7 @@ const SupplierProductManagement = () => {
         description: '',
         category: '',
         price: '',
+        gstPercentage: '18',
         stock: '',
         specifications: ''
     });
@@ -30,8 +31,12 @@ const SupplierProductManagement = () => {
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${API_URL}/api/products/supplier`, {
+            const response = await fetch(`${API_URL}/supplier/products`, {
+                method: 'GET',
                 credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
             const data = await response.json();
 
@@ -88,7 +93,7 @@ const SupplierProductManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.name || !formData.description || !formData.category || !formData.price || !formData.stock) {
+        if (!formData.name || !formData.description || !formData.category || !formData.price || !formData.stock || !formData.gstPercentage) {
             toast.error('Please fill all required fields');
             return;
         }
@@ -105,6 +110,7 @@ const SupplierProductManagement = () => {
             formDataToSend.append('description', formData.description);
             formDataToSend.append('category', formData.category);
             formDataToSend.append('price', formData.price);
+            formDataToSend.append('gstPercentage', formData.gstPercentage);
             formDataToSend.append('stock', formData.stock);
             formDataToSend.append('specifications', formData.specifications);
 
@@ -112,7 +118,7 @@ const SupplierProductManagement = () => {
                 formDataToSend.append('images', image);
             });
 
-            const response = await fetch(`${API_URL}/api/products`, {
+            const response = await fetch(`${API_URL}/supplier/products`, {
                 method: 'POST',
                 credentials: 'include',
                 body: formDataToSend,
@@ -121,13 +127,14 @@ const SupplierProductManagement = () => {
             const data = await response.json();
 
             if (data.success) {
-                toast.success('Product added successfully!');
+                toast.success('Product added successfully! Pending admin approval.');
                 setShowAddModal(false);
                 setFormData({
                     name: '',
                     description: '',
                     category: '',
                     price: '',
+                    gstPercentage: '18',
                     stock: '',
                     specifications: ''
                 });
@@ -149,9 +156,12 @@ const SupplierProductManagement = () => {
         }
 
         try {
-            const response = await fetch(`${API_URL}/api/products/${productId}`, {
+            const response = await fetch(`${API_URL}/supplier/products/${productId}`, {
                 method: 'DELETE',
                 credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
 
             const data = await response.json();
@@ -257,7 +267,7 @@ const SupplierProductManagement = () => {
                                     <th className="text-left py-4 px-6 font-semibold text-gray-900">Category</th>
                                     <th className="text-left py-4 px-6 font-semibold text-gray-900">Price</th>
                                     <th className="text-left py-4 px-6 font-semibold text-gray-900">Stock</th>
-                                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Status</th>
+                                    <th className="text-left py-4 px-6 font-semibold text-gray-900">Approval Status</th>
                                     <th className="text-left py-4 px-6 font-semibold text-gray-900">Actions</th>
                                 </tr>
                             </thead>
@@ -300,10 +310,22 @@ const SupplierProductManagement = () => {
                                             </span>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${product.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                            <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
+                                                product.approvalStatus === 'approved' ? 'bg-green-100 text-green-800' :
+                                                product.approvalStatus === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                'bg-yellow-100 text-yellow-800'
                                                 }`}>
-                                                {product.isAvailable ? 'Available' : 'Unavailable'}
+                                                {product.approvalStatus === 'approved' && <CheckCircle className="w-4 h-4 mr-1" />}
+                                                {product.approvalStatus === 'rejected' && <XCircle className="w-4 h-4 mr-1" />}
+                                                {product.approvalStatus === 'pending' && <Clock className="w-4 h-4 mr-1" />}
+                                                {product.approvalStatus === 'approved' ? 'Approved' :
+                                                 product.approvalStatus === 'rejected' ? 'Rejected' : 'Pending'}
                                             </span>
+                                            {product.rejectionReason && (
+                                                <div className="text-xs text-red-600 mt-1">
+                                                    {product.rejectionReason}
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center space-x-2">
@@ -382,7 +404,7 @@ const SupplierProductManagement = () => {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Price (₹) *
@@ -394,8 +416,28 @@ const SupplierProductManagement = () => {
                                         onChange={handleChange}
                                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                         placeholder="0"
+                                        min="0"
                                         required
                                     />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        GST (%) *
+                                    </label>
+                                    <select
+                                        name="gstPercentage"
+                                        value={formData.gstPercentage}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                        required
+                                    >
+                                        <option value="0">0%</option>
+                                        <option value="5">5%</option>
+                                        <option value="12">12%</option>
+                                        <option value="18">18%</option>
+                                        <option value="28">28%</option>
+                                    </select>
                                 </div>
 
                                 <div>
@@ -409,6 +451,7 @@ const SupplierProductManagement = () => {
                                         onChange={handleChange}
                                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                         placeholder="0"
+                                        min="0"
                                         required
                                     />
                                 </div>
