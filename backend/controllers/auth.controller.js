@@ -59,6 +59,7 @@ const register = async (req, res) => {
     res.status(201).json({
       success: true,
       message: user.message || 'User registered successfully',
+      token: user.token,
       data: {
         _id: user._id,
         name: user.name,
@@ -99,11 +100,13 @@ const login = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Login successful',
+      token: user.token,
       data: {
         _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        kycStatus: user.kycStatus
       }
     });
   } catch (error) {

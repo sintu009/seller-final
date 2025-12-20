@@ -14,8 +14,7 @@ import {
     DollarSign,
     X
 } from 'lucide-react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import apiClient from '../../utils/api';
 
 const ProductManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -38,14 +37,7 @@ const ProductManagement = () => {
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${API_URL}/admin/products`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            const data = await response.json();
+            const data = await apiClient.get('/api/admin/products');
             if (data.success) {
                 setProducts(data.data);
             }
@@ -112,19 +104,14 @@ const ProductManagement = () => {
 
         try {
             setActionLoading(true);
-            const response = await fetch(`${API_URL}/admin/products/${selectedProduct._id}/approve`, {
-                method: 'PUT',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ margin: parseFloat(margin) })
+            const data = await apiClient.put(`/api/admin/products/${selectedProduct._id}/approve`, {
+                margin: parseFloat(margin)
             });
 
-            const data = await response.json();
             if (data.success) {
                 alert('Product approved successfully!');
                 setShowApproveModal(false);
+                setMargin('');
                 fetchProducts();
             } else {
                 alert(data.message || 'Failed to approve product');
@@ -145,19 +132,14 @@ const ProductManagement = () => {
 
         try {
             setActionLoading(true);
-            const response = await fetch(`${API_URL}/admin/products/${selectedProduct._id}/reject`, {
-                method: 'PUT',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ reason: rejectionReason })
+            const data = await apiClient.put(`/api/admin/products/${selectedProduct._id}/reject`, {
+                reason: rejectionReason
             });
 
-            const data = await response.json();
             if (data.success) {
                 alert('Product rejected successfully!');
                 setShowRejectModal(false);
+                setRejectionReason('');
                 fetchProducts();
             } else {
                 alert(data.message || 'Failed to reject product');

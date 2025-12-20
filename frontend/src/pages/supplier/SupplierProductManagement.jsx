@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, ListFilter as Filter, Upload, CreditCard as Edit3, Trash2, Eye, Clock, CheckCircle, Circle as XCircle, Image as ImageIcon, Package } from 'lucide-react';
 import { toast } from 'react-toastify';
+import apiClient from '../../utils/api';
 
 const SupplierProductManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -20,8 +21,6 @@ const SupplierProductManagement = () => {
     const [images, setImages] = useState([]);
     const [uploading, setUploading] = useState(false);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
     const categories = ['all', 'Electronics', 'Office', 'Accessories', 'Health', 'Gaming', 'Home', 'Fashion'];
 
     useEffect(() => {
@@ -31,12 +30,7 @@ const SupplierProductManagement = () => {
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${API_URL}/api/products/supplier`, {
-                method: 'GET',
-                credentials: 'include'
-            });
-
-            const data = await response.json();
+            const data = await apiClient.get('/api/supplier/products');
 
             if (data.success) {
                 setProducts(data.data);
@@ -44,6 +38,7 @@ const SupplierProductManagement = () => {
                 toast.error(data.message || 'Failed to fetch products');
             }
         } catch (error) {
+            console.error('Fetch products error:', error);
             toast.error('Network error. Please try again.');
         } finally {
             setLoading(false);
@@ -117,13 +112,7 @@ const SupplierProductManagement = () => {
                 formDataToSend.append('images', image);
             });
 
-            const response = await fetch(`${API_URL}/api/products`, {
-                method: 'POST',
-                credentials: 'include',
-                body: formDataToSend,
-            });
-
-            const data = await response.json();
+            const data = await apiClient.postFormData('/api/supplier/products', formDataToSend);
 
             if (data.success) {
                 toast.success('Product added successfully! Pending admin approval.');
@@ -143,6 +132,7 @@ const SupplierProductManagement = () => {
                 toast.error(data.message || 'Failed to add product');
             }
         } catch (error) {
+            console.error('Add product error:', error);
             toast.error('Network error. Please try again.');
         } finally {
             setUploading(false);
@@ -153,12 +143,7 @@ const SupplierProductManagement = () => {
         if (!window.confirm('Are you sure you want to delete this product?')) return;
 
         try {
-            const response = await fetch(`${API_URL}/api/products/${productId}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-
-            const data = await response.json();
+            const data = await apiClient.delete(`/api/supplier/products/${productId}`);
 
             if (data.success) {
                 toast.success('Product deleted successfully');
@@ -167,6 +152,7 @@ const SupplierProductManagement = () => {
                 toast.error(data.message || 'Failed to delete product');
             }
         } catch (error) {
+            console.error('Delete product error:', error);
             toast.error('Network error. Please try again.');
         }
     };
