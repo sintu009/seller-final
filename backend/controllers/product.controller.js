@@ -72,7 +72,11 @@ const getProductsForSellers = async (req, res) => {
   try {
     const { category, search, notified } = req.query;
 
-    const filter = { status: 'active' };
+    const filter = {
+      status: 'active',
+      approvalStatus: 'approved',
+      adminApproved: true
+    };
     if (category) filter.category = category;
     if (search) {
       filter.$text = { $search: search };
@@ -82,7 +86,7 @@ const getProductsForSellers = async (req, res) => {
     }
 
     const products = await Product.find(filter)
-      .populate('supplier', 'name email phone')
+      .populate('supplier', 'name email phoneNumber businessName')
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -225,20 +229,122 @@ const notifyProductToSellers = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const { status, category, supplier } = req.query;
+    const { status, category, supplier, approvalStatus } = req.query;
     const filter = {};
 
     if (status) filter.status = status;
     if (category) filter.category = category;
     if (supplier) filter.supplier = supplier;
+    if (approvalStatus) filter.approvalStatus = approvalStatus;
 
     const products = await Product.find(filter)
-      .populate('supplier', 'name email')
+      .populate('supplier', 'name email businessName phoneNumber')
       .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
       data: products
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const approveProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { margin } = req.body;
+
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can approve products'
+      });
+    }
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    if (!margin || margin < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid margin amount'
+      });
+    }
+
+    product.approvalStatus = 'approved';
+    product.adminApproved = true;
+    product.approvedBy = req.user.id;
+    product.approvedAt = new Date();
+    product.margin = parseFloat(margin);
+    product.finalPrice = parseFloat(product.price) + parseFloat(margin);
+
+    await product.save();
+    await product.populate('supplier', 'name email businessName phoneNumber');
+
+    res.status(200).json({
+      success: true,
+      message: 'Product approved successfully',
+      data: product
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const rejectProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can reject products'
+      });
+    }
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    if (!reason || reason.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a rejection reason'
+      });
+    }
+
+    product.approvalStatus = 'rejected';
+    product.adminApproved = false;
+    product.rejectionReason = reason;
+    product.approvedBy = req.user.id;
+    product.approvedAt = new Date();
+
+    await product.save();
+    await product.populate('supplier', 'name email businessName phoneNumber');
+
+    res.status(200).json({
+      success: true,
+      message: 'Product rejected successfully',
+      data: product
     });
   } catch (error) {
     res.status(500).json({
@@ -256,5 +362,7 @@ module.exports = {
   updateProduct,
   deleteProduct,
   notifyProductToSellers,
-  getAllProducts
+  getAllProducts,
+  approveProduct,
+  rejectProduct
 };

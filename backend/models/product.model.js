@@ -12,12 +12,27 @@ const productSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: [true, 'Please add a category']
+    required: false
+  },
+  gstPercentage: {
+    type: Number,
+    required: [true, 'Please add GST percentage'],
+    min: 0,
+    max: 100
   },
   price: {
     type: Number,
     required: [true, 'Please add a price'],
     min: 0
+  },
+  margin: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  finalPrice: {
+    type: Number,
+    default: 0
   },
   stock: {
     type: Number,
@@ -37,6 +52,25 @@ const productSchema = new mongoose.Schema({
     type: String,
     enum: ['active', 'inactive', 'out_of_stock'],
     default: 'active'
+  },
+  approvalStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
+  },
+  adminApproved: {
+    type: Boolean,
+    default: false
+  },
+  approvedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  approvedAt: {
+    type: Date
+  },
+  rejectionReason: {
+    type: String
   },
   isNotifiedToSellers: {
     type: Boolean,
