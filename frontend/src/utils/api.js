@@ -19,53 +19,83 @@ export const apiClient = {
   async get(endpoint) {
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: 'GET',
+      credentials: 'include',
       headers: getAuthHeaders(),
     });
-    return response.json();
+    const data = await response.json();
+    if (!response.ok && data.message) {
+      throw new Error(data.message);
+    }
+    return data;
   },
 
   async post(endpoint, data) {
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: 'POST',
+      credentials: 'include',
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    return response.json();
+    const result = await response.json();
+    if (!response.ok && result.message) {
+      throw new Error(result.message);
+    }
+    return result;
   },
 
   async put(endpoint, data) {
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: 'PUT',
+      credentials: 'include',
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    return response.json();
+    const result = await response.json();
+    if (!response.ok && result.message) {
+      throw new Error(result.message);
+    }
+    return result;
   },
 
   async delete(endpoint) {
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: 'DELETE',
+      credentials: 'include',
       headers: getAuthHeaders(),
     });
-    return response.json();
+    const data = await response.json();
+    if (!response.ok && data.message) {
+      throw new Error(data.message);
+    }
+    return data;
   },
 
   async postFormData(endpoint, formData) {
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: 'POST',
+      credentials: 'include',
       headers: getAuthHeadersMultipart(),
       body: formData,
     });
-    return response.json();
+    const data = await response.json();
+    if (!response.ok && data.message) {
+      throw new Error(data.message);
+    }
+    return data;
   },
 
   async putFormData(endpoint, formData) {
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: 'PUT',
+      credentials: 'include',
       headers: getAuthHeadersMultipart(),
       body: formData,
     });
-    return response.json();
+    const data = await response.json();
+    if (!response.ok && data.message) {
+      throw new Error(data.message);
+    }
+    return data;
   }
 };
 

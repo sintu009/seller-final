@@ -99,6 +99,14 @@ const SupplierProductManagement = () => {
 
         try {
             setUploading(true);
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.error('Authentication required. Please log in again.');
+                setUploading(false);
+                return;
+            }
+
             const formDataToSend = new FormData();
             formDataToSend.append('name', formData.name);
             formDataToSend.append('description', formData.description);
@@ -133,7 +141,7 @@ const SupplierProductManagement = () => {
             }
         } catch (error) {
             console.error('Add product error:', error);
-            toast.error('Network error. Please try again.');
+            toast.error(error.message || 'Network error. Please try again.');
         } finally {
             setUploading(false);
         }
