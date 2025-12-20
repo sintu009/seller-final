@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Search,
     Filter,
@@ -11,150 +11,183 @@ import {
     Package,
     Building,
     Tag,
-    DollarSign
+    DollarSign,
+    X
 } from 'lucide-react';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const ProductManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
-    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showApproveModal, setShowApproveModal] = useState(false);
+    const [showRejectModal, setShowRejectModal] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [margin, setMargin] = useState('');
+    const [rejectionReason, setRejectionReason] = useState('');
+    const [actionLoading, setActionLoading] = useState(false);
 
-    // Mock products data
-    const products = [
-        {
-            id: 1,
-            name: 'Wireless Bluetooth Headphones Pro Max',
-            category: 'Electronics',
-            supplier: 'Kumar Electronics Manufacturing',
-            basePrice: 1800,
-            suggestedPrice: 2999,
-            hsnCode: '85183000',
-            gstRate: 18,
-            shippingCharges: 60,
-            stockQuantity: 150,
-            status: 'Pending Approval',
-            submittedDate: '2024-01-15',
-            image: 'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
-            description: 'Premium wireless headphones with noise cancellation and 30-hour battery life'
-        },
-        {
-            id: 2,
-            name: 'Ergonomic Laptop Stand Premium',
-            category: 'Office',
-            supplier: 'Premium Accessories Ltd',
-            basePrice: 899,
-            suggestedPrice: 1499,
-            hsnCode: '94036000',
-            gstRate: 18,
-            shippingCharges: 60,
-            stockQuantity: 75,
-            status: 'Approved',
-            submittedDate: '2024-01-10',
-            approvedDate: '2024-01-12',
-            image: 'https://images.pexels.com/photos/7974/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
-            description: 'Adjustable aluminum laptop stand for better ergonomics and cooling'
-        },
-        {
-            id: 3,
-            name: 'Premium Phone Case with Screen Guard',
-            category: 'Accessories',
-            supplier: 'Mobile Accessories Co',
-            basePrice: 299,
-            suggestedPrice: 599,
-            hsnCode: '39269099',
-            gstRate: 18,
-            shippingCharges: 60,
-            stockQuantity: 200,
-            status: 'Rejected',
-            submittedDate: '2024-01-08',
-            rejectedDate: '2024-01-09',
-            rejectionReason: 'Product images quality is not sufficient. Please upload high-resolution images showing all product features.',
-            image: 'https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
-            description: 'Durable phone case with built-in screen protector and shock absorption'
-        },
-        {
-            id: 4,
-            name: 'Bluetooth Speaker Waterproof',
-            category: 'Electronics',
-            supplier: 'Kumar Electronics Manufacturing',
-            basePrice: 2100,
-            suggestedPrice: 3499,
-            hsnCode: '85183000',
-            gstRate: 18,
-            shippingCharges: 60,
-            stockQuantity: 45,
-            status: 'Approved',
-            submittedDate: '2024-01-05',
-            approvedDate: '2024-01-07',
-            image: 'https://images.pexels.com/photos/1841841/pexels-photo-1841841.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
-            description: 'Portable waterproof Bluetooth speaker with 360-degree sound'
-        },
-        {
-            id: 5,
-            name: 'Smart Fitness Tracker Watch',
-            category: 'Health',
-            supplier: 'Health Tech Solutions',
-            basePrice: 3200,
-            suggestedPrice: 4999,
-            hsnCode: '90291000',
-            gstRate: 18,
-            shippingCharges: 60,
-            stockQuantity: 30,
-            status: 'Pending Approval',
-            submittedDate: '2024-01-16',
-            image: 'https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
-            description: 'Advanced fitness tracker with heart rate monitoring and GPS'
+    const statuses = ['all', 'pending', 'approved', 'rejected'];
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/admin/products`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                setProducts(data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            setLoading(false);
         }
-    ];
-
-    const categories = ['all', 'Electronics', 'Office', 'Accessories', 'Health', 'Gaming'];
-    const statuses = ['all', 'Pending Approval', 'Approved', 'Rejected'];
+    };
 
     const filteredProducts = products.filter(product => {
+        const supplierName = product.supplier?.businessName || product.supplier?.name || '';
         const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            product.supplier.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-        const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
+            supplierName.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = selectedStatus === 'all' || product.approvalStatus === selectedStatus;
 
-        return matchesSearch && matchesCategory && matchesStatus;
+        return matchesSearch && matchesStatus;
     });
 
     const getStatusIcon = (status) => {
         switch (status) {
-            case 'Approved': return <CheckCircle className="w-4 h-4" />;
-            case 'Pending Approval': return <Clock className="w-4 h-4" />;
-            case 'Rejected': return <XCircle className="w-4 h-4" />;
+            case 'approved': return <CheckCircle className="w-4 h-4" />;
+            case 'pending': return <Clock className="w-4 h-4" />;
+            case 'rejected': return <XCircle className="w-4 h-4" />;
             default: return <Clock className="w-4 h-4" />;
         }
     };
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'Approved': return 'bg-green-100 text-green-800';
-            case 'Pending Approval': return 'bg-yellow-100 text-yellow-800';
-            case 'Rejected': return 'bg-red-100 text-red-800';
+            case 'approved': return 'bg-green-100 text-green-800';
+            case 'pending': return 'bg-yellow-100 text-yellow-800';
+            case 'rejected': return 'bg-red-100 text-red-800';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
 
-    const handleApprove = (productId) => {
-        console.log('Approving product:', productId);
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case 'approved': return 'Approved';
+            case 'pending': return 'Pending Approval';
+            case 'rejected': return 'Rejected';
+            default: return status;
+        }
     };
 
-    const handleReject = (productId) => {
-        console.log('Rejecting product:', productId);
+    const handleApprove = (product) => {
+        setSelectedProduct(product);
+        setMargin('');
+        setShowApproveModal(true);
     };
 
-    const handleEdit = (productId) => {
-        console.log('Editing product:', productId);
+    const handleReject = (product) => {
+        setSelectedProduct(product);
+        setRejectionReason('');
+        setShowRejectModal(true);
+    };
+
+    const confirmApprove = async () => {
+        if (!margin || parseFloat(margin) < 0) {
+            alert('Please enter a valid margin amount');
+            return;
+        }
+
+        try {
+            setActionLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/admin/products/${selectedProduct._id}/approve`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ margin: parseFloat(margin) })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Product approved successfully!');
+                setShowApproveModal(false);
+                fetchProducts();
+            } else {
+                alert(data.message || 'Failed to approve product');
+            }
+        } catch (error) {
+            console.error('Error approving product:', error);
+            alert('Failed to approve product');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const confirmReject = async () => {
+        if (!rejectionReason.trim()) {
+            alert('Please provide a rejection reason');
+            return;
+        }
+
+        try {
+            setActionLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/admin/products/${selectedProduct._id}/reject`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ reason: rejectionReason })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('Product rejected successfully!');
+                setShowRejectModal(false);
+                fetchProducts();
+            } else {
+                alert(data.message || 'Failed to reject product');
+            }
+        } catch (error) {
+            console.error('Error rejecting product:', error);
+            alert('Failed to reject product');
+        } finally {
+            setActionLoading(false);
+        }
     };
 
     const productStats = {
         total: products.length,
-        approved: products.filter(p => p.status === 'Approved').length,
-        pending: products.filter(p => p.status === 'Pending Approval').length,
-        rejected: products.filter(p => p.status === 'Rejected').length
+        approved: products.filter(p => p.approvalStatus === 'approved').length,
+        pending: products.filter(p => p.approvalStatus === 'pending').length,
+        rejected: products.filter(p => p.approvalStatus === 'rejected').length
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-96">
+                <div className="text-center">
+                    <Package className="w-16 h-16 text-gray-400 mx-auto mb-4 animate-pulse" />
+                    <div className="text-gray-500 text-lg">Loading products...</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -215,32 +248,15 @@ const ProductManagement = () => {
                     <div className="flex gap-3">
                         <select
                             className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                            value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                        >
-                            {categories.map(category => (
-                                <option key={category} value={category}>
-                                    {category === 'all' ? 'All Categories' : category}
-                                </option>
-                            ))}
-                        </select>
-
-                        <select
-                            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             value={selectedStatus}
                             onChange={(e) => setSelectedStatus(e.target.value)}
                         >
                             {statuses.map(status => (
                                 <option key={status} value={status}>
-                                    {status === 'all' ? 'All Status' : status}
+                                    {status === 'all' ? 'All Status' : getStatusLabel(status)}
                                 </option>
                             ))}
                         </select>
-
-                        <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
-                            <Filter className="w-4 h-4 mr-2" />
-                            More Filters
-                        </button>
                     </div>
                 </div>
             </div>
@@ -253,9 +269,8 @@ const ProductManagement = () => {
                             <tr>
                                 <th className="text-left py-4 px-6 font-semibold text-gray-900">Product</th>
                                 <th className="text-left py-4 px-6 font-semibold text-gray-900">Supplier</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">Category</th>
                                 <th className="text-left py-4 px-6 font-semibold text-gray-900">Pricing</th>
-                                <th className="text-left py-4 px-6 font-semibold text-gray-900">HSN & GST</th>
+                                <th className="text-left py-4 px-6 font-semibold text-gray-900">GST</th>
                                 <th className="text-left py-4 px-6 font-semibold text-gray-900">Stock</th>
                                 <th className="text-left py-4 px-6 font-semibold text-gray-900">Status</th>
                                 <th className="text-left py-4 px-6 font-semibold text-gray-900">Date</th>
@@ -264,14 +279,20 @@ const ProductManagement = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                             {filteredProducts.map((product) => (
-                                <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                                <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                                     <td className="py-4 px-6">
                                         <div className="flex items-center">
-                                            <img
-                                                src={product.image}
-                                                alt={product.name}
-                                                className="w-12 h-12 rounded-lg object-cover mr-4"
-                                            />
+                                            {product.images && product.images[0] ? (
+                                                <img
+                                                    src={product.images[0]}
+                                                    alt={product.name}
+                                                    className="w-12 h-12 rounded-lg object-cover mr-4"
+                                                />
+                                            ) : (
+                                                <div className="w-12 h-12 rounded-lg bg-gray-200 mr-4 flex items-center justify-center">
+                                                    <Package className="w-6 h-6 text-gray-400" />
+                                                </div>
+                                            )}
                                             <div>
                                                 <div className="font-medium text-gray-900">{product.name}</div>
                                                 <div className="text-sm text-gray-500 line-clamp-1">{product.description}</div>
@@ -281,47 +302,51 @@ const ProductManagement = () => {
                                     <td className="py-4 px-6">
                                         <div className="flex items-center">
                                             <Building className="w-4 h-4 mr-2 text-gray-400" />
-                                            <span className="text-gray-900">{product.supplier}</span>
+                                            <div>
+                                                <div className="text-gray-900">{product.supplier?.businessName || product.supplier?.name || 'N/A'}</div>
+                                                <div className="text-xs text-gray-500">{product.supplier?.email}</div>
+                                            </div>
                                         </div>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <span className="px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded-full">
-                                            {product.category}
-                                        </span>
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="text-sm">
                                             <div className="flex items-center text-gray-900">
                                                 <Tag className="w-4 h-4 mr-1 text-gray-400" />
-                                                Base: ₹{product.basePrice}
+                                                Base: ₹{product.price}
                                             </div>
-                                            <div className="flex items-center text-green-600 font-semibold">
-                                                <DollarSign className="w-4 h-4 mr-1" />
-                                                Suggested: ₹{product.suggestedPrice}
-                                            </div>
+                                            {product.margin > 0 && (
+                                                <>
+                                                    <div className="text-orange-600">
+                                                        Margin: ₹{product.margin}
+                                                    </div>
+                                                    <div className="flex items-center text-green-600 font-semibold">
+                                                        <DollarSign className="w-4 h-4 mr-1" />
+                                                        Final: ₹{product.finalPrice}
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="text-sm">
-                                            <div className="text-gray-900 font-mono">{product.hsnCode}</div>
-                                            <div className="text-gray-500">GST: {product.gstRate}%</div>
+                                            <div className="text-gray-500">GST: {product.gstPercentage}%</div>
                                         </div>
                                     </td>
                                     <td className="py-4 px-6">
-                                        <span className={`font-medium ${product.stockQuantity < 20 ? 'text-red-600' :
-                                            product.stockQuantity < 50 ? 'text-yellow-600' :
+                                        <span className={`font-medium ${product.stock < 20 ? 'text-red-600' :
+                                            product.stock < 50 ? 'text-yellow-600' :
                                                 'text-green-600'
                                             }`}>
-                                            {product.stockQuantity}
+                                            {product.stock}
                                         </span>
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="space-y-2">
-                                            <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(product.status)}`}>
-                                                {getStatusIcon(product.status)}
-                                                <span className="ml-2">{product.status}</span>
+                                            <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(product.approvalStatus)}`}>
+                                                {getStatusIcon(product.approvalStatus)}
+                                                <span className="ml-2">{getStatusLabel(product.approvalStatus)}</span>
                                             </span>
-                                            {product.status === 'Rejected' && product.rejectionReason && (
+                                            {product.approvalStatus === 'rejected' && product.rejectionReason && (
                                                 <div className="text-xs text-red-600 bg-red-50 p-2 rounded-lg max-w-xs">
                                                     <strong>Reason:</strong> {product.rejectionReason}
                                                 </div>
@@ -330,37 +355,27 @@ const ProductManagement = () => {
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="text-sm text-gray-600">
-                                            <div>Submitted: {product.submittedDate}</div>
-                                            {product.approvedDate && (
-                                                <div className="text-green-600">Approved: {product.approvedDate}</div>
-                                            )}
-                                            {product.rejectedDate && (
-                                                <div className="text-red-600">Rejected: {product.rejectedDate}</div>
+                                            <div>Submitted: {new Date(product.createdAt).toLocaleDateString()}</div>
+                                            {product.approvedAt && (
+                                                <div className="text-green-600">
+                                                    {product.approvalStatus === 'approved' ? 'Approved' : 'Rejected'}: {new Date(product.approvedAt).toLocaleDateString()}
+                                                </div>
                                             )}
                                         </div>
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="flex items-center space-x-2">
-                                            <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                                                <Eye className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleEdit(product.id)}
-                                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                            >
-                                                <Edit3 className="w-4 h-4" />
-                                            </button>
-                                            {product.status === 'Pending Approval' && (
+                                            {product.approvalStatus === 'pending' && (
                                                 <>
                                                     <button
-                                                        onClick={() => handleApprove(product.id)}
+                                                        onClick={() => handleApprove(product)}
                                                         className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                                                         title="Approve"
                                                     >
                                                         <CheckCircle className="w-4 h-4" />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleReject(product.id)}
+                                                        onClick={() => handleReject(product)}
                                                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                         title="Reject"
                                                     >
@@ -385,25 +400,134 @@ const ProductManagement = () => {
                 )}
             </div>
 
-            {/* Pagination */}
-            {filteredProducts.length > 0 && (
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between">
-                        <div className="text-gray-600">
-                            Showing {filteredProducts.length} of {products.length} products
+            {/* Approve Modal */}
+            {showApproveModal && selectedProduct && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-2xl font-bold text-gray-900">Approve Product</h3>
+                            <button
+                                onClick={() => setShowApproveModal(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
                         </div>
-                        <div className="flex items-center space-x-2">
-                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
-                                Previous
+
+                        <div className="mb-6">
+                            <div className="text-sm text-gray-600 mb-2">Product</div>
+                            <div className="font-medium text-gray-900">{selectedProduct.name}</div>
+                            <div className="text-sm text-gray-500">Base Price: ₹{selectedProduct.price}</div>
+                            <div className="text-sm text-gray-500">GST: {selectedProduct.gstPercentage}%</div>
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Platform Margin (₹) <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={margin}
+                                onChange={(e) => setMargin(e.target.value)}
+                                placeholder="Enter margin amount in rupees"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                            {margin && (
+                                <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                                    <div className="text-sm text-gray-600">Final Price Preview:</div>
+                                    <div className="text-2xl font-bold text-green-600">
+                                        ₹{(parseFloat(selectedProduct.price) + parseFloat(margin)).toFixed(2)}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={() => setShowApproveModal(false)}
+                                disabled={actionLoading}
+                                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            >
+                                Cancel
                             </button>
-                            <button className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
-                                1
+                            <button
+                                onClick={confirmApprove}
+                                disabled={actionLoading || !margin}
+                                className="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                            >
+                                {actionLoading ? (
+                                    <>Processing...</>
+                                ) : (
+                                    <>
+                                        <CheckCircle className="w-4 h-4 mr-2" />
+                                        Approve Product
+                                    </>
+                                )}
                             </button>
-                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
-                                2
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reject Modal */}
+            {showRejectModal && selectedProduct && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-2xl font-bold text-gray-900">Reject Product</h3>
+                            <button
+                                onClick={() => setShowRejectModal(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-6 h-6" />
                             </button>
-                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
-                                Next
+                        </div>
+
+                        <div className="mb-6">
+                            <div className="text-sm text-gray-600 mb-2">Product</div>
+                            <div className="font-medium text-gray-900">{selectedProduct.name}</div>
+                            <div className="text-sm text-gray-500">Supplier: {selectedProduct.supplier?.businessName || selectedProduct.supplier?.name}</div>
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Rejection Reason <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                value={rejectionReason}
+                                onChange={(e) => setRejectionReason(e.target.value)}
+                                placeholder="Please provide a clear reason for rejection..."
+                                rows="4"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                            />
+                            <div className="text-xs text-gray-500 mt-1">
+                                This will be visible to the supplier
+                            </div>
+                        </div>
+
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={() => setShowRejectModal(false)}
+                                disabled={actionLoading}
+                                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmReject}
+                                disabled={actionLoading || !rejectionReason.trim()}
+                                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                            >
+                                {actionLoading ? (
+                                    <>Processing...</>
+                                ) : (
+                                    <>
+                                        <XCircle className="w-4 h-4 mr-2" />
+                                        Reject Product
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
