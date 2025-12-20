@@ -9,6 +9,11 @@ const authRoutes = require('./routes/auth.routes');
 const kycRoutes = require('./routes/kyc.routes');
 const productRoutes = require('./routes/product.routes');
 const orderRoutes = require('./routes/order.routes');
+const userRoutes = require('./routes/user.routes');
+const walletRoutes = require('./routes/wallet.routes');
+const adminRoutes = require('./routes/admin.routes');
+const sellerRoutes = require('./routes/seller.routes');
+const supplierRoutes = require('./routes/supplier.routes');
 
 const app = express();
 
@@ -29,6 +34,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/kyc', kycRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/wallet', walletRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/seller', sellerRoutes);
+app.use('/api/supplier', supplierRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
