@@ -9,6 +9,25 @@ A comprehensive B2B marketplace application with separate portals for Admin, Sup
 - **Database**: MongoDB
 - **Authentication**: JWT with HTTP-only cookies
 
+## Documentation
+
+- **[QUICK_START.md](./QUICK_START.md)** - ⚡ Quick 5-minute setup guide
+- **[WORKFLOW.md](./WORKFLOW.md)** - Complete product approval workflow documentation
+- **[API_ENDPOINTS.md](./API_ENDPOINTS.md)** - API endpoints reference guide
+
+## Quick Workflow Overview
+
+```
+Supplier → Adds Product → Admin Reviews → Admin Approves + Margin → Seller Sees Product
+```
+
+1. **Supplier** adds a product (status: pending)
+2. **Admin** reviews in Product Management portal
+3. **Admin** approves product and sets platform margin
+4. **Product** becomes available to sellers with final price (base + margin)
+
+See [WORKFLOW.md](./WORKFLOW.md) for detailed step-by-step process.
+
 ## Features
 
 ### Admin Portal
