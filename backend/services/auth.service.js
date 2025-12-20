@@ -7,22 +7,17 @@ const generateToken = (id) => {
   });
 };
 
-const registerUser = async (name, email, password, role) => {
-  const userExists = await User.findOne({ email });
+const registerUser = async (userData) => {
+  const userExists = await User.findOne({ email: userData.email });
 
   if (userExists) {
     throw new Error('User already exists');
   }
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-    role
-  });
+  const user = await User.create(userData);
 
   if (user) {
-    if (role !== 'admin' && user.kycStatus !== 'approved') {
+    if (userData.role !== 'admin' && user.kycStatus !== 'approved') {
       return {
         _id: user._id,
         name: user.name,

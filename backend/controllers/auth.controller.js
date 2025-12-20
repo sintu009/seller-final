@@ -2,7 +2,7 @@ const authService = require('../services/auth.service');
 
 const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, businessName, gstNumber, panNumber, phoneNumber, address } = req.body;
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({
@@ -18,7 +18,34 @@ const register = async (req, res) => {
       });
     }
 
-    const user = await authService.registerUser(name, email, password, role);
+    const kycDocuments = {};
+
+    if (req.files) {
+      if (req.files.gstCertificate && req.files.gstCertificate[0]) {
+        kycDocuments.gstCertificate = req.files.gstCertificate[0].path;
+      }
+      if (req.files.panCard && req.files.panCard[0]) {
+        kycDocuments.panCard = req.files.panCard[0].path;
+      }
+      if (req.files.cancelledCheque && req.files.cancelledCheque[0]) {
+        kycDocuments.cancelledCheque = req.files.cancelledCheque[0].path;
+      }
+    }
+
+    const userData = {
+      name,
+      email,
+      password,
+      role,
+      businessName,
+      gstNumber,
+      panNumber,
+      phoneNumber,
+      address: address ? JSON.parse(address) : undefined,
+      kycDocuments
+    };
+
+    const user = await authService.registerUser(userData);
 
     if (user.token) {
       res.cookie('token', user.token, {

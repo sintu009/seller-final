@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Search,
     Filter,
@@ -15,149 +15,155 @@ import {
     Phone
 } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const KYCCompliance = () => {
     const [mainTab, setMainTab] = useState('seller');
     const [activeTab, setActiveTab] = useState('pending');
     const [searchTerm, setSearchTerm] = useState('');
+    const [kycSubmissions, setKycSubmissions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [rejectionReason, setRejectionReason] = useState('');
+    const [showRejectModal, setShowRejectModal] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
 
-    // Mock KYC data
-    const kycSubmissions = [
-        {
-            id: 1,
-            type: 'Seller',
-            name: 'TechStore India',
-            email: 'contact@techstore.com',
-            phone: '+91 98765 43210',
-            submittedDate: '2024-01-15',
-            status: 'Pending',
-            documents: {
-                gst: { status: 'Submitted', filename: 'GST_Certificate.pdf' },
-                pan: { status: 'Submitted', filename: 'PAN_Card.jpg' },
-                cheque: { status: 'Submitted', filename: 'Cancelled_Cheque.jpg' }
-            },
-            businessDetails: {
-                businessName: 'TechStore India Pvt Ltd',
-                gstNumber: '22AAAAA0000A1Z5',
-                panNumber: 'ABCTY1234D'
+    useEffect(() => {
+        fetchKYCData();
+    }, []);
+
+    const fetchKYCData = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${API_URL}/api/kyc/all`, {
+                credentials: 'include'
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                setKycSubmissions(result.data);
             }
-        },
-        {
-            id: 2,
-            type: 'Supplier',
-            name: 'Kumar Electronics Manufacturing',
-            email: 'info@kumarelectronics.com',
-            phone: '+91 98765 54321',
-            submittedDate: '2024-01-12',
-            status: 'Verified',
-            documents: {
-                gst: { status: 'Verified', filename: 'GST_Certificate.pdf' },
-                pan: { status: 'Verified', filename: 'PAN_Card.jpg' },
-                cheque: { status: 'Verified', filename: 'Cancelled_Cheque.jpg' }
-            },
-            businessDetails: {
-                businessName: 'Kumar Electronics Manufacturing Ltd',
-                gstNumber: '06AAAAA0000A1Z5',
-                panNumber: 'ABCDE1234F'
-            }
-        },
-        {
-            id: 3,
-            type: 'Seller',
-            name: 'ElectroMart',
-            email: 'orders@electromart.com',
-            phone: '+91 98765 43211',
-            submittedDate: '2024-01-10',
-            status: 'Rejected',
-            documents: {
-                gst: { status: 'Rejected', filename: 'GST_Certificate.pdf', reason: 'Document not clear' },
-                pan: { status: 'Verified', filename: 'PAN_Card.jpg' },
-                cheque: { status: 'Rejected', filename: 'Cancelled_Cheque.jpg', reason: 'Bank details not matching' }
-            },
-            businessDetails: {
-                businessName: 'ElectroMart Solutions',
-                gstNumber: '27BBBBB0000B2Z6',
-                panNumber: 'DEFGH5678I'
-            },
-            rejectionReason: 'GST certificate is not clear and bank details do not match with business information.'
+        } catch (error) {
+            console.error('Error fetching KYC data:', error);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
 
     const mainTabs = [
-        { id: 'seller', label: 'Sellers', count: kycSubmissions.filter(k => k.type === 'Seller').length },
-        { id: 'supplier', label: 'Suppliers', count: kycSubmissions.filter(k => k.type === 'Supplier').length }
+        { id: 'seller', label: 'Sellers', count: kycSubmissions.filter(k => k.role === 'seller').length },
+        { id: 'supplier', label: 'Suppliers', count: kycSubmissions.filter(k => k.role === 'supplier').length }
     ];
 
     const getCurrentTypeSubmissions = () => {
-        return kycSubmissions.filter(k =>
-            k.type === (mainTab === 'seller' ? 'Seller' : 'Supplier')
-        );
+        return kycSubmissions.filter(k => k.role === mainTab);
     };
 
     const currentSubmissions = getCurrentTypeSubmissions();
 
     const tabs = [
-        { id: 'pending', label: 'Pending Review', count: currentSubmissions.filter(k => k.status === 'Pending').length },
-        { id: 'verified', label: 'Verified', count: currentSubmissions.filter(k => k.status === 'Verified').length },
-        { id: 'rejected', label: 'Rejected', count: currentSubmissions.filter(k => k.status === 'Rejected').length },
+        { id: 'pending', label: 'Pending Review', count: currentSubmissions.filter(k => k.kycStatus === 'pending').length },
+        { id: 'approved', label: 'Verified', count: currentSubmissions.filter(k => k.kycStatus === 'approved').length },
+        { id: 'rejected', label: 'Rejected', count: currentSubmissions.filter(k => k.kycStatus === 'rejected').length },
         { id: 'all', label: 'All Submissions', count: currentSubmissions.length }
     ];
 
     const getStatusIcon = (status) => {
         switch (status) {
-            case 'Verified': return <CheckCircle className="w-4 h-4" />;
-            case 'Pending': return <Clock className="w-4 h-4" />;
-            case 'Rejected': return <XCircle className="w-4 h-4" />;
+            case 'approved': return <CheckCircle className="w-4 h-4" />;
+            case 'pending': return <Clock className="w-4 h-4" />;
+            case 'rejected': return <XCircle className="w-4 h-4" />;
             default: return <Clock className="w-4 h-4" />;
         }
     };
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'Verified': return 'bg-green-100 text-green-800';
-            case 'Pending': return 'bg-yellow-100 text-yellow-800';
-            case 'Rejected': return 'bg-red-100 text-red-800';
+            case 'approved': return 'bg-green-100 text-green-800';
+            case 'pending': return 'bg-yellow-100 text-yellow-800';
+            case 'rejected': return 'bg-red-100 text-red-800';
             default: return 'bg-gray-100 text-gray-800';
-        }
-    };
-
-    const getDocumentStatusColor = (status) => {
-        switch (status) {
-            case 'Verified': return 'text-green-600';
-            case 'Submitted': return 'text-yellow-600';
-            case 'Rejected': return 'text-red-600';
-            default: return 'text-gray-600';
         }
     };
 
     const filteredSubmissions = kycSubmissions.filter(submission => {
         const matchesSearch = submission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             submission.email.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesMainTab = submission.type === (mainTab === 'seller' ? 'Seller' : 'Supplier');
-        const matchesTab = activeTab === 'all' || submission.status === (
-            activeTab === 'pending' ? 'Pending' :
-                activeTab === 'verified' ? 'Verified' :
-                    activeTab === 'rejected' ? 'Rejected' : submission.status
-        );
+        const matchesMainTab = submission.role === mainTab;
+        const matchesTab = activeTab === 'all' || submission.kycStatus === activeTab;
 
         return matchesSearch && matchesMainTab && matchesTab;
     });
 
-    const handleApprove = (id) => {
-        console.log('Approving KYC:', id);
+    const handleApprove = async (id) => {
+        try {
+            const response = await fetch(`${API_URL}/api/kyc/approve/${id}`, {
+                method: 'PUT',
+                credentials: 'include'
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                await fetchKYCData();
+                alert('KYC approved successfully');
+            }
+        } catch (error) {
+            console.error('Error approving KYC:', error);
+            alert('Failed to approve KYC');
+        }
     };
 
-    const handleReject = (id) => {
-        console.log('Rejecting KYC:', id);
+    const handleReject = async () => {
+        if (!rejectionReason.trim()) {
+            alert('Please provide a rejection reason');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/api/kyc/reject/${selectedUserId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ reason: rejectionReason })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                await fetchKYCData();
+                setShowRejectModal(false);
+                setRejectionReason('');
+                setSelectedUserId(null);
+                alert('KYC rejected successfully');
+            }
+        } catch (error) {
+            console.error('Error rejecting KYC:', error);
+            alert('Failed to reject KYC');
+        }
     };
 
-    const handleViewDocument = (filename) => {
-        console.log('Viewing document:', filename);
+    const openRejectModal = (id) => {
+        setSelectedUserId(id);
+        setShowRejectModal(true);
     };
+
+    const handleViewDocument = (filepath) => {
+        if (filepath) {
+            window.open(`${API_URL}/${filepath}`, '_blank');
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-gray-600">Loading...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-7xl mx-auto space-y-6">
-                {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">KYC & Compliance</h1>
@@ -171,7 +177,6 @@ const KYCCompliance = () => {
                     </div>
                 </div>
 
-                {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                         <div className="text-sm text-gray-600 mb-1">Total Submissions</div>
@@ -180,24 +185,23 @@ const KYCCompliance = () => {
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                         <div className="text-sm text-gray-600 mb-1">Pending Review</div>
                         <div className="text-2xl font-bold text-yellow-600">
-                            {kycSubmissions.filter(k => k.status === 'Pending').length}
+                            {kycSubmissions.filter(k => k.kycStatus === 'pending').length}
                         </div>
                     </div>
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                         <div className="text-sm text-gray-600 mb-1">Verified</div>
                         <div className="text-2xl font-bold text-green-600">
-                            {kycSubmissions.filter(k => k.status === 'Verified').length}
+                            {kycSubmissions.filter(k => k.kycStatus === 'approved').length}
                         </div>
                     </div>
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                         <div className="text-sm text-gray-600 mb-1">Rejected</div>
                         <div className="text-2xl font-bold text-red-600">
-                            {kycSubmissions.filter(k => k.status === 'Rejected').length}
+                            {kycSubmissions.filter(k => k.kycStatus === 'rejected').length}
                         </div>
                     </div>
                 </div>
 
-                {/* Main Tabs - Seller/Supplier */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div className="flex space-x-1">
                         {mainTabs.map((tab) => (
@@ -222,9 +226,7 @@ const KYCCompliance = () => {
                     </div>
                 </div>
 
-                {/* Tabs and Filters */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    {/* Tabs */}
                     <div className="flex space-x-1 mb-6">
                         {tabs.map((tab) => (
                             <button
@@ -243,7 +245,6 @@ const KYCCompliance = () => {
                         ))}
                     </div>
 
-                    {/* Search and Filters */}
                     <div className="flex flex-col lg:flex-row gap-4">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -264,32 +265,29 @@ const KYCCompliance = () => {
                     </div>
                 </div>
 
-                {/* KYC Submissions */}
                 <div className="space-y-4">
                     {filteredSubmissions.map((submission) => (
-                        <div key={submission.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <div key={submission._id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-start space-x-4">
-                                    <div className={`p-3 rounded-xl ${submission.type === 'Seller' ? 'bg-blue-100' : 'bg-emerald-100'
+                                    <div className={`p-3 rounded-xl ${submission.role === 'seller' ? 'bg-blue-100' : 'bg-emerald-100'
                                         }`}>
-                                        {submission.type === 'Seller' ? (
-                                            <User className={`w-6 h-6 ${submission.type === 'Seller' ? 'text-blue-600' : 'text-emerald-600'
-                                                }`} />
+                                        {submission.role === 'seller' ? (
+                                            <User className="w-6 h-6 text-blue-600" />
                                         ) : (
-                                            <Building className={`w-6 h-6 ${submission.type === 'Seller' ? 'text-blue-600' : 'text-emerald-600'
-                                                }`} />
+                                            <Building className="w-6 h-6 text-emerald-600" />
                                         )}
                                     </div>
                                     <div>
                                         <div className="flex items-center space-x-3 mb-2">
                                             <h3 className="text-lg font-semibold text-gray-900">{submission.name}</h3>
-                                            <span className={`px-3 py-1 text-sm font-medium rounded-full ${submission.type === 'Seller' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'
+                                            <span className={`px-3 py-1 text-sm font-medium rounded-full ${submission.role === 'seller' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'
                                                 }`}>
-                                                {submission.type}
+                                                {submission.role}
                                             </span>
-                                            <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(submission.status)}`}>
-                                                {getStatusIcon(submission.status)}
-                                                <span className="ml-2">{submission.status}</span>
+                                            <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(submission.kycStatus)}`}>
+                                                {getStatusIcon(submission.kycStatus)}
+                                                <span className="ml-2 capitalize">{submission.kycStatus}</span>
                                             </span>
                                         </div>
                                         <div className="space-y-1 text-sm text-gray-600">
@@ -299,24 +297,24 @@ const KYCCompliance = () => {
                                             </div>
                                             <div className="flex items-center">
                                                 <Phone className="w-4 h-4 mr-2" />
-                                                {submission.phone}
+                                                {submission.phoneNumber || 'N/A'}
                                             </div>
-                                            <div>Submitted: {submission.submittedDate}</div>
+                                            <div>Registered: {new Date(submission.createdAt).toLocaleDateString()}</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    {submission.status === 'Pending' && (
+                                    {submission.kycStatus === 'pending' && (
                                         <>
                                             <button
-                                                onClick={() => handleApprove(submission.id)}
+                                                onClick={() => handleApprove(submission._id)}
                                                 className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center"
                                             >
                                                 <CheckCircle className="w-4 h-4 mr-2" />
                                                 Approve
                                             </button>
                                             <button
-                                                onClick={() => handleReject(submission.id)}
+                                                onClick={() => openRejectModal(submission._id)}
                                                 className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors flex items-center"
                                             >
                                                 <XCircle className="w-4 h-4 mr-2" />
@@ -327,69 +325,90 @@ const KYCCompliance = () => {
                                 </div>
                             </div>
 
-                            {/* Business Details */}
                             <div className="bg-gray-50 rounded-xl p-4 mb-4">
                                 <h4 className="font-semibold text-gray-900 mb-3">Business Information</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                     <div>
                                         <span className="text-gray-600">Business Name:</span>
-                                        <div className="font-medium text-gray-900">{submission.businessDetails.businessName}</div>
+                                        <div className="font-medium text-gray-900">{submission.businessName || 'N/A'}</div>
                                     </div>
                                     <div>
                                         <span className="text-gray-600">GST Number:</span>
-                                        <div className="font-mono text-gray-900">{submission.businessDetails.gstNumber}</div>
+                                        <div className="font-mono text-gray-900">{submission.gstNumber || 'N/A'}</div>
                                     </div>
                                     <div>
                                         <span className="text-gray-600">PAN Number:</span>
-                                        <div className="font-mono text-gray-900">{submission.businessDetails.panNumber}</div>
+                                        <div className="font-mono text-gray-900">{submission.panNumber || 'N/A'}</div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Documents */}
-                            <div className="space-y-3">
-                                <h4 className="font-semibold text-gray-900">Submitted Documents</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    {Object.entries(submission.documents).map(([docType, doc]) => (
-                                        <div key={docType} className="border border-gray-200 rounded-xl p-4">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <div className="flex items-center">
-                                                    <FileText className="w-4 h-4 mr-2 text-gray-400" />
-                                                    <span className="font-medium text-gray-900">
-                                                        {docType === 'gst' ? 'GST Certificate' :
-                                                            docType === 'pan' ? 'PAN Card' : 'Cancelled Cheque'}
-                                                    </span>
+                            {submission.kycDocuments && Object.keys(submission.kycDocuments).length > 0 && (
+                                <div className="space-y-3">
+                                    <h4 className="font-semibold text-gray-900">Submitted Documents</h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {submission.kycDocuments.gstCertificate && (
+                                            <div className="border border-gray-200 rounded-xl p-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center">
+                                                        <FileText className="w-4 h-4 mr-2 text-gray-400" />
+                                                        <span className="font-medium text-gray-900">GST Certificate</span>
+                                                    </div>
                                                 </div>
-                                                <span className={`text-sm font-medium ${getDocumentStatusColor(doc.status)}`}>
-                                                    {doc.status}
-                                                </span>
+                                                <button
+                                                    onClick={() => handleViewDocument(submission.kycDocuments.gstCertificate)}
+                                                    className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
+                                                >
+                                                    <Eye className="w-4 h-4 mr-2" />
+                                                    View Document
+                                                </button>
                                             </div>
-                                            <div className="text-sm text-gray-600 mb-2">{doc.filename}</div>
-                                            {doc.reason && (
-                                                <div className="text-xs text-red-600 bg-red-50 p-2 rounded-lg mb-2">
-                                                    <strong>Reason:</strong> {doc.reason}
+                                        )}
+                                        {submission.kycDocuments.panCard && (
+                                            <div className="border border-gray-200 rounded-xl p-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center">
+                                                        <FileText className="w-4 h-4 mr-2 text-gray-400" />
+                                                        <span className="font-medium text-gray-900">PAN Card</span>
+                                                    </div>
                                                 </div>
-                                            )}
-                                            <button
-                                                onClick={() => handleViewDocument(doc.filename)}
-                                                className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
-                                            >
-                                                <Eye className="w-4 h-4 mr-2" />
-                                                View Document
-                                            </button>
-                                        </div>
-                                    ))}
+                                                <button
+                                                    onClick={() => handleViewDocument(submission.kycDocuments.panCard)}
+                                                    className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
+                                                >
+                                                    <Eye className="w-4 h-4 mr-2" />
+                                                    View Document
+                                                </button>
+                                            </div>
+                                        )}
+                                        {submission.kycDocuments.cancelledCheque && (
+                                            <div className="border border-gray-200 rounded-xl p-4">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center">
+                                                        <FileText className="w-4 h-4 mr-2 text-gray-400" />
+                                                        <span className="font-medium text-gray-900">Cancelled Cheque</span>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleViewDocument(submission.kycDocuments.cancelledCheque)}
+                                                    className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
+                                                >
+                                                    <Eye className="w-4 h-4 mr-2" />
+                                                    View Document
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
-                            {/* Rejection Reason */}
-                            {submission.status === 'Rejected' && submission.rejectionReason && (
+                            {submission.kycStatus === 'rejected' && submission.kycRejectionReason && (
                                 <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-4">
                                     <div className="flex items-start">
                                         <AlertTriangle className="w-5 h-5 text-red-600 mr-2 mt-0.5" />
                                         <div>
                                             <div className="font-medium text-red-800 mb-1">Rejection Reason</div>
-                                            <div className="text-red-700 text-sm">{submission.rejectionReason}</div>
+                                            <div className="text-red-700 text-sm">{submission.kycRejectionReason}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -406,6 +425,40 @@ const KYCCompliance = () => {
                     )}
                 </div>
             </div>
+
+            {showRejectModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Reject KYC Application</h3>
+                        <p className="text-gray-600 mb-4">Please provide a reason for rejecting this KYC application:</p>
+                        <textarea
+                            className="w-full border border-gray-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            rows="4"
+                            placeholder="Enter rejection reason..."
+                            value={rejectionReason}
+                            onChange={(e) => setRejectionReason(e.target.value)}
+                        ></textarea>
+                        <div className="flex gap-3 mt-4">
+                            <button
+                                onClick={() => {
+                                    setShowRejectModal(false);
+                                    setRejectionReason('');
+                                    setSelectedUserId(null);
+                                }}
+                                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleReject}
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
+                            >
+                                Reject
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
