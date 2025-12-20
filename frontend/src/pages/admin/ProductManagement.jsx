@@ -38,10 +38,11 @@ const ProductManagement = () => {
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('token');
             const response = await fetch(`${API_URL}/admin/products`, {
+                method: 'GET',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 }
             });
             const data = await response.json();
@@ -111,12 +112,11 @@ const ProductManagement = () => {
 
         try {
             setActionLoading(true);
-            const token = localStorage.getItem('token');
             const response = await fetch(`${API_URL}/admin/products/${selectedProduct._id}/approve`, {
                 method: 'PUT',
+                credentials: 'include',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ margin: parseFloat(margin) })
             });
@@ -145,12 +145,11 @@ const ProductManagement = () => {
 
         try {
             setActionLoading(true);
-            const token = localStorage.getItem('token');
             const response = await fetch(`${API_URL}/admin/products/${selectedProduct._id}/reject`, {
                 method: 'PUT',
+                credentials: 'include',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ reason: rejectionReason })
             });
