@@ -100,13 +100,6 @@ const SupplierProductManagement = () => {
         try {
             setUploading(true);
 
-            const token = localStorage.getItem('token');
-            if (!token) {
-                toast.error('Authentication required. Please log in again.');
-                setUploading(false);
-                return;
-            }
-
             const formDataToSend = new FormData();
             formDataToSend.append('name', formData.name);
             formDataToSend.append('description', formData.description);

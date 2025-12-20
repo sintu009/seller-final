@@ -10,6 +10,7 @@ const getAuthHeaders = () => {
 
 const getAuthHeadersMultipart = () => {
   const token = localStorage.getItem('token');
+  console.log('Token in multipart headers:', token ? 'Present' : 'Missing');
   return {
     ...(token && { 'Authorization': `Bearer ${token}` })
   };
