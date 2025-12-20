@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   DollarSign,
   ShoppingCart,
@@ -7,6 +7,11 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   ShoppingBagIcon,
+  FileText,
+  Eye,
+  Building2,
+  CreditCard,
+  Phone,
 } from "lucide-react";
 import {
   AreaChart,
@@ -20,7 +25,39 @@ import {
   Bar,
 } from "recharts";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const SellerOverview = () => {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/api/auth/profile`, {
+        credentials: 'include'
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        setUserData(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewDocument = (filepath) => {
+    if (filepath) {
+      window.open(`${API_URL}/${filepath}`, '_blank');
+    }
+  };
   // Business Summary Mock Data
   const stats = [
     {
@@ -76,23 +113,186 @@ const SellerOverview = () => {
     { name: "Week 4", orders: 61 },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Business Analytics
+            Business Overview
           </h1>
           <p className="text-gray-600 mt-1">
-            Complete overview of your multi-platform business performance
+            Your business profile and verification status
           </p>
         </div>
-        <div className="flex items-center space-x-3">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center transition-colors">
-            <ShoppingBagIcon className="w-5 h-5 mr-2" />
-            Connected with Amazon
-          </button>
+      </div>
+
+      {/* Business Information Card */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Business Information</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Business Name */}
+          <div className="flex items-start space-x-4">
+            <div className="p-3 bg-blue-50 rounded-xl">
+              <Building2 className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Business Name</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {userData?.businessName || 'N/A'}
+              </p>
+            </div>
+          </div>
+
+          {/* Phone Number */}
+          <div className="flex items-start space-x-4">
+            <div className="p-3 bg-green-50 rounded-xl">
+              <Phone className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Phone Number</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {userData?.phoneNumber || 'N/A'}
+              </p>
+            </div>
+          </div>
+
+          {/* GST Number */}
+          <div className="flex items-start space-x-4">
+            <div className="p-3 bg-purple-50 rounded-xl">
+              <FileText className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">GST Number</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {userData?.gstNumber || 'N/A'}
+              </p>
+            </div>
+          </div>
+
+          {/* PAN Number */}
+          <div className="flex items-start space-x-4">
+            <div className="p-3 bg-orange-50 rounded-xl">
+              <CreditCard className="w-6 h-6 text-orange-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">PAN Number</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {userData?.panNumber || 'N/A'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* KYC Status */}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">KYC Verification Status</p>
+              <div className="flex items-center space-x-2">
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    userData?.kycStatus === 'approved'
+                      ? 'bg-green-100 text-green-800'
+                      : userData?.kycStatus === 'pending'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}
+                >
+                  {userData?.kycStatus === 'approved'
+                    ? 'Verified'
+                    : userData?.kycStatus === 'pending'
+                    ? 'Pending Verification'
+                    : 'Rejected'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Documents Section */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Uploaded Documents</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* GST Certificate */}
+          <div className="border border-gray-200 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <FileText className="w-5 h-5 text-gray-600" />
+                <span className="font-medium text-gray-900">GST Certificate</span>
+              </div>
+            </div>
+            {userData?.kycDocuments?.gstCertificate ? (
+              <button
+                onClick={() => handleViewDocument(userData.kycDocuments.gstCertificate)}
+                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors"
+              >
+                <Eye className="w-4 h-4" />
+                <span>View Document</span>
+              </button>
+            ) : (
+              <div className="text-center text-gray-500 text-sm py-2">
+                Not uploaded
+              </div>
+            )}
+          </div>
+
+          {/* PAN Card */}
+          <div className="border border-gray-200 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <CreditCard className="w-5 h-5 text-gray-600" />
+                <span className="font-medium text-gray-900">PAN Card</span>
+              </div>
+            </div>
+            {userData?.kycDocuments?.panCard ? (
+              <button
+                onClick={() => handleViewDocument(userData.kycDocuments.panCard)}
+                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors"
+              >
+                <Eye className="w-4 h-4" />
+                <span>View Document</span>
+              </button>
+            ) : (
+              <div className="text-center text-gray-500 text-sm py-2">
+                Not uploaded
+              </div>
+            )}
+          </div>
+
+          {/* Cancelled Cheque */}
+          <div className="border border-gray-200 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <FileText className="w-5 h-5 text-gray-600" />
+                <span className="font-medium text-gray-900">Cancelled Cheque</span>
+              </div>
+            </div>
+            {userData?.kycDocuments?.cancelledCheque ? (
+              <button
+                onClick={() => handleViewDocument(userData.kycDocuments.cancelledCheque)}
+                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors"
+              >
+                <Eye className="w-4 h-4" />
+                <span>View Document</span>
+              </button>
+            ) : (
+              <div className="text-center text-gray-500 text-sm py-2">
+                Not uploaded
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
