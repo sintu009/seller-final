@@ -6,6 +6,13 @@ const createProduct = async (req, res) => {
     const supplierId = req.user.id;
     const user = await User.findById(supplierId);
 
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
     if (user.role !== 'supplier') {
       return res.status(403).json({
         success: false,
@@ -20,9 +27,12 @@ const createProduct = async (req, res) => {
       });
     }
 
+    const images = req.files ? req.files.map(file => file.path.replace(/\\/g, '/')) : [];
+
     const productData = {
       ...req.body,
-      supplier: supplierId
+      supplier: supplierId,
+      images: images
     };
 
     const product = await Product.create(productData);
@@ -34,6 +44,7 @@ const createProduct = async (req, res) => {
       data: product
     });
   } catch (error) {
+    console.error('Product creation error:', error);
     res.status(400).json({
       success: false,
       message: error.message
