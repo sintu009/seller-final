@@ -38,7 +38,7 @@ const orderSchema = new mongoose.Schema({
       'supplier_processing',
       'seller_processing',
       'admin_review',
-      'admin_approved',
+      'pushed',
       'admin_rejected',
       'shipped',
       'delivered',
@@ -80,11 +80,11 @@ const orderSchema = new mongoose.Schema({
     }
   }],
   shippingAddress: {
-    street: { type: String },
-    city: { type: String },
-    state: { type: String },
-    zipCode: { type: String },
-    country: { type: String }
+    street: { type: String, default: 'Not provided' },
+    city: { type: String, default: 'Not provided' },
+    state: { type: String, default: 'Not provided' },
+    zipCode: { type: String, default: '000000' },
+    country: { type: String, default: 'India' }
   },
   trackingNumber: {
     type: String

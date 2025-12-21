@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Search, ListFilter as Filter, Upload, CreditCard as Edit3, Trash2, Eye, Clock, CheckCircle, Circle as XCircle, Image as ImageIcon, Package } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Search, ListFilter as Filter, Upload, CreditCard as Edit3, Trash2, Eye, Clock, CheckCircle, Circle as XCircle, Image as ImageIcon, Package, AlertTriangle } from 'lucide-react';
 import { toast } from 'react-toastify';
-import apiClient from '../../utils/api';
+import { useGetSupplierProductsQuery, useCreateProductMutation } from '../../store/slices/apiSlice';
+import { useAppSelector } from '../../store/hooks';
+
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000');
 
 const SupplierProductManagement = () => {
+    const { user } = useAppSelector((state) => state.auth);
+    const { data: productsData, isLoading: loading } = useGetSupplierProductsQuery();
+    const [createProduct] = useCreateProductMutation();
+    
+    const products = productsData?.data || [];
+    const isKycApproved = user?.kycStatus !== 'rejected';
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -23,27 +30,7 @@ const SupplierProductManagement = () => {
 
     const categories = ['all', 'Electronics', 'Office', 'Accessories', 'Health', 'Gaming', 'Home', 'Fashion'];
 
-    useEffect(() => {
-        fetchProducts();
-    }, []);
 
-    const fetchProducts = async () => {
-        try {
-            setLoading(true);
-            const data = await apiClient.get('/api/supplier/products');
-
-            if (data.success) {
-                setProducts(data.data);
-            } else {
-                toast.error(data.message || 'Failed to fetch products');
-            }
-        } catch (error) {
-            console.error('Fetch products error:', error);
-            toast.error('Network error. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
 
 
     const handleChange = (e) => {
@@ -81,13 +68,18 @@ const SupplierProductManagement = () => {
     };
 
     const removeImage = (index) => {
+        const imageToRemove = images[index];
+        if (typeof imageToRemove === 'object' && imageToRemove.constructor === File) {
+            const url = URL.createObjectURL(imageToRemove);
+            URL.revokeObjectURL(url);
+        }
         setImages(images.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.name || !formData.description || !formData.category || !formData.price || !formData.stock || !formData.gstPercentage) {
+        if (!formData.name || !formData.description || !formData.price || !formData.stock) {
             toast.error('Please fill all required fields');
             return;
         }
@@ -99,46 +91,39 @@ const SupplierProductManagement = () => {
 
         try {
             setUploading(true);
-
             const formDataToSend = new FormData();
             formDataToSend.append('name', formData.name);
             formDataToSend.append('description', formData.description);
-            formDataToSend.append('category', formData.category);
+            formDataToSend.append('category', formData.category || 'Electronics');
             formDataToSend.append('price', formData.price);
             formDataToSend.append('gstPercentage', formData.gstPercentage);
             formDataToSend.append('stock', formData.stock);
-            formDataToSend.append('specifications', formData.specifications);
-
+            
             images.forEach((image) => {
                 formDataToSend.append('images', image);
             });
 
-            const data = await apiClient.postFormData('/api/supplier/products', formDataToSend);
-
-            if (data.success) {
-                toast.success('Product added successfully! Pending admin approval.');
-                setShowAddModal(false);
-                setFormData({
-                    name: '',
-                    description: '',
-                    category: '',
-                    price: '',
-                    gstPercentage: '18',
-                    stock: '',
-                    specifications: ''
-                });
-                setImages([]);
-                fetchProducts();
-            } else {
-                toast.error(data.message || 'Failed to add product');
-            }
+            await createProduct(formDataToSend).unwrap();
+            toast.success('Product added successfully!');
+            setShowAddModal(false);
+            setFormData({
+                name: '',
+                description: '',
+                category: '',
+                price: '',
+                gstPercentage: '18',
+                stock: '',
+                specifications: ''
+            });
+            setImages([]);
         } catch (error) {
-            console.error('Add product error:', error);
-            toast.error(error.message || 'Network error. Please try again.');
+            console.error('Product creation failed:', error);
+            toast.error(error.data?.message || 'Failed to create product');
         } finally {
             setUploading(false);
         }
     };
+
 
     const handleDelete = async (productId) => {
         if (!window.confirm('Are you sure you want to delete this product?')) return;
@@ -182,12 +167,29 @@ const SupplierProductManagement = () => {
                 </div>
                 <button
                     onClick={() => setShowAddModal(true)}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-xl font-semibold flex items-center transition-colors"
+                    disabled={!isKycApproved}
+                    className={`px-6 py-2 rounded-xl font-semibold flex items-center transition-colors ${
+                        isKycApproved 
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                 >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Product
                 </button>
             </div>
+
+            {user?.kycStatus === 'rejected' && (
+                <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3">
+                    <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                        <h3 className="font-medium text-red-800">KYC Rejected</h3>
+                        <p className="text-sm text-red-700 mt-1">
+                            Your KYC was rejected. Please resubmit your KYC documents before adding products.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -280,7 +282,7 @@ const SupplierProductManagement = () => {
                                             </span>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <div className="font-semibold text-gray-900">₹{product.price.toLocaleString()}</div>
+                                            <div className="font-semibold text-gray-900">₹{product.price?.toLocaleString() || '0'}</div>
                                         </td>
                                         <td className="py-4 px-6">
                                             <span className={`font-medium ${product.stock === 0 ? 'text-red-600' :

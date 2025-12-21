@@ -3,6 +3,8 @@ const authService = require('../services/auth.service');
 const register = async (req, res) => {
   try {
     const { name, email, password, role, businessName, gstNumber, panNumber, phoneNumber, address } = req.body;
+    
+    console.log('Registration attempt:', { name, email, role });
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({
@@ -45,7 +47,9 @@ const register = async (req, res) => {
       kycDocuments
     };
 
+    console.log('Creating user with data:', { ...userData, password: '[HIDDEN]' });
     const user = await authService.registerUser(userData);
+    console.log('User created successfully:', user._id);
 
     if (user.token) {
       res.cookie('token', user.token, {
@@ -70,6 +74,7 @@ const register = async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Registration error:', error);
     res.status(400).json({
       success: false,
       message: error.message

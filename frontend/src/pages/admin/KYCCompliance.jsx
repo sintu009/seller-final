@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useGetAllKYCQuery, useApproveKYCMutation, useRejectKYCMutation } from '../../store/slices/apiSlice';
 import {
     Search,
     Filter,
@@ -15,39 +16,19 @@ import {
     Phone
 } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
 const KYCCompliance = () => {
     const [mainTab, setMainTab] = useState('seller');
     const [activeTab, setActiveTab] = useState('pending');
     const [searchTerm, setSearchTerm] = useState('');
-    const [kycSubmissions, setKycSubmissions] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [rejectionReason, setRejectionReason] = useState('');
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState(null);
-
-    useEffect(() => {
-        fetchKYCData();
-    }, []);
-
-    const fetchKYCData = async () => {
-        try {
-            setLoading(true);
-            const response = await fetch(`${API_URL}/api/kyc/all`, {
-                credentials: 'include'
-            });
-            const result = await response.json();
-
-            if (result.success) {
-                setKycSubmissions(result.data);
-            }
-        } catch (error) {
-            console.error('Error fetching KYC data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    
+    const { data: kycData, isLoading: loading } = useGetAllKYCQuery();
+    const [approveKYC] = useApproveKYCMutation();
+    const [rejectKYC] = useRejectKYCMutation();
+    
+    const kycSubmissions = kycData?.data || [];
 
     const mainTabs = [
         { id: 'seller', label: 'Sellers', count: kycSubmissions.filter(k => k.role === 'seller').length },
@@ -96,19 +77,11 @@ const KYCCompliance = () => {
 
     const handleApprove = async (id) => {
         try {
-            const response = await fetch(`${API_URL}/api/kyc/approve/${id}`, {
-                method: 'PUT',
-                credentials: 'include'
-            });
-            const result = await response.json();
-
-            if (result.success) {
-                await fetchKYCData();
-                alert('KYC approved successfully');
-            }
+            await approveKYC(id).unwrap();
+            alert('KYC approved successfully');
         } catch (error) {
             console.error('Error approving KYC:', error);
-            alert('Failed to approve KYC');
+            alert(error.data?.message || 'Failed to approve KYC');
         }
     };
 
@@ -119,26 +92,14 @@ const KYCCompliance = () => {
         }
 
         try {
-            const response = await fetch(`${API_URL}/api/kyc/reject/${selectedUserId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({ reason: rejectionReason })
-            });
-            const result = await response.json();
-
-            if (result.success) {
-                await fetchKYCData();
-                setShowRejectModal(false);
-                setRejectionReason('');
-                setSelectedUserId(null);
-                alert('KYC rejected successfully');
-            }
+            await rejectKYC({ id: selectedUserId, reason: rejectionReason }).unwrap();
+            setShowRejectModal(false);
+            setRejectionReason('');
+            setSelectedUserId(null);
+            alert('KYC rejected successfully');
         } catch (error) {
             console.error('Error rejecting KYC:', error);
-            alert('Failed to reject KYC');
+            alert(error.data?.message || 'Failed to reject KYC');
         }
     };
 
@@ -149,7 +110,7 @@ const KYCCompliance = () => {
 
     const handleViewDocument = (filepath) => {
         if (filepath) {
-            window.open(`${API_URL}/${filepath}`, '_blank');
+            window.open(`http://localhost:5000/${filepath}`, '_blank');
         }
     };
 

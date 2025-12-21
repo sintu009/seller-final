@@ -25,7 +25,7 @@ import {
   Bar,
 } from "recharts";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const SellerOverview = () => {
   const [userData, setUserData] = useState(null);
@@ -39,7 +39,7 @@ const SellerOverview = () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_URL}/api/auth/profile`, {
-        credentials: 'include'
+        credentials: "include",
       });
       const result = await response.json();
 
@@ -47,7 +47,7 @@ const SellerOverview = () => {
         setUserData(result.data);
       }
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error("Error fetching user data:", error);
     } finally {
       setLoading(false);
     }
@@ -55,7 +55,7 @@ const SellerOverview = () => {
 
   const handleViewDocument = (filepath) => {
     if (filepath) {
-      window.open(`${API_URL}/${filepath}`, '_blank');
+      window.open(`${API_URL}/${filepath}`, "_blank");
     }
   };
   // Business Summary Mock Data
@@ -129,19 +129,19 @@ const SellerOverview = () => {
           <h1 className="text-3xl font-bold text-gray-900">
             Business Overview
           </h1>
-          <p className="text-gray-600 mt-1">
+          {/* <p className="text-gray-600 mt-1">
             Your business profile and verification status
-          </p>
+          </p> */}
         </div>
       </div>
 
       {/* Business Information Card */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Business Information</h2>
+      {/* <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Business Information</h2> */}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Business Name */}
-          <div className="flex items-start space-x-4">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> */}
+      {/* Business Name */}
+      {/* <div className="flex items-start space-x-4">
             <div className="p-3 bg-blue-50 rounded-xl">
               <Building2 className="w-6 h-6 text-blue-600" />
             </div>
@@ -151,10 +151,10 @@ const SellerOverview = () => {
                 {userData?.businessName || 'N/A'}
               </p>
             </div>
-          </div>
+          </div> */}
 
-          {/* Phone Number */}
-          <div className="flex items-start space-x-4">
+      {/* Phone Number */}
+      {/* <div className="flex items-start space-x-4">
             <div className="p-3 bg-green-50 rounded-xl">
               <Phone className="w-6 h-6 text-green-600" />
             </div>
@@ -164,10 +164,10 @@ const SellerOverview = () => {
                 {userData?.phoneNumber || 'N/A'}
               </p>
             </div>
-          </div>
+          </div> */}
 
-          {/* GST Number */}
-          <div className="flex items-start space-x-4">
+      {/* GST Number */}
+      {/* <div className="flex items-start space-x-4">
             <div className="p-3 bg-purple-50 rounded-xl">
               <FileText className="w-6 h-6 text-purple-600" />
             </div>
@@ -177,10 +177,10 @@ const SellerOverview = () => {
                 {userData?.gstNumber || 'N/A'}
               </p>
             </div>
-          </div>
+          </div> */}
 
-          {/* PAN Number */}
-          <div className="flex items-start space-x-4">
+      {/* PAN Number */}
+      {/* <div className="flex items-start space-x-4">
             <div className="p-3 bg-orange-50 rounded-xl">
               <CreditCard className="w-6 h-6 text-orange-600" />
             </div>
@@ -191,10 +191,10 @@ const SellerOverview = () => {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        {/* KYC Status */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
+      {/* KYC Status */}
+      {/* <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">KYC Verification Status</p>
@@ -218,22 +218,22 @@ const SellerOverview = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Documents Section */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Uploaded Documents</h2>
+      {/* <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">Uploaded Documents</h2> */}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* GST Certificate */}
-          <div className="border border-gray-200 rounded-xl p-4">
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> */}
+      {/* GST Certificate */}
+      {/* <div className="border border-gray-200 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-gray-600" />
                 <span className="font-medium text-gray-900">GST Certificate</span>
               </div>
-            </div>
-            {userData?.kycDocuments?.gstCertificate ? (
+            </div> */}
+      {/* {userData?.kycDocuments?.gstCertificate ? (
               <button
                 onClick={() => handleViewDocument(userData.kycDocuments.gstCertificate)}
                 className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors"
@@ -246,10 +246,10 @@ const SellerOverview = () => {
                 Not uploaded
               </div>
             )}
-          </div>
+          </div> */}
 
-          {/* PAN Card */}
-          <div className="border border-gray-200 rounded-xl p-4">
+      {/* PAN Card */}
+      {/* <div className="border border-gray-200 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <CreditCard className="w-5 h-5 text-gray-600" />
@@ -269,10 +269,10 @@ const SellerOverview = () => {
                 Not uploaded
               </div>
             )}
-          </div>
+          </div> */}
 
-          {/* Cancelled Cheque */}
-          <div className="border border-gray-200 rounded-xl p-4">
+      {/* Cancelled Cheque */}
+      {/* <div className="border border-gray-200 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-gray-600" />
@@ -294,7 +294,7 @@ const SellerOverview = () => {
             )}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Business Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

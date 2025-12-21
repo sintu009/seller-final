@@ -74,11 +74,15 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre('save', async function(next) {
+  console.log('User pre-save hook called for:', this.email);
   if (!this.isModified('password')) {
+    console.log('Password not modified, skipping hash');
     next();
   }
+  console.log('Hashing password...');
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  console.log('Password hashed successfully');
 });
 
 userSchema.methods.matchPassword = async function(enteredPassword) {

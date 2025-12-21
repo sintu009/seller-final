@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useGetProductsQuery, useApproveProductMutation, useRejectProductMutation } from '../../store/slices/apiSlice';
 import {
     Search,
     Filter,
@@ -14,13 +15,13 @@ import {
     DollarSign,
     X
 } from 'lucide-react';
-import apiClient from '../../utils/api';
 
 const ProductManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { data: productsData, isLoading: loading } = useGetProductsQuery();
+    const [approveProduct] = useApproveProductMutation();
+    const [rejectProduct] = useRejectProductMutation();
     const [showApproveModal, setShowApproveModal] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -28,25 +29,8 @@ const ProductManagement = () => {
     const [rejectionReason, setRejectionReason] = useState('');
     const [actionLoading, setActionLoading] = useState(false);
 
+    const products = productsData?.data || [];
     const statuses = ['all', 'pending', 'approved', 'rejected'];
-
-    useEffect(() => {
-        fetchProducts();
-    }, []);
-
-    const fetchProducts = async () => {
-        try {
-            setLoading(true);
-            const data = await apiClient.get('/api/admin/products');
-            if (data.success) {
-                setProducts(data.data);
-            }
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const filteredProducts = products.filter(product => {
         const supplierName = product.supplier?.businessName || product.supplier?.name || '';
@@ -104,21 +88,17 @@ const ProductManagement = () => {
 
         try {
             setActionLoading(true);
-            const data = await apiClient.put(`/api/admin/products/${selectedProduct._id}/approve`, {
+            await approveProduct({
+                id: selectedProduct._id,
                 margin: parseFloat(margin)
-            });
+            }).unwrap();
 
-            if (data.success) {
-                alert('Product approved successfully!');
-                setShowApproveModal(false);
-                setMargin('');
-                fetchProducts();
-            } else {
-                alert(data.message || 'Failed to approve product');
-            }
+            alert('Product approved successfully!');
+            setShowApproveModal(false);
+            setMargin('');
         } catch (error) {
             console.error('Error approving product:', error);
-            alert('Failed to approve product');
+            alert(error.data?.message || 'Failed to approve product');
         } finally {
             setActionLoading(false);
         }
@@ -132,21 +112,17 @@ const ProductManagement = () => {
 
         try {
             setActionLoading(true);
-            const data = await apiClient.put(`/api/admin/products/${selectedProduct._id}/reject`, {
+            await rejectProduct({
+                id: selectedProduct._id,
                 reason: rejectionReason
-            });
+            }).unwrap();
 
-            if (data.success) {
-                alert('Product rejected successfully!');
-                setShowRejectModal(false);
-                setRejectionReason('');
-                fetchProducts();
-            } else {
-                alert(data.message || 'Failed to reject product');
-            }
+            alert('Product rejected successfully!');
+            setShowRejectModal(false);
+            setRejectionReason('');
         } catch (error) {
             console.error('Error rejecting product:', error);
-            alert('Failed to reject product');
+            alert(error.data?.message || 'Failed to reject product');
         } finally {
             setActionLoading(false);
         }

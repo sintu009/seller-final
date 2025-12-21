@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAppDispatch } from '../store/hooks';
+import { useLoginMutation } from '../store/slices/apiSlice';
+import { setCredentials } from '../store/slices/authSlice';
 import { Store, Truck, Shield, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const LoginPage = () => {
   const { role } = useParams<{ role: string }>();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const dispatch = useAppDispatch();
+  const [loginMutation] = useLoginMutation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -27,14 +31,16 @@ const LoginPage = () => {
     setError('');
 
     try {
-      const result = await login(email, password);
+      const result = await loginMutation({ email, password }).unwrap();
       if (result.success) {
+        dispatch(setCredentials(result.data));
+        toast.success('Login successful!');
         navigate(`/${role}/dashboard`);
-      } else {
-        setError(result.message || 'Invalid email or password');
       }
-    } catch (err) {
-      setError('Login failed. Please try again.');
+    } catch (err: any) {
+      const errorMessage = err.data?.message || 'Login failed. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

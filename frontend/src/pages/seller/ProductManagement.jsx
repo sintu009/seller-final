@@ -1,100 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Search, ListFilter as Filter, ShoppingCart, Package, Eye, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Search, ListFilter as Filter, Send, Package, Eye, X } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useGetSellerProductsQuery, useCreateOrderMutation } from '../../store/slices/apiSlice';
 
 const ProductManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showPushModal, setShowPushModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [orderQuantity, setOrderQuantity] = useState(1);
-  const [orderNotes, setOrderNotes] = useState('');
-  const [ordering, setOrdering] = useState(false);
-
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
+  const [pushQuantity, setPushQuantity] = useState(1);
+  const [pushNotes, setPushNotes] = useState('');
+  
+  const { data: productsData, isLoading: loading } = useGetSellerProductsQuery();
+  const [createOrder, { isLoading: pushing }] = useCreateOrderMutation();
+  const products = productsData?.data?.filter(p => p.approvalStatus === 'approved') || [];
+  
   const categories = ['all', 'Electronics', 'Accessories', 'Office', 'Gaming', 'Mobile', 'Home', 'Fashion', 'Health'];
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_URL}/api/products`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      const data = await response.json();
-
-      if (data.success) {
-        setProducts(data.data);
-      } else {
-        toast.error('Failed to fetch products');
-      }
-    } catch (error) {
-      toast.error('Network error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOrderClick = (product) => {
+  const handlePushClick = (product) => {
     setSelectedProduct(product);
-    setOrderQuantity(1);
-    setOrderNotes('');
-    setShowOrderModal(true);
+    setPushQuantity(1);
+    setPushNotes('');
+    setShowPushModal(true);
   };
 
-  const handleCreateOrder = async () => {
+  const handlePushToAdmin = async () => {
     if (!selectedProduct) return;
 
-    if (orderQuantity <= 0) {
+    if (pushQuantity <= 0) {
       toast.error('Please enter a valid quantity');
       return;
     }
 
-    if (orderQuantity > selectedProduct.stock) {
+    if (pushQuantity > selectedProduct.stock) {
       toast.error(`Only ${selectedProduct.stock} units available in stock`);
       return;
     }
 
     try {
-      setOrdering(true);
-      const response = await fetch(`${API_URL}/api/orders`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId: selectedProduct._id,
-          quantity: orderQuantity,
-          notes: orderNotes,
-        }),
-      });
+      const result = await createOrder({
+        productId: selectedProduct._id,
+        quantity: pushQuantity,
+        notes: pushNotes,
+      }).unwrap();
 
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success('Order created successfully!');
-        setShowOrderModal(false);
-        setSelectedProduct(null);
-        setOrderQuantity(1);
-        setOrderNotes('');
-      } else {
-        toast.error(data.message || 'Failed to create order');
-      }
+      toast.success('Product pushed to admin for approval!');
+      setShowPushModal(false);
+      setSelectedProduct(null);
+      setPushQuantity(1);
+      setPushNotes('');
     } catch (error) {
-      toast.error('Network error. Please try again.');
-    } finally {
-      setOrdering(false);
+      toast.error(error?.data?.message || 'Failed to push product');
     }
   };
 
@@ -179,7 +135,7 @@ const ProductManagement = () => {
               <div className="relative">
                 {product.images && product.images.length > 0 ? (
                   <img
-                    src={`${API_URL}/${product.images[0]}`}
+                    src={`http://localhost:5000/${product.images[0]}`}
                     alt={product.name}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -228,15 +184,15 @@ const ProductManagement = () => {
                 </div>
 
                 <button
-                  onClick={() => handleOrderClick(product)}
+                  onClick={() => handlePushClick(product)}
                   disabled={product.stock === 0}
                   className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center ${product.stock > 0
                     ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                 >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  {product.stock > 0 ? 'Order Now' : 'Out of Stock'}
+                  <Send className="w-4 h-4 mr-2" />
+                  {product.stock > 0 ? 'Push' : 'Out of Stock'}
                 </button>
               </div>
             </div>
@@ -252,14 +208,14 @@ const ProductManagement = () => {
         </div>
       )}
 
-      {showOrderModal && selectedProduct && (
+      {showPushModal && selectedProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-gray-900">Create Order</h3>
+                <h3 className="text-xl font-bold text-gray-900">Push to Admin</h3>
                 <button
-                  onClick={() => setShowOrderModal(false)}
+                  onClick={() => setShowPushModal(false)}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <X className="w-6 h-6" />
@@ -271,7 +227,7 @@ const ProductManagement = () => {
               <div className="flex items-start space-x-4">
                 {selectedProduct.images && selectedProduct.images.length > 0 ? (
                   <img
-                    src={`${API_URL}/${selectedProduct.images[0]}`}
+                    src={`http://localhost:5000/${selectedProduct.images[0]}`}
                     alt={selectedProduct.name}
                     className="w-24 h-24 rounded-lg object-cover"
                   />
@@ -305,8 +261,8 @@ const ProductManagement = () => {
                   type="number"
                   min="1"
                   max={selectedProduct.stock}
-                  value={orderQuantity}
-                  onChange={(e) => setOrderQuantity(parseInt(e.target.value) || 1)}
+                  value={pushQuantity}
+                  onChange={(e) => setPushQuantity(parseInt(e.target.value) || 1)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter quantity"
                 />
@@ -314,11 +270,11 @@ const ProductManagement = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Order Notes (Optional)
+                  Notes (Optional)
                 </label>
                 <textarea
-                  value={orderNotes}
-                  onChange={(e) => setOrderNotes(e.target.value)}
+                  value={pushNotes}
+                  onChange={(e) => setPushNotes(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   rows={4}
                   placeholder="Add any special instructions or notes..."
@@ -334,13 +290,13 @@ const ProductManagement = () => {
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Quantity:</span>
-                  <span className="font-semibold">{orderQuantity}</span>
+                  <span className="font-semibold">{pushQuantity}</span>
                 </div>
                 <div className="border-t pt-2 mt-2">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold text-gray-900">Total Amount:</span>
                     <span className="text-2xl font-bold text-green-600">
-                      ₹{((selectedProduct.finalPrice || selectedProduct.price) * orderQuantity).toLocaleString()}
+                      ₹{((selectedProduct.finalPrice || selectedProduct.price) * pushQuantity).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -348,25 +304,25 @@ const ProductManagement = () => {
 
               <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
                 <button
-                  onClick={() => setShowOrderModal(false)}
+                  onClick={() => setShowPushModal(false)}
                   className="px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={handleCreateOrder}
-                  disabled={ordering}
+                  onClick={handlePushToAdmin}
+                  disabled={pushing}
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
-                  {ordering ? (
+                  {pushing ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Creating Order...
+                      Pushing...
                     </>
                   ) : (
                     <>
-                      <ShoppingCart className="w-5 h-5 mr-2" />
-                      Place Order
+                      <Send className="w-5 h-5 mr-2" />
+                      Push to Admin
                     </>
                   )}
                 </button>

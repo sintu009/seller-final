@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAppDispatch } from "../store/hooks";
+import { useRegisterMutation } from "../store/slices/apiSlice";
+import { setCredentials } from "../store/slices/authSlice";
 import { Store, Truck, Shield, Eye, EyeOff, ArrowLeft, Upload, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 
 const SignupPage = () => {
   const { role } = useParams<{ role: string }>();
   const navigate = useNavigate();
-  const { signup } = useAuth();
+  const dispatch = useAppDispatch();
+  const [registerMutation] = useRegisterMutation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -112,8 +115,8 @@ const SignupPage = () => {
         if (files.cancelledCheque) formDataToSend.append('cancelledCheque', files.cancelledCheque);
       }
 
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${API_URL}/api/auth/register`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         credentials: 'include',
         body: formDataToSend,
@@ -122,7 +125,10 @@ const SignupPage = () => {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success(data.message);
+        if (data.token) {
+          dispatch(setCredentials(data.data));
+        }
+        toast.success(data.message || 'Registration successful!');
         if (role === 'admin') {
           navigate(`/admin/dashboard`);
         } else {

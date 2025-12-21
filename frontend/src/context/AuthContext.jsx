@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { setCredentials, logout as logoutAction, setLoading } from '../store/slices/authSlice';
+import { useLoginMutation, useRegisterMutation, useLogoutMutation, useGetProfileQuery } from '../store/slices/apiSlice';
 
 const AuthContext = createContext();
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -13,144 +14,64 @@ export const useAuth = () => {
   return context;
 };
 
-const getStoredToken = () => localStorage.getItem('token');
-const getStoredUser = () => {
-  const userStr = localStorage.getItem('user');
-  return userStr ? JSON.parse(userStr) : null;
-};
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(getStoredUser());
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { user, isAuthenticated, loading } = useAppSelector((state) => state.auth);
+  const [loginMutation] = useLoginMutation();
+  const [registerMutation] = useRegisterMutation();
+  const [logoutMutation] = useLogoutMutation();
+  const { data: profileData, isLoading: profileLoading } = useGetProfileQuery(undefined, { 
+    skip: !isAuthenticated 
+  });
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const token = getStoredToken();
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch(`${API_URL}/api/auth/profile`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setUser(data.data);
-          localStorage.setItem('user', JSON.stringify(data.data));
-        }
-      } else {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      setUser(null);
-    } finally {
-      setLoading(false);
+    if (profileData?.success && profileData?.data) {
+      dispatch(setCredentials(profileData.data));
     }
-  };
+  }, [profileData, dispatch]);
 
   const login = async (email, password) => {
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-        }
-        const userData = data.data;
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+      dispatch(setLoading(true));
+      const result = await loginMutation({ email, password }).unwrap();
+      if (result.success) {
+        dispatch(setCredentials(result.data));
         toast.success('Login successful!');
         return { success: true };
-      } else {
-        toast.error(data.message || 'Login failed');
-        return { success: false, message: data.message || 'Login failed' };
       }
     } catch (error) {
-      toast.error('Network error. Please try again.');
-      return { success: false, message: 'Network error. Please try again.' };
+      toast.error(error.data?.message || 'Login failed');
+      return { success: false, message: error.data?.message || 'Login failed' };
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
   const signup = async (email, password, name, role) => {
     try {
-      const response = await fetch(`${API_URL}/api/auth/register`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, name, role }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-        }
-        const userData = data.data;
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+      dispatch(setLoading(true));
+      const result = await registerMutation({ email, password, name, role }).unwrap();
+      if (result.success) {
+        dispatch(setCredentials(result.data));
         toast.success('Account created successfully!');
         return { success: true };
-      } else {
-        toast.error(data.message || 'Registration failed');
-        return { success: false, message: data.message || 'Registration failed' };
       }
     } catch (error) {
-      toast.error('Network error. Please try again.');
-      return { success: false, message: 'Network error. Please try again.' };
+      toast.error(error.data?.message || 'Registration failed');
+      return { success: false, message: error.data?.message || 'Registration failed' };
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
   const logout = async () => {
     try {
-      const token = getStoredToken();
-      if (token) {
-        await fetch(`${API_URL}/api/auth/logout`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-        });
-      }
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      setUser(null);
-      toast.success('Logged out successfully!');
+      await logoutMutation().unwrap();
     } catch (error) {
-      console.error('Logout failed:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      setUser(null);
+      console.error('Logout request failed:', error);
+    } finally {
+      dispatch(logoutAction());
+      toast.success('Logged out successfully!');
     }
   };
 

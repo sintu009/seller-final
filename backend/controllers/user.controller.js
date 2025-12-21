@@ -63,7 +63,37 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin only.'
+      });
+    }
+
+    const { role, kycStatus } = req.query;
+    const filter = {};
+    
+    if (role) filter.role = role;
+    if (kycStatus) filter.kycStatus = kycStatus;
+
+    const users = await User.find(filter).select('-password').sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: users
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  getAllUsers
 };

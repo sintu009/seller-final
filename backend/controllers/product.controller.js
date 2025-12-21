@@ -3,40 +3,58 @@ const User = require('../models/user.model');
 
 const createProduct = async (req, res) => {
   try {
+    console.log('Product creation request received');
+    console.log('Request body:', req.body);
+    console.log('Request files:', req.files);
+    console.log('User:', req.user);
+    
     const supplierId = req.user.id;
     const user = await User.findById(supplierId);
 
     if (!user) {
+      console.log('User not found:', supplierId);
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
 
-    if (user.role !== 'supplier') {
+    console.log('User found:', { id: user._id, role: user.role, kycStatus: user.kycStatus });
+
+    if (user.role !== 'supplier' && user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only suppliers can create products'
+        message: 'Only suppliers and admins can create products'
       });
     }
 
-    if (user.kycStatus !== 'approved') {
-      return res.status(403).json({
-        success: false,
-        message: 'Your KYC must be approved before you can add products'
-      });
+    // Skip KYC check for admins, and for suppliers check if KYC is actually required
+    if (user.role === 'supplier') {
+      console.log('Supplier KYC status check:', user.kycStatus);
+      // Only block if KYC is explicitly rejected, allow pending and approved
+      if (user.kycStatus === 'rejected') {
+        return res.status(403).json({
+          success: false,
+          message: 'Your KYC was rejected. Please resubmit your KYC documents.'
+        });
+      }
     }
 
     const images = req.files ? req.files.map(file => file.path.replace(/\\/g, '/')) : [];
+    console.log('Processed images:', images);
 
     const productData = {
       ...req.body,
       supplier: supplierId,
       images: images
     };
+    
+    console.log('Product data to create:', productData);
 
     const product = await Product.create(productData);
     await product.populate('supplier', 'name email');
+
+    console.log('Product created successfully:', product._id);
 
     res.status(201).json({
       success: true,
@@ -45,6 +63,7 @@ const createProduct = async (req, res) => {
     });
   } catch (error) {
     console.error('Product creation error:', error);
+    console.error('Error stack:', error.stack);
     res.status(400).json({
       success: false,
       message: error.message

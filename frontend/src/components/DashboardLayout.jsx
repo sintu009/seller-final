@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { useLogoutMutation } from '../store/slices/apiSlice';
+import { logout as logoutAction } from '../store/slices/authSlice';
 import {
   Menu,
   X,
@@ -19,7 +21,9 @@ import {
 const DashboardLayout = ({ children, sidebarItems, title }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const [logoutMutation] = useLogoutMutation();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -54,9 +58,15 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
     // Add your delete logic here
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logoutMutation().unwrap();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      dispatch(logoutAction());
+      navigate('/');
+    }
   };
 
   return (

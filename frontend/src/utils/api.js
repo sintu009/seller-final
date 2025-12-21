@@ -1,33 +1,57 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
   return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
+    'Content-Type': 'application/json'
   };
 };
 
 const getAuthHeadersMultipart = () => {
-  const token = localStorage.getItem('token');
-  console.log('Token in multipart headers:', token ? 'Present' : 'Missing');
-  return {
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
+  return {};
+};
+
+// Simple error handling for auth failures
+const handleAuthError = (response) => {
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  }
 };
 
 export const apiClient = {
   async get(endpoint) {
+    console.log('API GET request to:', `${API_URL}${endpoint}`);
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: 'GET',
       credentials: 'include',
       headers: getAuthHeaders(),
     });
-    const data = await response.json();
-    if (!response.ok && data.message) {
-      throw new Error(data.message);
+    
+    console.log('Response status:', response.status);
+    
+    if (response.status === 401) {
+      handleAuthError(response);
+      throw new Error('Authentication failed');
     }
-    return data;
+    
+    const text = await response.text();
+    console.log('Response text preview:', text.substring(0, 100));
+    
+    if (text.startsWith('<!DOCTYPE')) {
+      throw new Error(`Server returned HTML instead of JSON. Status: ${response.status}`);
+    }
+    
+    try {
+      const data = JSON.parse(text);
+      if (!response.ok && data.message) {
+        throw new Error(data.message);
+      }
+      return data;
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      throw new Error('Invalid response from server');
+    }
   },
 
   async post(endpoint, data) {
@@ -37,6 +61,12 @@ export const apiClient = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
+    
+    if (response.status === 401) {
+      handleAuthError(response);
+      throw new Error('Authentication failed');
+    }
+    
     const result = await response.json();
     if (!response.ok && result.message) {
       throw new Error(result.message);
@@ -51,6 +81,12 @@ export const apiClient = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
+    
+    if (response.status === 401) {
+      handleAuthError(response);
+      throw new Error('Authentication failed');
+    }
+    
     const result = await response.json();
     if (!response.ok && result.message) {
       throw new Error(result.message);
@@ -64,6 +100,12 @@ export const apiClient = {
       credentials: 'include',
       headers: getAuthHeaders(),
     });
+    
+    if (response.status === 401) {
+      handleAuthError(response);
+      throw new Error('Authentication failed');
+    }
+    
     const data = await response.json();
     if (!response.ok && data.message) {
       throw new Error(data.message);
@@ -78,20 +120,12 @@ export const apiClient = {
       headers: getAuthHeadersMultipart(),
       body: formData,
     });
-    const data = await response.json();
-    if (!response.ok && data.message) {
-      throw new Error(data.message);
+    
+    if (response.status === 401) {
+      handleAuthError(response);
+      throw new Error('Authentication failed');
     }
-    return data;
-  },
-
-  async putFormData(endpoint, formData) {
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: getAuthHeadersMultipart(),
-      body: formData,
-    });
+    
     const data = await response.json();
     if (!response.ok && data.message) {
       throw new Error(data.message);

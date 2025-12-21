@@ -12,7 +12,7 @@ const {
 } = require('../controllers/product.controller');
 
 router.use(protect);
-router.use(authorize('supplier'));
+router.use(authorize('supplier', 'admin'));
 
 router.post('/products', uploadProductImages, createProduct);
 router.get('/products', getSupplierProducts);

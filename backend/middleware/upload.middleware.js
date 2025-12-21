@@ -43,7 +43,22 @@ const uploadDocuments = upload.fields([
   { name: 'cancelledCheque', maxCount: 1 }
 ]);
 
-const uploadProductImages = upload.array('images', 5);
+const uploadProductImages = (req, res, next) => {
+  console.log('Upload middleware called');
+  const uploadHandler = upload.array('images', 5);
+  
+  uploadHandler(req, res, (err) => {
+    if (err) {
+      console.error('Upload error:', err);
+      return res.status(400).json({
+        success: false,
+        message: err.message
+      });
+    }
+    console.log('Upload successful, files:', req.files);
+    next();
+  });
+};
 
 module.exports = {
   upload,

@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import TestLogin from './pages/TestLogin';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import SupplierDashboard from './pages/supplier/SupplierDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -12,19 +13,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
-  const handleLogin = async () => {
-    try {
-      // ...login logic...
-      if (loginSuccess) {
-        toast.success('Login successful!');
-      } else {
-        toast.error('Invalid credentials. Please try again.');
-      }
-    } catch (error) {
-      toast.error('Login failed. Please check your credentials.');
-    }
-  };
-
   return (
     <AuthProvider>
       <Router>
@@ -43,6 +31,7 @@ function App() {
           />
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/test-login" element={<TestLogin />} />
             <Route path="/login/:role" element={<LoginPage />} />
             <Route path="/signup/:role" element={<SignupPage />} />
             <Route

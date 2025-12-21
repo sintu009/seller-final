@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useGetProductsQuery, useGetAllKYCQuery } from '../../store/slices/apiSlice';
+import { useAppSelector } from '../../store/hooks';
 import {
     Users,
     Building,
@@ -31,12 +33,32 @@ import {
 
 const AdminOverview = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('30days');
+    const { isAuthenticated } = useAppSelector((state) => state.auth);
+    const { data: productsData, isLoading: productsLoading } = useGetProductsQuery(undefined, { skip: !isAuthenticated });
+    const { data: kycData, isLoading: kycLoading } = useGetAllKYCQuery(undefined, { skip: !isAuthenticated });
 
-    // Mock data for admin dashboard
+    const products = productsData?.data || [];
+    const kycUsers = kycData?.data || [];
+    const sellers = kycUsers.filter(user => user.role === 'seller');
+    const suppliers = kycUsers.filter(user => user.role === 'supplier');
+    const pendingProducts = products.filter(p => p.approvalStatus === 'pending').length;
+    const pendingKyc = kycUsers.filter(user => user.kycStatus === 'pending').length;
+
+    const dashboardData = {
+        totalSellers: sellers.length,
+        totalSuppliers: suppliers.length,
+        totalProducts: products.length,
+        totalOrders: 0, // Mock data
+        totalRevenue: null,
+        pendingApprovals: pendingProducts + pendingKyc
+    };
+
+    const loading = productsLoading || kycLoading;
+
     const stats = [
         {
             title: 'Total Sellers Registered',
-            value: '2,847',
+            value: loading ? '...' : dashboardData.totalSellers.toLocaleString(),
             change: '+12.5%',
             trend: 'up',
             icon: Users,
@@ -44,7 +66,7 @@ const AdminOverview = () => {
         },
         {
             title: 'Total Suppliers Registered',
-            value: '456',
+            value: loading ? '...' : dashboardData.totalSuppliers.toLocaleString(),
             change: '+8.3%',
             trend: 'up',
             icon: Building,
@@ -52,7 +74,7 @@ const AdminOverview = () => {
         },
         {
             title: 'Total Products Listed',
-            value: '15,678',
+            value: loading ? '...' : dashboardData.totalProducts.toLocaleString(),
             change: '+15.7%',
             trend: 'up',
             icon: Package,
@@ -60,7 +82,7 @@ const AdminOverview = () => {
         },
         {
             title: 'Total Orders Processed',
-            value: '89,234',
+            value: loading ? '...' : dashboardData.totalOrders.toLocaleString(),
             change: '+22.1%',
             trend: 'up',
             icon: ShoppingCart,
@@ -68,15 +90,15 @@ const AdminOverview = () => {
         },
         {
             title: 'Total Revenue Generated',
-            value: '₹45,67,890',
-            change: '+18.9%',
+            value: dashboardData.totalRevenue ? `₹${dashboardData.totalRevenue.toLocaleString()}` : 'N/A',
+            change: dashboardData.totalRevenue ? '+18.9%' : 'N/A',
             trend: 'up',
             icon: DollarSign,
             color: 'text-orange-600 bg-orange-50'
         },
         {
             title: 'Pending Approvals',
-            value: '23',
+            value: loading ? '...' : dashboardData.pendingApprovals.toString(),
             change: '-5.2%',
             trend: 'down',
             icon: Clock,
@@ -185,15 +207,17 @@ const AdminOverview = () => {
                             <div className={`p-3 rounded-xl ${stat.color}`}>
                                 <stat.icon className="w-6 h-6" />
                             </div>
-                            <div className={`flex items-center text-sm font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                                }`}>
-                                {stat.trend === 'up' ? (
-                                    <ArrowUpRight className="w-4 h-4 mr-1" />
-                                ) : (
-                                    <ArrowDownRight className="w-4 h-4 mr-1" />
-                                )}
-                                {stat.change}
-                            </div>
+                            {stat.change !== 'N/A' && (
+                                <div className={`flex items-center text-sm font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                                    }`}>
+                                    {stat.trend === 'up' ? (
+                                        <ArrowUpRight className="w-4 h-4 mr-1" />
+                                    ) : (
+                                        <ArrowDownRight className="w-4 h-4 mr-1" />
+                                    )}
+                                    {stat.change}
+                                </div>
+                            )}
                         </div>
                         <div className="space-y-1">
                             <p className="text-gray-600 text-sm">{stat.title}</p>

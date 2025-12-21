@@ -1,12 +1,9 @@
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-
-let mongoServer;
 
 const connectDB = async () => {
   try {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/Centraldb';
+    console.log('Attempting to connect to MongoDB:', mongoUri);
 
     const conn = await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
@@ -14,23 +11,26 @@ const connectDB = async () => {
     });
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
-    console.log('Using in-memory MongoDB server');
+    console.log(`Database: ${conn.connection.name}`);
+    console.log('Connection state:', mongoose.connection.readyState);
+    
+    // Test database write
+    mongoose.connection.on('connected', () => {
+      console.log('Mongoose connected to MongoDB');
+    });
+    
+    mongoose.connection.on('error', (err) => {
+      console.error('Mongoose connection error:', err);
+    });
+    
+    mongoose.connection.on('disconnected', () => {
+      console.log('Mongoose disconnected');
+    });
+    
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    console.error(`MongoDB connection error: ${error.message}`);
     process.exit(1);
   }
 };
 
-const disconnectDB = async () => {
-  try {
-    await mongoose.disconnect();
-    if (mongoServer) {
-      await mongoServer.stop();
-    }
-  } catch (error) {
-    console.error(`Error disconnecting: ${error.message}`);
-  }
-};
-
 module.exports = connectDB;
-module.exports.disconnectDB = disconnectDB;
