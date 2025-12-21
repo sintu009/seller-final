@@ -17,131 +17,135 @@ import {
     Mail,
     MapPin
 } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { useGetAllUsersQuery, useGetAllKYCQuery, useApproveUserMutation, useRejectUserMutation, useBlockUserMutation } from '../../store/slices/apiSlice';
+import { useAppSelector } from '../../store/hooks';
 
 const UserManagement = () => {
     const [activeTab, setActiveTab] = useState('sellers');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
 
-    // Mock sellers data
-    const sellers = [
-        {
-            id: 1,
-            name: 'TechStore India',
-            email: 'contact@techstore.com',
-            phone: '+91 98765 43210',
-            status: 'Active',
-            kycStatus: 'Verified',
-            walletBalance: 45678,
-            joinDate: '2024-01-15',
-            totalOrders: 245,
-            totalRevenue: 567890,
-            address: 'Mumbai, Maharashtra'
-        },
-        {
-            id: 2,
-            name: 'ElectroMart',
-            email: 'orders@electromart.com',
-            phone: '+91 98765 43211',
-            status: 'Pending',
-            kycStatus: 'Pending',
-            walletBalance: 12340,
-            joinDate: '2024-01-20',
-            totalOrders: 0,
-            totalRevenue: 0,
-            address: 'Delhi, India'
-        },
-        {
-            id: 3,
-            name: 'GadgetHub',
-            email: 'support@gadgethub.com',
-            phone: '+91 98765 43212',
-            status: 'Blocked',
-            kycStatus: 'Rejected',
-            walletBalance: 0,
-            joinDate: '2024-01-10',
-            totalOrders: 89,
-            totalRevenue: 234567,
-            address: 'Bangalore, Karnataka'
-        }
-    ];
+    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
-    // Mock suppliers data
-    const suppliers = [
-        {
-            id: 1,
-            companyName: 'Kumar Electronics Manufacturing',
-            email: 'info@kumarelectronics.com',
-            phone: '+91 98765 54321',
-            status: 'Active',
-            kycStatus: 'Verified',
-            totalProducts: 156,
-            joinDate: '2024-01-05',
-            totalOrders: 1247,
-            totalRevenue: 2345678,
-            address: 'Gurgaon, Haryana'
-        },
-        {
-            id: 2,
-            companyName: 'Premium Accessories Ltd',
-            email: 'contact@premiumacc.com',
-            phone: '+91 98765 54322',
-            status: 'Pending',
-            kycStatus: 'Pending',
-            totalProducts: 45,
-            joinDate: '2024-01-22',
-            totalOrders: 0,
-            totalRevenue: 0,
-            address: 'Chennai, Tamil Nadu'
-        }
-    ];
+    const { 
+        data: usersData, 
+        isLoading: usersLoading, 
+        error: usersError,
+        refetch: refetchUsers 
+    } = useGetAllUsersQuery(undefined, {
+        skip: !isAuthenticated || user?.role !== 'admin'
+    });
+
+    const [approveUser] = useApproveUserMutation();
+    const [rejectUser] = useRejectUserMutation();
+    const [blockUser] = useBlockUserMutation();
+
+    const users = usersData?.data || [];
+
+    // Transform user data to match original structure
+    const enrichedUsers = users.map(user => ({
+        id: user._id,
+        name: user.name || 'N/A',
+        email: user.email,
+        phone: user.phone || 'N/A',
+        status: user.isActive ? 'Active' : 'Blocked',
+        kycStatus: user.kycStatus ? user.kycStatus.charAt(0).toUpperCase() + user.kycStatus.slice(1) : 'Pending',
+        walletBalance: 0, // Default value
+        joinDate: new Date(user.createdAt).toLocaleDateString(),
+        totalOrders: 0, // Default value
+        totalRevenue: 0, // Default value
+        address: user.address ? `${user.address.city || ''}, ${user.address.state || ''}`.trim().replace(/^,\s*|,\s*$/g, '') || 'N/A' : 'N/A',
+        role: user.role,
+        _id: user._id
+    }));
+
+    // Mock sellers data - replace with real data
+    const sellers = enrichedUsers.filter(user => user.role === 'seller');
+
+    // Mock suppliers data - replace with real data  
+    const suppliers = enrichedUsers.filter(user => user.role === 'supplier').map(user => ({
+        id: user.id,
+        companyName: user.name,
+        email: user.email,
+        phone: user.phone,
+        status: user.status,
+        kycStatus: user.kycStatus,
+        totalProducts: 0, // Default value
+        joinDate: user.joinDate,
+        totalOrders: 0, // Default value
+        totalRevenue: 0, // Default value
+        address: user.address,
+        _id: user._id
+    }));
 
     const tabs = [
         { id: 'sellers', label: 'Sellers', count: sellers.length },
         { id: 'suppliers', label: 'Suppliers', count: suppliers.length },
-        { id: 'admins', label: 'Admin Staff', count: 3 }
+        { id: 'admins', label: 'Admin Staff', count: enrichedUsers.filter(u => u.role === 'admin').length }
     ];
 
     const statuses = ['all', 'Active', 'Pending', 'Blocked', 'Rejected'];
 
     const getStatusColor = (status) => {
-        switch (status) {
-            case 'Active': return 'bg-green-100 text-green-800';
-            case 'Pending': return 'bg-yellow-100 text-yellow-800';
-            case 'Blocked': return 'bg-red-100 text-red-800';
-            case 'Rejected': return 'bg-red-100 text-red-800';
+        const lowerStatus = status?.toLowerCase();
+        switch (lowerStatus) {
+            case 'active': return 'bg-green-100 text-green-800';
+            case 'pending': return 'bg-yellow-100 text-yellow-800';
+            case 'blocked': return 'bg-red-100 text-red-800';
+            case 'rejected': return 'bg-red-100 text-red-800';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
 
     const getKycStatusColor = (status) => {
-        switch (status) {
-            case 'Verified': return 'bg-green-100 text-green-800';
-            case 'Pending': return 'bg-yellow-100 text-yellow-800';
-            case 'Rejected': return 'bg-red-100 text-red-800';
+        const lowerStatus = status?.toLowerCase();
+        switch (lowerStatus) {
+            case 'approved': return 'bg-green-100 text-green-800';
+            case 'pending': return 'bg-yellow-100 text-yellow-800';
+            case 'rejected': return 'bg-red-100 text-red-800';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
 
     const getKycStatusIcon = (status) => {
-        switch (status) {
-            case 'Verified': return <CheckCircle className="w-4 h-4" />;
-            case 'Pending': return <Clock className="w-4 h-4" />;
-            case 'Rejected': return <XCircle className="w-4 h-4" />;
+        const lowerStatus = status?.toLowerCase();
+        switch (lowerStatus) {
+            case 'approved': return <CheckCircle className="w-4 h-4" />;
+            case 'pending': return <Clock className="w-4 h-4" />;
+            case 'rejected': return <XCircle className="w-4 h-4" />;
             default: return <Clock className="w-4 h-4" />;
         }
     };
 
-    const handleApprove = (id, type) => {
-        console.log(`Approving ${type} with ID: ${id}`);
+    const handleApprove = async (id, type) => {
+        try {
+            await approveUser(id).unwrap();
+            toast.success('User approved successfully!');
+            refetchUsers();
+        } catch (error) {
+            toast.error('Failed to approve user');
+        }
     };
 
-    const handleReject = (id, type) => {
-        console.log(`Rejecting ${type} with ID: ${id}`);
+    const handleReject = async (id, type) => {
+        try {
+            await rejectUser({ userId: id, reason: 'Admin rejection' }).unwrap();
+            toast.success('User rejected successfully!');
+            refetchUsers();
+        } catch (error) {
+            toast.error('Failed to reject user');
+        }
     };
 
-    const handleBlock = (id, type) => {
-        console.log(`Blocking ${type} with ID: ${id}`);
+    const handleBlock = async (id, type) => {
+        try {
+            await blockUser({ userId: id, reason: 'Admin block' }).unwrap();
+            toast.success('User blocked successfully!');
+            refetchUsers();
+        } catch (error) {
+            toast.error('Failed to block user');
+        }
     };
 
     const handleResetPassword = (id, type) => {
@@ -161,6 +165,17 @@ const UserManagement = () => {
         const matchesStatus = selectedStatus === 'all' || supplier.status === selectedStatus;
         return matchesSearch && matchesStatus;
     });
+
+    if (usersLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <div className="bg-white p-8 rounded-lg shadow-md text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading users...</p>
+                </div>
+            </div>
+        );
+    }
 
     const renderSellersTab = () => (
         <div className="space-y-6">
@@ -183,9 +198,9 @@ const UserManagement = () => {
                     </div>
                 </div>
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="text-sm text-gray-600 mb-1">KYC Verified</div>
+                    <div className="text-sm text-gray-600 mb-1">KYC Approved</div>
                     <div className="text-2xl font-bold text-blue-600">
-                        {sellers.filter(s => s.kycStatus === 'Verified').length}
+                        {sellers.filter(s => s.kycStatus === 'Approved').length}
                     </div>
                 </div>
             </div>
@@ -217,22 +232,22 @@ const UserManagement = () => {
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="space-y-1">
-                                            <div className="flex items-center text-sm text-gray-600">
-                                                <Mail className="w-4 h-4 mr-2" />
+                                            <div className="flex items-center text-sm">
+                                                <Mail className="w-4 h-4 mr-2 text-gray-400" />
                                                 {seller.email}
                                             </div>
                                             <div className="flex items-center text-sm text-gray-600">
-                                                <Phone className="w-4 h-4 mr-2" />
+                                                <Phone className="w-4 h-4 mr-2 text-gray-400" />
                                                 {seller.phone}
                                             </div>
                                             <div className="flex items-center text-sm text-gray-600">
-                                                <MapPin className="w-4 h-4 mr-2" />
+                                                <MapPin className="w-4 h-4 mr-2 text-gray-400" />
                                                 {seller.address}
                                             </div>
                                         </div>
                                     </td>
                                     <td className="py-4 px-6">
-                                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(seller.status)}`}>
+                                        <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(seller.status)}`}>
                                             {seller.status}
                                         </span>
                                     </td>
@@ -245,13 +260,16 @@ const UserManagement = () => {
                                     <td className="py-4 px-6">
                                         <div className="flex items-center">
                                             <Wallet className="w-4 h-4 mr-2 text-gray-400" />
-                                            <span className="font-semibold text-gray-900">₹{seller.walletBalance.toLocaleString()}</span>
+                                            <div>
+                                                <div className="font-semibold text-gray-900">₹{seller.walletBalance.toLocaleString()}</div>
+                                                <div className="text-xs text-gray-500">Available</div>
+                                            </div>
                                         </div>
                                     </td>
                                     <td className="py-4 px-6">
-                                        <div className="text-sm">
-                                            <div className="text-gray-900">{seller.totalOrders} orders</div>
-                                            <div className="text-gray-500">₹{seller.totalRevenue.toLocaleString()}</div>
+                                        <div>
+                                            <div className="text-sm font-medium text-gray-900">{seller.totalOrders} Orders</div>
+                                            <div className="text-sm text-gray-600">₹{seller.totalRevenue.toLocaleString()} Revenue</div>
                                         </div>
                                     </td>
                                     <td className="py-4 px-6">
@@ -259,16 +277,16 @@ const UserManagement = () => {
                                             {seller.status === 'Pending' && (
                                                 <>
                                                     <button
-                                                        onClick={() => handleApprove(seller.id, 'seller')}
+                                                        onClick={() => handleApprove(seller._id, 'seller')}
                                                         className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                                        title="Approve"
+                                                        title="Approve Seller"
                                                     >
                                                         <UserCheck className="w-4 h-4" />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleReject(seller.id, 'seller')}
+                                                        onClick={() => handleReject(seller._id, 'seller')}
                                                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                        title="Reject"
+                                                        title="Reject Seller"
                                                     >
                                                         <UserX className="w-4 h-4" />
                                                     </button>
@@ -276,19 +294,15 @@ const UserManagement = () => {
                                             )}
                                             {seller.status === 'Active' && (
                                                 <button
-                                                    onClick={() => handleBlock(seller.id, 'seller')}
+                                                    onClick={() => handleBlock(seller._id, 'seller')}
                                                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                    title="Block"
+                                                    title="Block Seller"
                                                 >
                                                     <Shield className="w-4 h-4" />
                                                 </button>
                                             )}
-                                            <button
-                                                onClick={() => handleResetPassword(seller.id, 'seller')}
-                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                title="Reset Password"
-                                            >
-                                                <Edit3 className="w-4 h-4" />
+                                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                                <Eye className="w-4 h-4" />
                                             </button>
                                             <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
                                                 <MoreVertical className="w-4 h-4" />
@@ -325,9 +339,9 @@ const UserManagement = () => {
                     </div>
                 </div>
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="text-sm text-gray-600 mb-1">Total Products</div>
+                    <div className="text-sm text-gray-600 mb-1">KYC Approved</div>
                     <div className="text-2xl font-bold text-blue-600">
-                        {suppliers.reduce((sum, s) => sum + s.totalProducts, 0)}
+                        {suppliers.filter(s => s.kycStatus === 'Approved').length}
                     </div>
                 </div>
             </div>
@@ -359,22 +373,22 @@ const UserManagement = () => {
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="space-y-1">
-                                            <div className="flex items-center text-sm text-gray-600">
-                                                <Mail className="w-4 h-4 mr-2" />
+                                            <div className="flex items-center text-sm">
+                                                <Mail className="w-4 h-4 mr-2 text-gray-400" />
                                                 {supplier.email}
                                             </div>
                                             <div className="flex items-center text-sm text-gray-600">
-                                                <Phone className="w-4 h-4 mr-2" />
+                                                <Phone className="w-4 h-4 mr-2 text-gray-400" />
                                                 {supplier.phone}
                                             </div>
                                             <div className="flex items-center text-sm text-gray-600">
-                                                <MapPin className="w-4 h-4 mr-2" />
+                                                <MapPin className="w-4 h-4 mr-2 text-gray-400" />
                                                 {supplier.address}
                                             </div>
                                         </div>
                                     </td>
                                     <td className="py-4 px-6">
-                                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(supplier.status)}`}>
+                                        <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(supplier.status)}`}>
                                             {supplier.status}
                                         </span>
                                     </td>
@@ -385,15 +399,12 @@ const UserManagement = () => {
                                         </span>
                                     </td>
                                     <td className="py-4 px-6">
-                                        <div className="text-sm">
-                                            <div className="font-semibold text-gray-900">{supplier.totalProducts}</div>
-                                            <div className="text-gray-500">products listed</div>
-                                        </div>
+                                        <div className="text-sm font-medium text-gray-900">{supplier.totalProducts} Products</div>
                                     </td>
                                     <td className="py-4 px-6">
-                                        <div className="text-sm">
-                                            <div className="text-gray-900">{supplier.totalOrders} orders</div>
-                                            <div className="text-gray-500">₹{supplier.totalRevenue.toLocaleString()}</div>
+                                        <div>
+                                            <div className="text-sm font-medium text-gray-900">{supplier.totalOrders} Orders</div>
+                                            <div className="text-sm text-gray-600">₹{supplier.totalRevenue.toLocaleString()} Revenue</div>
                                         </div>
                                     </td>
                                     <td className="py-4 px-6">
@@ -401,16 +412,16 @@ const UserManagement = () => {
                                             {supplier.status === 'Pending' && (
                                                 <>
                                                     <button
-                                                        onClick={() => handleApprove(supplier.id, 'supplier')}
+                                                        onClick={() => handleApprove(supplier._id, 'supplier')}
                                                         className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                                        title="Approve"
+                                                        title="Approve Supplier"
                                                     >
                                                         <UserCheck className="w-4 h-4" />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleReject(supplier.id, 'supplier')}
+                                                        onClick={() => handleReject(supplier._id, 'supplier')}
                                                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                        title="Reject"
+                                                        title="Reject Supplier"
                                                     >
                                                         <UserX className="w-4 h-4" />
                                                     </button>
@@ -418,13 +429,16 @@ const UserManagement = () => {
                                             )}
                                             {supplier.status === 'Active' && (
                                                 <button
-                                                    onClick={() => handleBlock(supplier.id, 'supplier')}
+                                                    onClick={() => handleBlock(supplier._id, 'supplier')}
                                                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                    title="Block"
+                                                    title="Block Supplier"
                                                 >
                                                     <Shield className="w-4 h-4" />
                                                 </button>
                                             )}
+                                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                                <Eye className="w-4 h-4" />
+                                            </button>
                                             <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
                                                 <MoreVertical className="w-4 h-4" />
                                             </button>
@@ -439,91 +453,93 @@ const UserManagement = () => {
         </div>
     );
 
-    const renderAdminsTab = () => (
-        <div className="text-center py-12">
-            <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Admin Staff Management</h3>
-            <p className="text-gray-600">Create and manage sub-admin accounts with role-based permissions</p>
-            <button className="mt-4 bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-xl font-medium transition-colors">
-                Add New Admin
-            </button>
-        </div>
-    );
-
     return (
         <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-                    <p className="text-gray-600 mt-1">Manage sellers, suppliers, and admin staff</p>
+                    <p className="text-gray-600 mt-1">
+                        Manage sellers, suppliers, and admin staff
+                    </p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+                    <button 
+                        onClick={() => { refetchUsers(); }}
+                        className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center"
+                    >
                         <Download className="w-4 h-4 mr-2" />
                         Export Users
+                    </button>
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium transition-colors flex items-center">
+                        <UserCheck className="w-4 h-4 mr-2" />
+                        Bulk Actions
                     </button>
                 </div>
             </div>
 
             {/* Tabs */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex space-x-1 mb-6">
+                <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`px-4 py-2 rounded-xl font-medium transition-colors flex items-center ${activeTab === tab.id
-                                ? 'bg-orange-100 text-orange-700 border border-orange-200'
-                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                                }`}
+                            className={`flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-colors ${
+                                activeTab === tab.id
+                                    ? 'bg-white text-blue-600 shadow-sm'
+                                    : 'text-gray-600 hover:text-gray-900'
+                            }`}
                         >
-                            {tab.label}
-                            <span className="ml-2 px-2 py-0.5 bg-white rounded-full text-xs">
-                                {tab.count}
-                            </span>
+                            {tab.label} ({tab.count})
                         </button>
                     ))}
                 </div>
+            </div>
 
-                {/* Search and Filters */}
-                {(activeTab === 'sellers' || activeTab === 'suppliers') && (
-                    <div className="flex flex-col lg:flex-row gap-4 mb-6">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder={`Search ${activeTab}...`}
-                                className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                        <div className="flex gap-3">
-                            <select
-                                className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                                value={selectedStatus}
-                                onChange={(e) => setSelectedStatus(e.target.value)}
-                            >
-                                {statuses.map(status => (
-                                    <option key={status} value={status}>
-                                        {status === 'all' ? 'All Status' : status}
-                                    </option>
-                                ))}
-                            </select>
-                            <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
-                                <Filter className="w-4 h-4 mr-2" />
-                                More Filters
-                            </button>
-                        </div>
+            {/* Filters and Search */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="flex flex-col lg:flex-row gap-4">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search by name, email, or company..."
+                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
-                )}
+                    <div className="flex gap-3">
+                        <select
+                            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={selectedStatus}
+                            onChange={(e) => setSelectedStatus(e.target.value)}
+                        >
+                            {statuses.map(status => (
+                                <option key={status} value={status}>
+                                    {status === 'all' ? 'All Status' : status}
+                                </option>
+                            ))}
+                        </select>
+                        <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                            <Filter className="w-4 h-4 mr-2" />
+                            More Filters
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Tab Content */}
             {activeTab === 'sellers' && renderSellersTab()}
             {activeTab === 'suppliers' && renderSuppliersTab()}
-            {activeTab === 'admins' && renderAdminsTab()}
+            {activeTab === 'admins' && (
+                <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
+                    <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-600 mb-2">Admin Management</h3>
+                    <p className="text-gray-500">Admin user management coming soon</p>
+                </div>
+            )}
         </div>
     );
 };

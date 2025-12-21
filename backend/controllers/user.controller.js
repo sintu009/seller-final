@@ -92,8 +92,113 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const approveUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    user.status = 'active';
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'User approved successfully',
+      data: user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const rejectUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { reason } = req.body;
+    
+    if (!reason) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rejection reason is required'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    user.status = 'rejected';
+    user.rejectionReason = reason;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'User rejected successfully',
+      data: user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const blockUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { reason } = req.body;
+    
+    if (!reason) {
+      return res.status(400).json({
+        success: false,
+        message: 'Block reason is required'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    user.status = 'blocked';
+    user.blockReason = reason;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'User blocked successfully',
+      data: user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   getUserProfile,
   updateUserProfile,
-  getAllUsers
+  getAllUsers,
+  approveUser,
+  rejectUser,
+  blockUser
 };

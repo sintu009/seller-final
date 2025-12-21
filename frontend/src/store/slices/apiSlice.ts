@@ -87,6 +87,35 @@ export const apiSlice = createApi({
       invalidatesTags: ['KYC'],
     }),
     
+    // Users
+    getAllUsers: builder.query({
+      query: () => '/admin/users',
+      providesTags: ['User'],
+    }),
+    approveUser: builder.mutation({
+      query: (userId) => ({
+        url: `/admin/users/${userId}/approve`,
+        method: 'PUT',
+      }),
+      invalidatesTags: ['User', 'KYC'],
+    }),
+    rejectUser: builder.mutation({
+      query: ({ userId, reason }) => ({
+        url: `/admin/users/${userId}/reject`,
+        method: 'PUT',
+        body: { reason },
+      }),
+      invalidatesTags: ['User', 'KYC'],
+    }),
+    blockUser: builder.mutation({
+      query: ({ userId, reason }) => ({
+        url: `/admin/users/${userId}/block`,
+        method: 'PUT',
+        body: { reason },
+      }),
+      invalidatesTags: ['User'],
+    }),
+    
     // Auth
     login: builder.mutation({
       query: (credentials) => ({
@@ -169,6 +198,10 @@ export const {
   useGetAllKYCQuery,
   useApproveKYCMutation,
   useRejectKYCMutation,
+  useGetAllUsersQuery,
+  useApproveUserMutation,
+  useRejectUserMutation,
+  useBlockUserMutation,
   useLoginMutation,
   useRegisterMutation,
   useLogoutMutation,
