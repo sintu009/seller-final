@@ -141,6 +141,12 @@ export const apiSlice = createApi({
       query: () => '/auth/profile',
     }),
     
+    // Supplier Dashboard
+    getSupplierDashboard: builder.query({
+      query: () => '/supplier/dashboard',
+      providesTags: ['Product', 'Order'],
+    }),
+    
     // Orders
     createOrder: builder.mutation({
       query: (orderData) => ({
@@ -202,6 +208,7 @@ export const {
   useApproveUserMutation,
   useRejectUserMutation,
   useBlockUserMutation,
+  useGetSupplierDashboardQuery,
   useLoginMutation,
   useRegisterMutation,
   useLogoutMutation,

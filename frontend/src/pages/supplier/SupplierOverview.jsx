@@ -22,115 +22,158 @@ import {
     BarChart,
     Bar
 } from 'recharts';
+import { useGetSupplierProductsQuery, useGetSupplierOrdersQuery } from '../../store/slices/apiSlice';
+import { useAppSelector } from '../../store/hooks';
 
 const SupplierOverview = () => {
-    // Mock data for supplier analytics
+    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+    
+    const { data: productsData, isLoading: productsLoading } = useGetSupplierProductsQuery(undefined, {
+        skip: !isAuthenticated || user?.role !== 'supplier'
+    });
+    
+    const { data: ordersData, isLoading: ordersLoading } = useGetSupplierOrdersQuery(undefined, {
+        skip: !isAuthenticated || user?.role !== 'supplier'
+    });
+
+    const products = productsData?.data || [];
+    const orders = ordersData?.data || [];
+
+    // Calculate real stats
+    const totalProducts = products.length;
+    const totalOrders = orders.length;
+    const pendingProducts = products.filter(p => p.status === 'pending').length;
+    const totalRevenue = orders
+        .filter(o => o.status === 'delivered')
+        .reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+
     const stats = [
         {
             title: 'Total Products Listed',
-            value: '156',
-            change: '+8.2%',
+            value: totalProducts > 0 ? totalProducts.toString() : 'N/A',
+            change: 'N/A',
             trend: 'up',
             icon: Package,
             color: 'text-blue-600 bg-blue-50'
         },
         {
             title: 'Total Orders Received',
-            value: '2,847',
-            change: '+15.3%',
+            value: totalOrders > 0 ? totalOrders.toString() : 'N/A',
+            change: 'N/A',
             trend: 'up',
             icon: ShoppingCart,
             color: 'text-green-600 bg-green-50'
         },
         {
             title: 'Revenue Generated',
-            value: '₹8,45,670',
-            change: '+22.1%',
+            value: totalRevenue > 0 ? `₹${totalRevenue.toLocaleString()}` : 'N/A',
+            change: 'N/A',
             trend: 'up',
             icon: DollarSign,
             color: 'text-emerald-600 bg-emerald-50'
         },
         {
             title: 'Pending Approvals',
-            value: '23',
-            change: '-5.2%',
+            value: pendingProducts > 0 ? pendingProducts.toString() : 'N/A',
+            change: 'N/A',
             trend: 'down',
             icon: Clock,
             color: 'text-orange-600 bg-orange-50'
         }
     ];
 
-    // Revenue trends data
-    const revenueData = [
-        { name: 'Jan', revenue: 65000, orders: 245 },
-        { name: 'Feb', revenue: 72000, orders: 287 },
-        { name: 'Mar', revenue: 68000, orders: 256 },
-        { name: 'Apr', revenue: 81000, orders: 324 },
-        { name: 'May', revenue: 75000, orders: 298 },
-        { name: 'Jun', revenue: 87000, orders: 356 },
-        { name: 'Jul', revenue: 94000, orders: 398 }
+    // Revenue trends data from real orders
+    const getMonthlyData = () => {
+        const monthlyData = {};
+        orders.forEach(order => {
+            const date = new Date(order.createdAt);
+            const monthKey = date.toLocaleDateString('en-US', { month: 'short' });
+            if (!monthlyData[monthKey]) {
+                monthlyData[monthKey] = { revenue: 0, orders: 0 };
+            }
+            monthlyData[monthKey].orders += 1;
+            if (order.status === 'delivered') {
+                monthlyData[monthKey].revenue += order.totalPrice || 0;
+            }
+        });
+        return Object.entries(monthlyData).map(([name, data]) => ({
+            name,
+            revenue: data.revenue,
+            orders: data.orders
+        }));
+    };
+
+    const revenueData = orders.length > 0 ? getMonthlyData() : [
+        { name: 'No Data', revenue: 0, orders: 0 }
     ];
 
-    // Orders trend data
-    const ordersData = [
-        { name: 'Week 1', orders: 85 },
-        { name: 'Week 2', orders: 92 },
-        { name: 'Week 3', orders: 78 },
-        { name: 'Week 4', orders: 105 }
+    // Orders trend data from real orders (last 4 weeks)
+    const getWeeklyData = () => {
+        const weeklyData = {};
+        const now = new Date();
+        
+        orders.forEach(order => {
+            const orderDate = new Date(order.createdAt);
+            const daysDiff = Math.floor((now - orderDate) / (1000 * 60 * 60 * 24));
+            const weekNumber = Math.floor(daysDiff / 7) + 1;
+            
+            if (weekNumber <= 4) {
+                const weekKey = `Week ${weekNumber}`;
+                if (!weeklyData[weekKey]) {
+                    weeklyData[weekKey] = 0;
+                }
+                weeklyData[weekKey] += 1;
+            }
+        });
+        
+        return ['Week 1', 'Week 2', 'Week 3', 'Week 4'].map(week => ({
+            name: week,
+            orders: weeklyData[week] || 0
+        }));
+    };
+
+    const ordersChartData = orders.length > 0 ? getWeeklyData() : [
+        { name: 'Week 1', orders: 0 },
+        { name: 'Week 2', orders: 0 },
+        { name: 'Week 3', orders: 0 },
+        { name: 'Week 4', orders: 0 }
     ];
 
-    // Recent orders
-    const recentOrders = [
-        {
-            id: '#ORD-12345',
-            seller: 'TechStore India',
-            product: 'Wireless Headphones Pro',
-            quantity: 2,
-            amount: 5998,
-            status: 'Processing',
-            date: '2024-01-15'
-        },
-        {
-            id: '#ORD-12346',
-            seller: 'ElectroMart',
-            product: 'Bluetooth Speaker',
-            quantity: 1,
-            amount: 3499,
-            status: 'Shipped',
-            date: '2024-01-14'
-        },
-        {
-            id: '#ORD-12347',
-            seller: 'GadgetHub',
-            product: 'Phone Case Premium',
-            quantity: 5,
-            amount: 2995,
-            status: 'Delivered',
-            date: '2024-01-13'
+    // Recent orders from real data
+    const recentOrders = orders.slice(0, 3).map(order => ({
+        id: order.orderNumber,
+        seller: order.seller?.name || 'N/A',
+        product: order.product?.name || 'N/A',
+        quantity: order.quantity,
+        amount: order.totalPrice,
+        status: order.status === 'pushed' ? 'Processing' : 
+               order.status === 'shipped' ? 'Shipped' : 
+               order.status === 'delivered' ? 'Delivered' : 'Pending',
+        date: new Date(order.createdAt).toLocaleDateString()
+    }));
+
+    // Top selling products from real data
+    const productOrderCounts = {};
+    orders.forEach(order => {
+        const productName = order.product?.name;
+        if (productName) {
+            if (!productOrderCounts[productName]) {
+                productOrderCounts[productName] = { orders: 0, revenue: 0 };
+            }
+            productOrderCounts[productName].orders += 1;
+            productOrderCounts[productName].revenue += order.totalPrice || 0;
         }
-    ];
+    });
 
-    // Top selling products
-    const topProducts = [
-        {
-            name: 'Wireless Headphones Pro',
-            orders: 245,
-            revenue: 73455,
-            growth: '+15%'
-        },
-        {
-            name: 'Bluetooth Speaker Premium',
-            orders: 189,
-            revenue: 66115,
-            growth: '+22%'
-        },
-        {
-            name: 'Phone Case Set',
-            orders: 167,
-            revenue: 9983,
-            growth: '+8%'
-        }
-    ];
+    const topProducts = Object.entries(productOrderCounts)
+        .map(([name, data]) => ({
+            name,
+            orders: data.orders,
+            revenue: data.revenue,
+            growth: 'N/A'
+        }))
+        .sort((a, b) => b.orders - a.orders)
+        .slice(0, 3);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -140,6 +183,17 @@ const SupplierOverview = () => {
             default: return 'bg-gray-100 text-gray-800';
         }
     };
+
+    if (productsLoading || ordersLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <div className="bg-white p-8 rounded-lg shadow-md text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading dashboard...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -170,11 +224,14 @@ const SupplierOverview = () => {
                             <div className={`p-3 rounded-xl ${stat.color}`}>
                                 <stat.icon className="w-6 h-6" />
                             </div>
-                            <div className={`flex items-center text-sm font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                            {stat.change !== 'N/A' && (
+                                <div className={`flex items-center text-sm font-medium ${
+                                    stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
                                 }`}>
-                                <TrendingUp className={`w-4 h-4 mr-1 ${stat.trend === 'down' ? 'rotate-180' : ''}`} />
-                                {stat.change}
-                            </div>
+                                    <TrendingUp className={`w-4 h-4 mr-1 ${stat.trend === 'down' ? 'rotate-180' : ''}`} />
+                                    {stat.change}
+                                </div>
+                            )}
                         </div>
                         <div className="space-y-1">
                             <p className="text-gray-600 text-sm">{stat.title}</p>
@@ -238,7 +295,7 @@ const SupplierOverview = () => {
                         </div>
                     </div>
                     <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={ordersData}>
+                        <BarChart data={ordersChartData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis dataKey="name" stroke="#6b7280" />
                             <YAxis stroke="#6b7280" />
