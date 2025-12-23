@@ -1,11 +1,12 @@
-require('dotenv').config({ path: './.env' });
 const mongoose = require('mongoose');
 const User = require('./models/user.model');
+require('dotenv').config();
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/Centraldb')
-  .then(async () => {
+const fixExistingUsers = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/drop-central');
     console.log('Connected to MongoDB');
-    
+
     // Find all users with old data structure
     const users = await User.find({
       role: { $in: ['seller', 'supplier'] },
@@ -48,21 +49,13 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/Centraldb
         console.log(`Updated user: ${user.email}`);
       }
     }
-    
-    // Show all users
-    const allUsers = await User.find({}, 'name email role kycStatus phone kycDocuments');
-    console.log('\nAll users:');
-    allUsers.forEach(u => {
-      console.log(`- ${u.name} (${u.email}) - ${u.role} - KYC: ${u.kycStatus}`);
-      console.log(`  Phone: ${u.phone || 'N/A'}`);
-      console.log(`  Business: ${u.kycDocuments?.businessName || 'N/A'}`);
-      console.log(`  GST: ${u.kycDocuments?.taxId || 'N/A'}`);
-      console.log(`  PAN: ${u.kycDocuments?.businessRegistration || 'N/A'}`);
-    });
-    
+
+    console.log('Migration completed');
     process.exit(0);
-  })
-  .catch(err => {
-    console.error('Error:', err);
+  } catch (error) {
+    console.error('Migration failed:', error);
     process.exit(1);
-  });
+  }
+};
+
+fixExistingUsers();

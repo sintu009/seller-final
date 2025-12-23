@@ -55,6 +55,11 @@ const userSchema = new mongoose.Schema({
   kycRejectionReason: {
     type: String
   },
+  plan: {
+    type: String,
+    enum: ['starter', 'growth', 'scale'],
+    default: null
+  },
   phone: {
     type: String
   },
@@ -77,12 +82,13 @@ userSchema.pre('save', async function(next) {
   console.log('User pre-save hook called for:', this.email);
   if (!this.isModified('password')) {
     console.log('Password not modified, skipping hash');
-    next();
+    return next();
   }
   console.log('Hashing password...');
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   console.log('Password hashed successfully');
+  next();
 });
 
 userSchema.methods.matchPassword = async function(enteredPassword) {

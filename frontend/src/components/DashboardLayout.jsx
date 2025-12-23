@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { useLogoutMutation } from '../store/slices/apiSlice';
-import { logout as logoutAction } from '../store/slices/authSlice';
+import { useLogoutMutation, useGetProfileQuery } from '../store/slices/apiSlice';
+import { logout as logoutAction, updateUser } from '../store/slices/authSlice';
 import {
   Menu,
   X,
@@ -24,8 +24,15 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const [logoutMutation] = useLogoutMutation();
+  const { data: profileData } = useGetProfileQuery(undefined, { skip: !user });
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (profileData?.user && user) {
+      dispatch(updateUser(profileData.user));
+    }
+  }, [profileData, dispatch, user]);
 
   const connectedStores = [
     {
@@ -198,6 +205,19 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
                   className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
                 />
               </div>
+
+              {(user?.plan || user?.role === 'seller') && (
+                <div className="ml-4">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    user?.plan === 'starter' ? 'bg-blue-100 text-blue-800' :
+                    user?.plan === 'growth' ? 'bg-green-100 text-green-800' :
+                    user?.plan === 'scale' ? 'bg-purple-100 text-purple-800' :
+                    'bg-orange-100 text-orange-800'
+                  }`}>
+                    {user?.plan ? `${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)} Plan` : 'No Plan Selected'}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center space-x-4">
@@ -225,7 +245,19 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
                   </div>
                   <div className="text-left">
                     <div className="text-sm font-medium text-gray-900">{user?.name}</div>
-                    <div className="text-xs text-gray-500 capitalize">{user?.role}</div>
+                    <div className="flex items-center space-x-2">
+                      <div className="text-xs text-gray-500 capitalize">{user?.role}</div>
+                      {user?.plan && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          user.plan === 'starter' ? 'bg-blue-100 text-blue-800' :
+                          user.plan === 'growth' ? 'bg-green-100 text-green-800' :
+                          user.plan === 'scale' ? 'bg-purple-100 text-purple-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {user.plan}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <ChevronDown className="w-4 h-4 text-gray-400" />
                 </button>

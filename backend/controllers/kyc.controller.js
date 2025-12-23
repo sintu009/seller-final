@@ -70,6 +70,7 @@ const getKYCById = async (req, res) => {
 
 const approveKYC = async (req, res) => {
   try {
+    const { plan } = req.body;
     const user = await User.findById(req.params.id);
 
     if (!user) {
@@ -88,6 +89,11 @@ const approveKYC = async (req, res) => {
 
     user.kycStatus = 'approved';
     user.kycRejectionReason = undefined;
+    
+    if (user.role === 'seller') {
+      user.plan = plan;
+    }
+    
     await user.save();
 
     res.status(200).json({

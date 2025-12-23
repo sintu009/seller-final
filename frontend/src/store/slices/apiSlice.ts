@@ -72,9 +72,10 @@ export const apiSlice = createApi({
       },
     }),
     approveKYC: builder.mutation({
-      query: (id) => ({
+      query: ({ id, plan }) => ({
         url: `/kyc/approve/${id}`,
         method: 'PUT',
+        body: { plan },
       }),
       invalidatesTags: ['KYC'],
     }),
@@ -114,6 +115,14 @@ export const apiSlice = createApi({
         body: { reason },
       }),
       invalidatesTags: ['User'],
+    }),
+    updateUserPlan: builder.mutation({
+      query: ({ userId, plan }) => ({
+        url: `/admin/users/${userId}/plan`,
+        method: 'PUT',
+        body: { plan },
+      }),
+      invalidatesTags: ['User', 'KYC'],
     }),
     
     // Auth
@@ -208,6 +217,7 @@ export const {
   useApproveUserMutation,
   useRejectUserMutation,
   useBlockUserMutation,
+  useUpdateUserPlanMutation,
   useGetSupplierDashboardQuery,
   useLoginMutation,
   useRegisterMutation,

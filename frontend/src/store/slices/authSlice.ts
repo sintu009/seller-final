@@ -6,6 +6,7 @@ interface User {
   name: string;
   role: 'admin' | 'supplier' | 'seller';
   kycStatus?: string;
+  plan?: string;
 }
 
 interface AuthState {
@@ -29,6 +30,12 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       localStorage.setItem('user', JSON.stringify(action.payload));
     },
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+        localStorage.setItem('user', JSON.stringify(state.user));
+      }
+    },
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
@@ -40,5 +47,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, logout, setLoading } = authSlice.actions;
+export const { setCredentials, updateUser, logout, setLoading } = authSlice.actions;
 export default authSlice.reducer;

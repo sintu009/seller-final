@@ -20,17 +20,23 @@ const register = async (req, res) => {
       });
     }
 
-    const kycDocuments = {};
+    const kycDocuments = {
+      businessName,
+      taxId: gstNumber,
+      businessRegistration: panNumber
+    };
 
     if (req.files) {
       if (req.files.gstCertificate && req.files.gstCertificate[0]) {
-        kycDocuments.gstCertificate = req.files.gstCertificate[0].path;
+        kycDocuments.idProof = req.files.gstCertificate[0].path;
       }
       if (req.files.panCard && req.files.panCard[0]) {
-        kycDocuments.panCard = req.files.panCard[0].path;
+        kycDocuments.addressProof = req.files.panCard[0].path;
       }
       if (req.files.cancelledCheque && req.files.cancelledCheque[0]) {
-        kycDocuments.cancelledCheque = req.files.cancelledCheque[0].path;
+        kycDocuments.bankDetails = {
+          cancelledChequePath: req.files.cancelledCheque[0].path
+        };
       }
     }
 
@@ -39,10 +45,7 @@ const register = async (req, res) => {
       email,
       password,
       role,
-      businessName,
-      gstNumber,
-      panNumber,
-      phoneNumber,
+      phone: phoneNumber,
       address: address ? JSON.parse(address) : undefined,
       kycDocuments
     };
@@ -111,7 +114,8 @@ const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        kycStatus: user.kycStatus
+        kycStatus: user.kycStatus,
+        plan: user.plan
       }
     });
   } catch (error) {

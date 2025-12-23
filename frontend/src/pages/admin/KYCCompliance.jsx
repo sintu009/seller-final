@@ -13,7 +13,8 @@ import {
     User,
     Building,
     Mail,
-    Phone
+    Phone,
+    Crown
 } from 'lucide-react';
 
 const KYCCompliance = () => {
@@ -23,12 +24,57 @@ const KYCCompliance = () => {
     const [rejectionReason, setRejectionReason] = useState('');
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState(null);
-    
-    const { data: kycData, isLoading: loading } = useGetAllKYCQuery();
+    const [selectedPlans, setSelectedPlans] = useState({});
+
+    const { data: kycData, isLoading: loading, refetch } = useGetAllKYCQuery();
     const [approveKYC] = useApproveKYCMutation();
     const [rejectKYC] = useRejectKYCMutation();
-    
+
     const kycSubmissions = kycData?.data || [];
+    
+    // Debug: Log the first submission to see data structure
+    if (kycSubmissions.length > 0) {
+        console.log('First submission data:', kycSubmissions[0]);
+    }
+
+    const planOptions = [
+
+        {
+            id: 'starter',
+            name: 'Starter',
+            color: 'bg-blue-100 text-blue-800',
+            features: ['• Amazon account setup & GST/brand registry help',
+                '• 10 optimized product listings (keywords + images)',
+                '• Basic ad setup (1–2 campaigns)',
+                '• Dashboard: order tracking + profit calculator (basic)',
+                '• Email support']
+        },
+        {
+            id: 'growth',
+            name: 'Growth',
+            color: 'bg-green-100 text-green-800',
+            features: ['• 30 optimized listings + A+ content',
+                '• Weekly PPC optimization + competitor & keyword tracking',
+                '• Inventory & returns tracking + wallet recharge alerts',
+                '• Automated profit breakdown (fees, ads, shipping, COGS)',
+                '• Dedicated account manager (WhatsApp support)',
+                '• Sales & performance dashboard',
+                '• replace the things in above object ']
+        },
+        {
+            id: 'scale',
+            name: 'Scale',
+            color: 'bg-purple-100 text-purple-800',
+            features: [
+                '• Unlimited listings with A+ content refresh',
+                '• Advanced PPC (bulk campaigns, auto-bidding, TACoS)',
+                '• Multi-channel sync (Flipkart, Meesho, Shopify)',
+                '• International expansion support with review & feedback management',
+                '• Custom analytics dashboard with advanced alerts (low stock, suppressed listings, ACoS)',
+                '• Dedicated manager, priority support & quarterly strategy calls'
+            ]
+        }
+    ];
 
     const mainTabs = [
         { id: 'seller', label: 'Sellers', count: kycSubmissions.filter(k => k.role === 'seller').length },
@@ -76,13 +122,29 @@ const KYCCompliance = () => {
     });
 
     const handleApprove = async (id) => {
+        const selectedPlan = selectedPlans[id];
+        if (!selectedPlan) {
+            alert('Please select a plan before approving');
+            return;
+        }
+
         try {
-            await approveKYC(id).unwrap();
-            alert('KYC approved successfully');
+            await approveKYC({ id, plan: selectedPlan }).unwrap();
+            setSelectedPlans(prev => {
+                const newPlans = { ...prev };
+                delete newPlans[id];
+                return newPlans;
+            });
+            alert('KYC approved successfully with plan: ' + selectedPlan);
+            await refetch();
         } catch (error) {
             console.error('Error approving KYC:', error);
             alert(error.data?.message || 'Failed to approve KYC');
         }
+    };
+
+    const handlePlanSelect = (userId, plan) => {
+        setSelectedPlans(prev => ({ ...prev, [userId]: plan }));
     };
 
     const handleReject = async () => {
@@ -123,7 +185,7 @@ const KYCCompliance = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-gray-50 ">
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
@@ -250,6 +312,16 @@ const KYCCompliance = () => {
                                                 {getStatusIcon(submission.kycStatus)}
                                                 <span className="ml-2 capitalize">{submission.kycStatus}</span>
                                             </span>
+                                            {submission.kycStatus === 'approved' && submission.role === 'seller' && submission.plan && (
+                                                <span className={`px-3 py-1 text-sm font-medium rounded-full ${submission.plan === 'starter' ? 'bg-blue-100 text-blue-800' :
+                                                    submission.plan === 'growth' ? 'bg-green-100 text-green-800' :
+                                                        submission.plan === 'scale' ? 'bg-purple-100 text-purple-800' :
+                                                            'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                    <Crown className="w-3 h-3 mr-1" />
+                                                    {submission.plan.charAt(0).toUpperCase() + submission.plan.slice(1)} Plan
+                                                </span>
+                                            )}
                                         </div>
                                         <div className="space-y-1 text-sm text-gray-600">
                                             <div className="flex items-center">
@@ -258,7 +330,7 @@ const KYCCompliance = () => {
                                             </div>
                                             <div className="flex items-center">
                                                 <Phone className="w-4 h-4 mr-2" />
-                                                {submission.phoneNumber || 'N/A'}
+                                                {submission.phone || submission.phoneNumber || 'N/A'}
                                             </div>
                                             <div>Registered: {new Date(submission.createdAt).toLocaleDateString()}</div>
                                         </div>
@@ -269,7 +341,11 @@ const KYCCompliance = () => {
                                         <>
                                             <button
                                                 onClick={() => handleApprove(submission._id)}
-                                                className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center"
+                                                disabled={submission.role === 'seller' && !selectedPlans[submission._id]}
+                                                className={`px-4 py-2 rounded-xl transition-colors flex items-center ${submission.role === 'seller' && !selectedPlans[submission._id]
+                                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                    : 'bg-green-600 text-white hover:bg-green-700'
+                                                    }`}
                                             >
                                                 <CheckCircle className="w-4 h-4 mr-2" />
                                                 Approve
@@ -286,20 +362,90 @@ const KYCCompliance = () => {
                                 </div>
                             </div>
 
+                            {submission.kycStatus === 'approved' && submission.role === 'seller' && (
+                                <div className="mb-4 bg-green-50 border border-green-200 rounded-xl p-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center">
+                                            <Crown className="w-5 h-5 text-green-600 mr-2" />
+                                            <h4 className="font-semibold text-green-800">Assigned Plan</h4>
+                                        </div>
+                                        {submission.plan ? (
+                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${submission.plan === 'starter' ? 'bg-blue-100 text-blue-800' :
+                                                submission.plan === 'growth' ? 'bg-green-100 text-green-800' :
+                                                    submission.plan === 'scale' ? 'bg-purple-100 text-purple-800' :
+                                                        'bg-gray-100 text-gray-800'
+                                                }`}>
+                                                <Crown className="w-3 h-3 mr-1" />
+                                                {submission.plan.charAt(0).toUpperCase() + submission.plan.slice(1)} Plan
+                                            </span>
+                                        ) : (
+                                            <span className="text-sm text-gray-500">
+                                                No plan assigned
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {submission.kycStatus === 'pending' && submission.role === 'seller' && (
+                                <div className="mb-4 bg-orange-50 border border-orange-200 rounded-xl p-4">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center">
+                                            <Crown className="w-5 h-5 text-orange-600 mr-2" />
+                                            <h4 className="font-semibold text-orange-800">Select Plan for Seller</h4>
+                                        </div>
+                                        {selectedPlans[submission._id] && (
+                                            <div className="flex items-center">
+                                                <span className="text-sm text-gray-600 mr-2">Selected:</span>
+                                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedPlans[submission._id] === 'starter' ? 'bg-blue-100 text-blue-800' :
+                                                    selectedPlans[submission._id] === 'growth' ? 'bg-green-100 text-green-800' :
+                                                        selectedPlans[submission._id] === 'scale' ? 'bg-purple-100 text-purple-800' :
+                                                            'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                    <Crown className="w-3 h-3 mr-1" />
+                                                    {selectedPlans[submission._id].charAt(0).toUpperCase() + selectedPlans[submission._id].slice(1)} Plan
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        {planOptions.map((plan) => (
+                                            <button
+                                                key={plan.id}
+                                                onClick={() => handlePlanSelect(submission._id, plan.id)}
+                                                className={`p-3 rounded-xl border-2 transition-all text-left ${selectedPlans[submission._id] === plan.id
+                                                    ? 'border-orange-500 bg-orange-50'
+                                                    : 'border-gray-200 bg-white hover:border-gray-300'
+                                                    }`}
+                                            >
+                                                <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${plan.color}`}>
+                                                    {plan.name}
+                                                </div>
+                                                <div className="text-xs text-gray-600 space-y-1">
+                                                    {plan.features.map((feature, index) => (
+                                                        <div key={index}>{feature}</div>
+                                                    ))}
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="bg-gray-50 rounded-xl p-4 mb-4">
                                 <h4 className="font-semibold text-gray-900 mb-3">Business Information</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                     <div>
                                         <span className="text-gray-600">Business Name:</span>
-                                        <div className="font-medium text-gray-900">{submission.businessName || 'N/A'}</div>
+                                        <div className="font-medium text-gray-900">{submission.kycDocuments?.businessName || submission.businessName || 'N/A'}</div>
                                     </div>
                                     <div>
                                         <span className="text-gray-600">GST Number:</span>
-                                        <div className="font-mono text-gray-900">{submission.gstNumber || 'N/A'}</div>
+                                        <div className="font-mono text-gray-900">{submission.kycDocuments?.taxId || submission.gstNumber || 'N/A'}</div>
                                     </div>
                                     <div>
                                         <span className="text-gray-600">PAN Number:</span>
-                                        <div className="font-mono text-gray-900">{submission.panNumber || 'N/A'}</div>
+                                        <div className="font-mono text-gray-900">{submission.kycDocuments?.businessRegistration || submission.panNumber || 'N/A'}</div>
                                     </div>
                                 </div>
                             </div>
@@ -308,7 +454,7 @@ const KYCCompliance = () => {
                                 <div className="space-y-3">
                                     <h4 className="font-semibold text-gray-900">Submitted Documents</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        {submission.kycDocuments.gstCertificate && (
+                                        {submission.kycDocuments?.idProof && (
                                             <div className="border border-gray-200 rounded-xl p-4">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <div className="flex items-center">
@@ -317,7 +463,7 @@ const KYCCompliance = () => {
                                                     </div>
                                                 </div>
                                                 <button
-                                                    onClick={() => handleViewDocument(submission.kycDocuments.gstCertificate)}
+                                                    onClick={() => handleViewDocument(submission.kycDocuments.idProof)}
                                                     className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
                                                 >
                                                     <Eye className="w-4 h-4 mr-2" />
@@ -325,7 +471,7 @@ const KYCCompliance = () => {
                                                 </button>
                                             </div>
                                         )}
-                                        {submission.kycDocuments.panCard && (
+                                        {submission.kycDocuments?.addressProof && (
                                             <div className="border border-gray-200 rounded-xl p-4">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <div className="flex items-center">
@@ -334,7 +480,7 @@ const KYCCompliance = () => {
                                                     </div>
                                                 </div>
                                                 <button
-                                                    onClick={() => handleViewDocument(submission.kycDocuments.panCard)}
+                                                    onClick={() => handleViewDocument(submission.kycDocuments.addressProof)}
                                                     className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
                                                 >
                                                     <Eye className="w-4 h-4 mr-2" />
@@ -342,7 +488,7 @@ const KYCCompliance = () => {
                                                 </button>
                                             </div>
                                         )}
-                                        {submission.kycDocuments.cancelledCheque && (
+                                        {submission.kycDocuments?.bankDetails?.cancelledChequePath && (
                                             <div className="border border-gray-200 rounded-xl p-4">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <div className="flex items-center">
@@ -351,7 +497,7 @@ const KYCCompliance = () => {
                                                     </div>
                                                 </div>
                                                 <button
-                                                    onClick={() => handleViewDocument(submission.kycDocuments.cancelledCheque)}
+                                                    onClick={() => handleViewDocument(submission.kycDocuments.bankDetails.cancelledChequePath)}
                                                     className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
                                                 >
                                                     <Eye className="w-4 h-4 mr-2" />

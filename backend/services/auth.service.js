@@ -67,10 +67,10 @@ const loginUser = async (email, password) => {
     throw new Error('Invalid email or password');
   }
 
-  // Temporarily disable KYC check for testing
-  // if (user.role !== 'admin' && user.kycStatus !== 'approved') {
-  //   throw new Error('Your account is pending approval. Please wait for admin verification.');
-  // }
+  // Check KYC status for non-admin users
+  if (user.role !== 'admin' && user.kycStatus !== 'approved') {
+    throw new Error('Your account is pending approval. Please wait for admin verification.');
+  }
 
   return {
     _id: user._id,
@@ -78,6 +78,7 @@ const loginUser = async (email, password) => {
     email: user.email,
     role: user.role,
     kycStatus: user.kycStatus,
+    plan: user.plan,
     token: generateToken(user._id)
   };
 };
