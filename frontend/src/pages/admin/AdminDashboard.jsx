@@ -13,20 +13,37 @@ import SupportHelpdesk from './SupportHelpdesk';
 import AdminSettings from './AdminSettings';
 import PlatformMargins from './PlatformMargins';
 import { LayoutDashboard, Users, Package, ShoppingCart, DollarSign, FileCheck, Headphones as HeadphonesIcon, Settings, TrendingUp } from 'lucide-react';
+import { useGetAdminDashboardCountsQuery } from '../../store/slices/apiSlice';
 
 const AdminDashboard = () => {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-  const { data: productsData } = useGetProductsQuery(undefined, { skip: !isAuthenticated });
-  const { data: kycData } = useGetAllKYCQuery(undefined, { skip: !isAuthenticated });
-  const { data: ordersData } = useGetAdminOrdersQuery(undefined, { skip: !isAuthenticated });
-  
-  const products = productsData?.data || [];
-  const kycUsers = kycData?.data || [];
-  const orders = ordersData?.data || [];
-  
-  const pendingProducts = products.filter(p => p.approvalStatus === 'pending').length;
-  const pendingKyc = kycUsers.filter(user => user.kycStatus === 'pending').length;
-  const pendingOrders = orders.filter(order => order.status === 'admin_review').length;
+const {
+  data: dashboardResponse,
+  isLoading: dashboardLoading,
+} = useGetAdminDashboardCountsQuery(undefined, {
+  skip: !isAuthenticated,
+  pollingInterval: 30000,
+  refetchOnFocus: false,
+  refetchOnReconnect: false,
+});
+
+const dashboardData = dashboardResponse?.data ?? {
+  totalSellers: 0,
+  totalSuppliers: 0,
+  totalProducts: 0,
+  totalOrders: 0,
+  totalRevenue: null,
+  pendingApprovals: 0,
+  breakdown: {
+    pendingProducts: 0,
+    pendingKyc: 0,
+    pendingOrders: 0, // future-ready
+  },
+};
+
+const pendingProducts = dashboardData.breakdown.pendingProducts;
+const pendingKyc = dashboardData.breakdown.pendingKyc;
+const pendingOrders = dashboardData.breakdown.pendingOrders ?? 0;
 
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },

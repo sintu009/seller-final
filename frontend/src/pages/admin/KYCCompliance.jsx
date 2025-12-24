@@ -121,27 +121,41 @@ const KYCCompliance = () => {
         return matchesSearch && matchesMainTab && matchesTab;
     });
 
-    const handleApprove = async (id) => {
-        const selectedPlan = selectedPlans[id];
-        if (!selectedPlan) {
-            alert('Please select a plan before approving');
-            return;
-        }
+    const handleApprove = async (id, role) => {
+        if (role === 'seller') {
+            const selectedPlan = selectedPlans[id];
+            if (!selectedPlan) {
+                alert('Please select a plan before approving seller KYC');
+                return;
+            }
 
-        try {
-            await approveKYC({ id, plan: selectedPlan }).unwrap();
-            setSelectedPlans(prev => {
-                const newPlans = { ...prev };
-                delete newPlans[id];
-                return newPlans;
-            });
-            alert('KYC approved successfully with plan: ' + selectedPlan);
-            await refetch();
-        } catch (error) {
-            console.error('Error approving KYC:', error);
-            alert(error.data?.message || 'Failed to approve KYC');
+            try {
+                await approveKYC({ id, plan: selectedPlan }).unwrap();
+                setSelectedPlans(prev => {
+                    const newPlans = { ...prev };
+                    delete newPlans[id];
+                    return newPlans;
+                });
+                alert(`Seller KYC approved with plan: ${selectedPlan}`);
+                await refetch();
+            } catch (error) {
+                console.error('Error approving seller KYC:', error);
+                alert(error.data?.message || 'Failed to approve seller KYC');
+            }
+        } 
+        // 🔥 Supplier → no plan needed
+        else {
+            try {
+                await approveKYC({ id }).unwrap();
+                alert('Supplier KYC approved successfully');
+                await refetch();
+            } catch (error) {
+                console.error('Error approving supplier KYC:', error);
+                alert(error.data?.message || 'Failed to approve supplier KYC');
+            }
         }
     };
+
 
     const handlePlanSelect = (userId, plan) => {
         setSelectedPlans(prev => ({ ...prev, [userId]: plan }));
@@ -340,7 +354,7 @@ const KYCCompliance = () => {
                                     {submission.kycStatus === 'pending' && (
                                         <>
                                             <button
-                                                onClick={() => handleApprove(submission._id)}
+                                                onClick={() => handleApprove(submission._id, submission.role)}
                                                 disabled={submission.role === 'seller' && !selectedPlans[submission._id]}
                                                 className={`px-4 py-2 rounded-xl transition-colors flex items-center ${submission.role === 'seller' && !selectedPlans[submission._id]
                                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'

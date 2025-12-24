@@ -16,6 +16,18 @@ export const apiSlice = createApi({
   baseQuery,
   tagTypes: ['Product', 'User', 'KYC', 'Order'],
   endpoints: (builder) => ({
+    //Dashbaord Counts
+     getAdminDashboardCounts: builder.query({
+      query: () => '/admin/dashboard-counts',
+      providesTags: ['User', 'Product', 'KYC'],
+      transformErrorResponse: (response) => {
+        if (response.status === 401) {
+          window.location.href = '/login/admin';
+        }
+        return response;
+      },
+    }),
+
     // Products
     getProducts: builder.query({
       query: () => '/admin/products',
@@ -60,6 +72,17 @@ export const apiSlice = createApi({
       invalidatesTags: ['Product'],
     }),
     
+    getPendingProducts: builder.query({
+      query: () => '/admin/products/pending',
+      providesTags: ['Product'],
+      transformErrorResponse: (response) => {
+        if (response.status === 401) {
+          window.location.href = '/login/admin';
+        }
+        return response;
+      },
+    }),
+    
     // KYC
     getAllKYC: builder.query({
       query: () => '/kyc/all',
@@ -87,7 +110,7 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['KYC'],
     }),
-    
+
     // Users
     getAllUsers: builder.query({
       query: () => '/admin/users',
@@ -204,12 +227,14 @@ export const apiSlice = createApi({
 });
 
 export const {
+  useGetAdminDashboardCountsQuery,
   useGetProductsQuery,
   useGetSupplierProductsQuery,
   useGetSellerProductsQuery,
   useApproveProductMutation,
   useRejectProductMutation,
   useCreateProductMutation,
+  useGetPendingProductsQuery,
   useGetAllKYCQuery,
   useApproveKYCMutation,
   useRejectKYCMutation,

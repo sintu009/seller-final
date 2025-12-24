@@ -1,4 +1,5 @@
-import React from 'react';
+import React,{useEffect} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,8 +12,29 @@ import SupplierDashboard from './pages/supplier/SupplierDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
+import { socket } from './socket';
 
 function App() {
+  
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    socket.on('NEW_SELLER_REGISTERED', (seller) => {
+      console.log('🔥 Socket event received:', seller);
+
+      // ✅ ADMIN-ONLY UI reaction
+      if (user?.role === 'admin') {
+        toast.info(`🆕 New seller registered: ${seller.name}`);
+        dispatch(apiSlice.util.invalidateTags(['User', 'KYC']));
+      }
+    });
+
+    return () => {
+      socket.off('NEW_SELLER_REGISTERED');
+    };
+  }, [user, dispatch]);
+
   return (
     <AuthProvider>
       <Router>

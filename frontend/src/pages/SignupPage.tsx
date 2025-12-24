@@ -33,6 +33,12 @@ const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [passwordError, setPasswordError] = useState('');
+  const [panError, setPanError] = useState('');
+
+
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
 
   const roleConfig = {
     seller: { icon: Store, color: "blue", title: "Seller Dashboard" },
@@ -43,11 +49,44 @@ const SignupPage = () => {
   const config = roleConfig[role as keyof typeof roleConfig];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-  };
+
+  if (name === 'password') {
+    if (value.length < 8) {
+      setPasswordError('Password must be at least 8 characters long');
+    } else if (!/[A-Za-z]/.test(value)) {
+      setPasswordError('Password must contain at least 1 letter');
+    } else if (!/\d/.test(value)) {
+      setPasswordError('Password must contain at least 1 number');
+    } else {
+      setPasswordError('');
+    }
+  }
+
+  const formattedValue = name === 'panNumber' ? value.toUpperCase() : value;
+
+  if (name === 'confirmPassword') {
+    if (value !== formData.password) {
+      setPasswordError('Passwords do not match');
+    } else {
+      setPasswordError('');
+    }
+  }
+
+  if (name === 'panNumber') {
+    if (!panRegex.test(formattedValue)) {
+      setPanError('PAN format should be ABCDE1234F');
+    } else {
+      setPanError('');
+    }
+  }
+};
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
     if (e.target.files && e.target.files[0]) {
@@ -77,14 +116,21 @@ const SignupPage = () => {
     setLoading(true);
     setError("");
 
+    if (!panRegex.test(formData.panNumber)) {
+      setPanError('Invalid PAN number format');
+      setLoading(false);
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       setLoading(false);
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
+   if (!passwordRegex.test(formData.password)) {
+      setPasswordError(
+        'Password must be at least 8 characters and contain at least 1 letter and 1 number'
+      );
       setLoading(false);
       return;
     }
@@ -224,6 +270,7 @@ const SignupPage = () => {
                       id="phoneNumber"
                       name="phoneNumber"
                       value={formData.phoneNumber}
+                      maxLength={10}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                       placeholder="Enter phone number"
@@ -275,11 +322,24 @@ const SignupPage = () => {
                       name="panNumber"
                       value={formData.panNumber}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                      placeholder="Enter PAN number"
+                      maxLength={10}
+                      className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-colors
+                        ${panError ? 'border-red-400 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+                      `}
+                      placeholder="ABCDE1234F"
                       required
                     />
+
+                    {/* Helper text */}
+                    <p className="text-xs mt-1 text-gray-500">
+                      Format: 5 letters, 4 digits, 1 letter (ABCDE1234F)
+                    </p>
+
+                    {panError && (
+                      <p className="text-sm text-red-600 mt-1">{panError}</p>
+                    )}
                   </div>
+
                 </div>
 
                 <div className="space-y-4">
@@ -322,47 +382,69 @@ const SignupPage = () => {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  Password *
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors pr-12"
-                    placeholder="Create a password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password *
-                </label>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password *
+              </label>
+              <div className="relative">
                 <input
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="Confirm your password"
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 pr-12
+                    ${passwordError ? 'border-red-400 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+                  `}
+                  placeholder="Create a strong password"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
+
+              {/* 🔥 Validation rules */}
+              <ul className="mt-2 text-xs space-y-1">
+                <li className={formData.password.length >= 8 ? 'text-green-600' : 'text-gray-500'}>
+                  • At least 8 characters
+                </li>
+                <li className={/[A-Za-z]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}>
+                  • At least 1 letter
+                </li>
+                <li className={/\d/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}>
+                  • At least 1 number
+                </li>
+              </ul>
+
+              {passwordError && (
+                <p className="text-sm text-red-600 mt-2">{passwordError}</p>
+              )}
             </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                Confirm Password *
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2
+                  ${passwordError ? 'border-red-400 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+                `}
+                placeholder="Confirm your password"
+                required
+              />
+            </div>
+          </div>
+
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">

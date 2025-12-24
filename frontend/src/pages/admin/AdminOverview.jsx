@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useGetProductsQuery, useGetAllKYCQuery } from '../../store/slices/apiSlice';
+import { useGetAdminDashboardCountsQuery } from '../../store/slices/apiSlice';
 import { useAppSelector } from '../../store/hooks';
 import {
     Users,
@@ -31,29 +31,42 @@ import {
     Bar
 } from 'recharts';
 
+import { io } from 'socket.io-client';
+
+
+const socket = io("http://localhost:5000", {
+  withCredentials: true,
+});
+
 const AdminOverview = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('30days');
     const { isAuthenticated } = useAppSelector((state) => state.auth);
-    const { data: productsData, isLoading: productsLoading } = useGetProductsQuery(undefined, { skip: !isAuthenticated });
-    const { data: kycData, isLoading: kycLoading } = useGetAllKYCQuery(undefined, { skip: !isAuthenticated });
+    
+    const {
+            data: dashboardResponse,
+            isLoading: dashboardLoading,
+        } = useGetAdminDashboardCountsQuery(undefined, {
+            skip: !isAuthenticated,
+            pollingInterval: 30000,
+            refetchOnFocus: false,
+            refetchOnReconnect: false,
+        });
 
-    const products = productsData?.data || [];
-    const kycUsers = kycData?.data || [];
-    const sellers = kycUsers.filter(user => user.role === 'seller');
-    const suppliers = kycUsers.filter(user => user.role === 'supplier');
-    const pendingProducts = products.filter(p => p.approvalStatus === 'pending').length;
-    const pendingKyc = kycUsers.filter(user => user.kycStatus === 'pending').length;
-
-    const dashboardData = {
-        totalSellers: sellers.length,
-        totalSuppliers: suppliers.length,
-        totalProducts: products.length,
-        totalOrders: 0, // Mock data
-        totalRevenue: null,
-        pendingApprovals: pendingProducts + pendingKyc
+    // 🔥 KEEP VARIABLE NAME SAME
+    const dashboardData = dashboardResponse?.data ?? {
+    totalSellers: 0,
+    totalSuppliers: 0,
+    totalProducts: 0,
+    totalOrders: 0,
+    totalRevenue: null,
+    pendingApprovals: 0,
+    breakdown: {
+        pendingProducts: 0,
+        pendingKyc: 0,
+    },
     };
 
-    const loading = productsLoading || kycLoading;
+    const loading = dashboardLoading;
 
     const stats = [
         {
