@@ -194,6 +194,7 @@ const blockUser = async (req, res) => {
   }
 };
 
+
 module.exports = {
   getUserProfile,
   updateUserProfile,

@@ -384,10 +384,42 @@ const rejectProduct = async (req, res) => {
   }
 };
 
+const getPendingProducts = async (req, res) => {
+  try {
+    // Admin check
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can view pending products'
+      });
+    }
+
+    const pendingProducts = await Product.find({
+      approvalStatus: 'pending',
+      adminApproved: false
+    })
+      .populate('supplier', 'name email businessName phoneNumber')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: pendingProducts.length,
+      data: pendingProducts
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+
 module.exports = {
   createProduct,
   getSupplierProducts,
   getProductsForSellers,
+  getPendingProducts,
   getProductById,
   updateProduct,
   deleteProduct,

@@ -1,14 +1,15 @@
 require('dotenv').config({ path: './.env' });
+
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
+
 const connectDB = require('./config/database');
 
-// console.log('Environment variables:');
-// console.log('MONGODB_URI:', process.env.MONGODB_URI);
-// console.log('NODE_ENV:', process.env.NODE_ENV);
-
+// Routes
 const authRoutes = require('./routes/auth.routes');
 const kycRoutes = require('./routes/kyc.routes');
 const productRoutes = require('./routes/product.routes');
@@ -18,14 +19,17 @@ const walletRoutes = require('./routes/wallet.routes');
 const adminRoutes = require('./routes/admin.routes');
 const sellerRoutes = require('./routes/seller.routes');
 const supplierRoutes = require('./routes/supplier.routes');
+const testRoutes = require('./routes/testRoutes');
 
+// --------------------
+// APP SETUP
+// --------------------
 const app = express();
-
 connectDB();
 
 app.use(cors({
   origin: 'http://localhost:5173',
-  credentials: true
+  credentials: true,
 }));
 
 app.use(express.json());
@@ -34,6 +38,7 @@ app.use(cookieParser());
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/kyc', kycRoutes);
 app.use('/api/products', productRoutes);
@@ -43,20 +48,43 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/seller', sellerRoutes);
 app.use('/api/supplier', supplierRoutes);
+app.use('/api/test', testRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-
+// --------------------
+// HTTP SERVER + SOCKET
+// --------------------
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// 🔥 Create HTTP server
+const server = http.createServer(app);
 
+// 🔥 Attach Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:5173',
+    credentials: true,
+  },
 });
 
-module.exports = app;
+// 🔥 Socket connection
+io.on('connection', (socket) => {
+  console.log('🟢 Client connected:', socket.id);
+
+  socket.on('disconnect', () => {
+    console.log('🔴 Client disconnected:', socket.id);
+  });
+});
+
+// 🔥 Make io globally available
+global.io = io;
+
+// --------------------
+// START SERVER
+// --------------------
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

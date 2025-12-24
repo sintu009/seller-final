@@ -200,11 +200,31 @@ const updateKYCDocuments = async (req, res) => {
   }
 };
 
+const getPendingKycCount = async (req, res) => {
+  try {
+    const count = await User.countDocuments({
+      role: { $in: ['seller', 'supplier'] },
+      kycStatus: 'pending',
+    });
+
+    res.status(200).json({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getPendingKYC,
   getAllKYC,
   getKYCById,
   approveKYC,
   rejectKYC,
-  updateKYCDocuments
+  updateKYCDocuments,
+  getPendingKycCount
 };

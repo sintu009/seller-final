@@ -54,6 +54,15 @@ const register = async (req, res) => {
     const user = await authService.registerUser(userData);
     console.log('User created successfully:', user._id);
 
+    if (user.role === 'seller' && global.io) {
+      global.io.emit('NEW_SELLER_REGISTERED', {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      });
+    }
+
+
     if (user.token) {
       res.cookie('token', user.token, {
         httpOnly: true,

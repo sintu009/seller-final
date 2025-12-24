@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth.middleware');
-const { approveProduct, rejectProduct, getAllProducts } = require('../controllers/product.controller');
+const { approveProduct, rejectProduct, getAllProducts, getPendingProducts } = require('../controllers/product.controller');
 const { getAllUsers, approveUser, rejectUser, blockUser } = require('../controllers/user.controller');
 const { getOrdersForAdmin, adminApproveOrder, adminRejectOrder } = require('../controllers/order.controller');
+const { getAdminDashboardCounts } = require('../controllers/dashboard.controller');
 
 // Debug route without auth
 router.get('/debug', (req, res) => {
@@ -35,13 +36,19 @@ router.get('/orders', protect, authorize('admin'), (req, res, next) => {
 router.use(protect);
 router.use(authorize('admin'));
 
+router.get('/dashboard-counts', getAdminDashboardCounts);
+
 router.get('/users', getAllUsers);
 router.put('/users/:id/approve', approveUser);
 router.put('/users/:id/reject', rejectUser);
 router.put('/users/:id/block', blockUser);
+
+router.get('/products/pending', getPendingProducts);
+
 router.get('/products', getAllProducts);
 router.put('/products/:id/approve', approveProduct);
 router.put('/products/:id/reject', rejectProduct);
+
 router.put('/orders/:id/approve', adminApproveOrder);
 router.put('/orders/:id/reject', adminRejectOrder);
 
