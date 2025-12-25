@@ -1,4 +1,6 @@
 const authService = require('../services/auth.service');
+const { createNotification } = require('../utils/notification.helper');
+const User = require('../models/user.model');
 
 const register = async (req, res) => {
   try {
