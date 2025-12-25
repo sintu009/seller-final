@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { Bell, Package, CheckCircle, XCircle, DollarSign, AlertTriangle, Clock, Filter, BookMarked as MarkAsRead, Trash2 } from 'lucide-react';
 
+import { useGetMyNotificationsQuery, useMarkNotificationsReadMutation, useDeleteNotificationsMutation
+} from '../../store/slices/apiSlice';
+
 const SupplierNotifications = () => {
     const [selectedFilter, setSelectedFilter] = useState('all');
     const [selectedNotifications, setSelectedNotifications] = useState([]);
 
-    const notifications = [
+    const { data, isLoading } = useGetMyNotificationsQuery();
+    const [markRead] = useMarkNotificationsReadMutation();
+    const [deleteNoti] = useDeleteNotificationsMutation();
+
+
+    const notificationsStatic = [
         {
             id: 1,
             type: 'order',
@@ -100,6 +108,45 @@ const SupplierNotifications = () => {
         }
     ];
 
+    const mapNotification = (n) => {
+        const map = {
+            success: {
+            icon: CheckCircle,
+            color: 'bg-green-100 text-green-600',
+            type: 'approval',
+            },
+            error: {
+            icon: XCircle,
+            color: 'bg-red-100 text-red-600',
+            type: 'approval',
+            },
+            system: {
+            icon: AlertTriangle,
+            color: 'bg-yellow-100 text-yellow-600',
+            type: 'system',
+            },
+            payment: {
+            icon: DollarSign,
+            color: 'bg-emerald-100 text-emerald-600',
+            type: 'payment',
+            },
+        };
+
+        const config = map[n.type] || {};
+
+        return {
+            id: n._id,
+            type: config.type || 'system',
+            title: n.title,
+            message: n.message,
+            read: n.isRead,
+            icon: config.icon || Clock,
+            color: config.color || 'bg-gray-100 text-gray-600',
+            time: new Date(n.createdAt).toLocaleString(),
+        };
+    };
+
+    const notifications = (data?.data || []).map(mapNotification);
     const filters = [
         { id: 'all', label: 'All Notifications', count: notifications.length },
         { id: 'order', label: 'Orders', count: notifications.filter(n => n.type === 'order').length },

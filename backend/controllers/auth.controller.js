@@ -62,7 +62,26 @@ const register = async (req, res) => {
       });
     }
 
+    if (role !== 'admin') {
+      const admins = await User.find({
+        role: 'admin',
+        isDeleted: false,
+      }).select('_id');
 
+      await Promise.all(
+        admins.map((admin) =>
+          createNotification({
+            user: admin._id,
+            title: `New ${role} registered`,
+            message: `${name} (${email}) has registered and requires approval.`,
+            type: 'info',
+            entityType: 'user',
+            entityId: user._id,
+          })
+        )
+      );
+    }
+    
     if (user.token) {
       res.cookie('token', user.token, {
         httpOnly: true,

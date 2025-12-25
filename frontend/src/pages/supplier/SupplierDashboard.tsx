@@ -1,5 +1,10 @@
-import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+
+import { useSelector } from 'react-redux';
+
+import { useGetUnreadNotificationCountQuery } 
+from '../../store/slices/apiSlice';
+
 import DashboardLayout from "../../components/DashboardLayout";
 import SupplierOverview from "./SupplierOverview";
 import SupplierProductManagement from "./SupplierProductManagement";
@@ -16,7 +21,12 @@ import {
   Bell,
 } from "lucide-react";
 
+
 const SupplierDashboard = () => {
+
+  const { data } = useGetUnreadNotificationCountQuery(undefined);
+  const unreadCount = data?.count || 0;
+
   const sidebarItems = [
     {
       id: "dashboard",
@@ -48,7 +58,7 @@ const SupplierDashboard = () => {
       label: "Notifications",
       icon: Bell,
       path: "/supplier/notifications",
-      badge: "5",
+      badge: unreadCount > 0 ? unreadCount.toString() : 0,
     },
     {
       id: "settings",

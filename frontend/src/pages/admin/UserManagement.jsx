@@ -15,11 +15,15 @@ import {
     Wallet,
     Phone,
     Mail,
-    MapPin
+    MapPin,
+    Trash2
 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useGetAllUsersQuery, useGetAllKYCQuery, useApproveUserMutation, useRejectUserMutation, useBlockUserMutation } from '../../store/slices/apiSlice';
+import { useGetAllUsersQuery, useGetAllKYCQuery, useApproveUserMutation, useRejectUserMutation, useBlockUserMutation,useUnBlockUserMutation 
+    , useDeleteUserMutation
+} from '../../store/slices/apiSlice';
 import { useAppSelector } from '../../store/hooks';
+import { showAlert } from '../../utils/sweetAlert';
 
 const UserManagement = () => {
     const [activeTab, setActiveTab] = useState('sellers');
@@ -40,6 +44,8 @@ const UserManagement = () => {
     const [approveUser] = useApproveUserMutation();
     const [rejectUser] = useRejectUserMutation();
     const [blockUser] = useBlockUserMutation();
+    const [unBlockUser] = useUnBlockUserMutation();
+    const [deleteUser] = useDeleteUserMutation();
 
     const users = usersData?.data || [];
 
@@ -130,6 +136,16 @@ const UserManagement = () => {
 
     const handleReject = async (id, type) => {
         try {
+            const result = await showAlert({
+                type: 'warning',
+                title: 'Reject User?',
+                text: 'This user will lose access to the platform.',
+                confirmText: 'Yes, Reject',
+                showCancel: true,
+            });
+
+            if (!result.isConfirmed) return;
+            
             await rejectUser({ userId: id, reason: 'Admin rejection' }).unwrap();
             toast.success('User rejected successfully!');
             refetchUsers();
@@ -140,11 +156,61 @@ const UserManagement = () => {
 
     const handleBlock = async (id, type) => {
         try {
+            const result = await showAlert({
+                type: 'warning',
+                title: 'Block User?',
+                text: 'This user will lose access to the platform.',
+                confirmText: 'Yes, Block',
+                showCancel: true,
+            });
+
+            if (!result.isConfirmed) return;
+
             await blockUser({ userId: id, reason: 'Admin block' }).unwrap();
             toast.success('User blocked successfully!');
             refetchUsers();
         } catch (error) {
             toast.error('Failed to block user');
+        }
+    };
+
+    const handleUnBlock = async (id, type) => {
+        try {
+            const result = await showAlert({
+                type: 'warning',
+                title: 'Unblock User?',
+                text: 'This user will regain access to the platform.',
+                confirmText: 'Yes, Unblock',
+                showCancel: true,
+            });
+
+            if (!result.isConfirmed) return;
+
+            await unBlockUser({ userId: id, reason: 'Admin unblock' }).unwrap();
+            toast.success('User unblocked successfully!');
+            refetchUsers();
+        } catch (error) {
+            toast.error('Failed to unblock user');
+        }
+    };
+
+    const handleDeleteUser = async (id, type) => {
+        try {
+            const result = await showAlert({
+                type: 'warning',
+                title: 'Delete User?',
+                text: 'This user will be permanently deleted.',
+                confirmText: 'Yes, Delete',
+                showCancel: true,
+            });
+
+            if (!result.isConfirmed) return;
+
+            await deleteUser(id).unwrap();
+            toast.success('User deleted successfully!');
+            refetchUsers();
+        } catch (error) {
+            toast.error('Failed to delete user');
         }
     };
 
@@ -301,11 +367,26 @@ const UserManagement = () => {
                                                     <Shield className="w-4 h-4" />
                                                 </button>
                                             )}
-                                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+
+                                            {seller.status === 'Blocked' && (
+                                                <button
+                                                    onClick={() => handleUnBlock(seller._id, 'seller')}
+                                                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                    title="Unblock Seller"
+                                                >
+                                                    <UserCheck className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                                
+                                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            title="View Seller">
                                                 <Eye className="w-4 h-4" />
                                             </button>
-                                            <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                                                <MoreVertical className="w-4 h-4" />
+                                            <button
+                                                onClick={() => handleDeleteUser(seller._id, 'seller')}
+                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Delete Seller">
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </td>
@@ -436,12 +517,25 @@ const UserManagement = () => {
                                                     <Shield className="w-4 h-4" />
                                                 </button>
                                             )}
+                                            {supplier.status === 'Blocked' && (
+                                                <button
+                                                    onClick={() => handleUnBlock(supplier._id, 'supplier')}
+                                                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                    title="Unblock Supplier"
+                                                >
+                                                    <UserCheck className="w-4 h-4" />
+                                                </button>
+                                            )}
                                             <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                                 <Eye className="w-4 h-4" />
                                             </button>
-                                            <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-                                                <MoreVertical className="w-4 h-4" />
+                                           <button
+                                                onClick={() => handleDeleteUser(supplier._id, 'supplier')}
+                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Delete Supplier">
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
+
                                         </div>
                                     </td>
                                 </tr>

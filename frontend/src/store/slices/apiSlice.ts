@@ -14,7 +14,7 @@ const baseQuery = fetchBaseQuery({
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Product', 'User', 'KYC', 'Order'],
+  tagTypes: ['Product', 'User', 'KYC', 'Order', 'Notification'],
   endpoints: (builder) => ({
     //Dashbaord Counts
      getAdminDashboardCounts: builder.query({
@@ -82,6 +82,13 @@ export const apiSlice = createApi({
         return response;
       },
     }),
+    deleteProduct: builder.mutation({
+      query: ({ id }) => ({
+        url: `/supplier/products/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Product'],
+    }),
     
     // KYC
     getAllKYC: builder.query({
@@ -136,6 +143,23 @@ export const apiSlice = createApi({
         url: `/admin/users/${userId}/block`,
         method: 'PUT',
         body: { reason },
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    unBlockUser: builder.mutation({
+      query: ({ userId,reason }) => ({
+        url: `/admin/users/${userId}/unblock`,
+        method: 'PUT',
+        body: { reason },
+      }),
+      invalidatesTags: ['User'],
+    }),
+
+    deleteUser: builder.mutation({
+      query: (userId) => ({
+        url: `/admin/users/${userId}`,
+        method: 'DELETE',
       }),
       invalidatesTags: ['User'],
     }),
@@ -223,6 +247,35 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Order'],
     }),
+
+    // Notifications
+    getMyNotifications: builder.query({
+      query: () => '/notifications',
+      providesTags: ['Notification'],
+    }),
+
+    markNotificationsRead: builder.mutation({
+      query: (ids) => ({
+        url: '/notifications/mark-read',
+        method: 'PUT',
+        body: { ids },
+      }),
+      invalidatesTags: ['Notification'],
+    }),
+
+    deleteNotifications: builder.mutation({
+      query: (ids) => ({
+        url: '/notifications/delete',
+        method: 'POST',
+        body: { ids },
+      }),
+      invalidatesTags: ['Notification'],
+    }),
+    
+    getUnreadNotificationCount: builder.query({
+      query: () => '/notifications/unread-count',
+      providesTags: ['Notification'],
+    }),
   }),
 });
 
@@ -235,6 +288,7 @@ export const {
   useRejectProductMutation,
   useCreateProductMutation,
   useGetPendingProductsQuery,
+  useDeleteProductMutation,
   useGetAllKYCQuery,
   useApproveKYCMutation,
   useRejectKYCMutation,
@@ -242,6 +296,8 @@ export const {
   useApproveUserMutation,
   useRejectUserMutation,
   useBlockUserMutation,
+  useUnBlockUserMutation,
+  useDeleteUserMutation,
   useUpdateUserPlanMutation,
   useGetSupplierDashboardQuery,
   useLoginMutation,
@@ -254,4 +310,8 @@ export const {
   useGetSellerOrdersQuery,
   useApproveOrderMutation,
   useRejectOrderMutation,
+  useGetMyNotificationsQuery,
+  useMarkNotificationsReadMutation,
+  useDeleteNotificationsMutation,
+  useGetUnreadNotificationCountQuery,
 } = apiSlice;

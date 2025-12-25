@@ -1,5 +1,6 @@
 const Product = require('../models/product.model');
 const User = require('../models/user.model');
+const { createNotification } = require('../utils/notification.helper');
 
 const createProduct = async (req, res) => {
   try {
@@ -74,12 +75,16 @@ const createProduct = async (req, res) => {
 const getSupplierProducts = async (req, res) => {
   try {
     const supplierId = req.user.id;
-    const { status, search } = req.query;
+    const { status, search,includeDeleted } = req.query;
 
     const filter = { supplier: supplierId };
     if (status) filter.status = status;
     if (search) {
       filter.$text = { $search: search };
+    }
+    
+    if (includeDeleted !== 'true') {
+      filter.isDeleted = { $ne: true };
     }
 
     const products = await Product.find(filter)
@@ -100,7 +105,7 @@ const getSupplierProducts = async (req, res) => {
 
 const getProductsForSellers = async (req, res) => {
   try {
-    const { category, search, notified } = req.query;
+    const { category, search, notified, includeDeleted } = req.query;
 
     const filter = {
       status: 'active',
@@ -113,6 +118,9 @@ const getProductsForSellers = async (req, res) => {
     }
     if (notified !== undefined) {
       filter.isNotifiedToSellers = notified === 'true';
+    }
+    if (includeDeleted !== 'true') {
+      filter.isDeleted = { $ne: true };
     }
 
     const products = await Product.find(filter)
@@ -194,30 +202,38 @@ const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
-    if (!product) {
+    if (!product || product.isDeleted) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found'
+        message: 'Product not found',
       });
     }
 
-    if (product.supplier.toString() !== req.user.id && req.user.role !== 'admin') {
+    // Authorization
+    if (
+      product.supplier.toString() !== req.user.id &&
+      req.user.role !== 'admin'
+    ) {
       return res.status(403).json({
         success: false,
-        message: 'Not authorized to delete this product'
+        message: 'Not authorized to delete this product',
       });
     }
 
-    await product.deleteOne();
+    product.isDeleted = true;
+    product.deletedAt = new Date();
+    product.deletedBy = req.user.id;
+
+    await product.save();
 
     res.status(200).json({
       success: true,
-      message: 'Product deleted successfully'
+      message: 'Product deleted successfully',
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -259,14 +275,17 @@ const notifyProductToSellers = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const { status, category, supplier, approvalStatus } = req.query;
+    const { status, category, supplier, approvalStatus, includeDeleted } = req.query;
     const filter = {};
+
+    if (includeDeleted !== 'true') {
+      filter.isDeleted = { $ne: true };
+    }
 
     if (status) filter.status = status;
     if (category) filter.category = category;
     if (supplier) filter.supplier = supplier;
     if (approvalStatus) filter.approvalStatus = approvalStatus;
-
     const products = await Product.find(filter)
       .populate('supplier', 'name email businessName phoneNumber')
       .sort({ createdAt: -1 });
@@ -319,6 +338,16 @@ const approveProduct = async (req, res) => {
     product.finalPrice = parseFloat(product.price) + parseFloat(margin);
 
     await product.save();
+
+    await createNotification({
+      user: product.supplier,
+      title: 'Product Approved',
+      message: `Your product "${product.name}" has been approved.`,
+      type: 'success',
+      entityType: 'product',
+      entityId: product._id,
+    });
+
     await product.populate('supplier', 'name email businessName phoneNumber');
 
     res.status(200).json({
@@ -369,6 +398,16 @@ const rejectProduct = async (req, res) => {
     product.approvedAt = new Date();
 
     await product.save();
+    
+    await createNotification({
+      user: product.supplier,
+      title: 'Product Rejected',
+      message: `Your product "${product.name}" was rejected. Reason: ${reason}`,
+      type: 'error',
+      entityType: 'product',
+      entityId: product._id,
+    });
+
     await product.populate('supplier', 'name email businessName phoneNumber');
 
     res.status(200).json({

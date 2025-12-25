@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const { createNotification } = require('../utils/notification.helper');
 
 const getUserProfile = async (req, res) => {
   try {
@@ -73,7 +74,12 @@ const getAllUsers = async (req, res) => {
     }
 
     const { role, kycStatus } = req.query;
-    const filter = {};
+    const filter = {
+      $or: [
+        { isDeleted: false },
+        { isDeleted: { $exists: false } }, // 🔥 handles old data
+      ],
+    };
     
     if (role) filter.role = role;
     if (kycStatus) filter.kycStatus = kycStatus;
@@ -106,6 +112,15 @@ const approveUser = async (req, res) => {
 
     user.status = 'active';
     await user.save();
+
+    await createNotification({
+      user: user._id,
+      title: 'Account Approved',
+      message: 'Your account has been approved successfully.',
+      type: 'success',
+      entityType: 'user', // ✅ valid enum
+      entityId: user._id,
+    });
 
     res.status(200).json({
       success: true,
@@ -144,6 +159,15 @@ const rejectUser = async (req, res) => {
     user.rejectionReason = reason;
     await user.save();
 
+     await createNotification({
+      user: user._id,
+      title: 'Account Rejected',
+      message: 'Your account has been rejected.',
+      type: 'success',
+      entityType: 'user',
+      entityId: user._id,
+    });
+
     res.status(200).json({
       success: true,
       message: 'User rejected successfully',
@@ -161,7 +185,7 @@ const blockUser = async (req, res) => {
   try {
     const userId = req.params.id;
     const { reason } = req.body;
-    
+    console.log(reason);
     if (!reason) {
       return res.status(400).json({
         success: false,
@@ -178,13 +202,124 @@ const blockUser = async (req, res) => {
     }
 
     user.status = 'blocked';
+    user.isActive = false;
+    user.blockedAt = new Date();
     user.blockReason = reason;
     await user.save();
+
+    await createNotification({
+      user: user._id,
+      title: 'Account Blocked',
+      message: 'Your account has been blocked.',
+      type: 'success',
+      entityType: 'user',
+      entityId: user._id,
+    });
 
     res.status(200).json({
       success: true,
       message: 'User blocked successfully',
       data: user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const unBlockUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { reason } = req.body;
+    console.log(reason);
+    if (!reason) {
+      return res.status(400).json({
+        success: false,
+        message: 'Unblock reason is required'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    user.status = 'active';
+    user.isActive = true;
+    user.blockedAt = new Date();
+    user.blockReason = reason;
+    await user.save();
+
+    await createNotification({
+      user: user._id,
+      title: 'Account Unblocked',
+      message: 'Your account has been unblocked successfully.',
+      type: 'success',
+      entityType: 'user',
+      entityId: user._id,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'User unblocked successfully',
+      data: user
+    });
+
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Only admin can delete
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admin can delete users'
+      });
+    }
+
+    const user = await User.findById(id);
+
+    if (!user || user.isDeleted) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    user.isDeleted = true;
+    user.deletedBy = req.user.id;
+    user.deletedOn = new Date();
+    user.isActive = false;
+    user.status = 'blocked';
+
+    await user.save();
+
+    await createNotification({
+      user: user._id,
+      title: 'Account Deleted',
+      message: 'Your account has been deleted successfully.',
+      type: 'success',
+      entityType: 'user',
+      entityId: user._id,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully (soft delete)',
     });
   } catch (error) {
     res.status(500).json({
@@ -201,5 +336,7 @@ module.exports = {
   getAllUsers,
   approveUser,
   rejectUser,
-  blockUser
+  blockUser,
+  unBlockUser,
+  deleteUser
 };

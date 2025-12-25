@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Plus, Search, ListFilter as Filter, Upload, CreditCard as Edit3, Trash2, Eye, Clock, CheckCircle, Circle as XCircle, Image as ImageIcon, Package, AlertTriangle } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useGetSupplierProductsQuery, useCreateProductMutation } from '../../store/slices/apiSlice';
+import { useGetSupplierProductsQuery, useCreateProductMutation, useDeleteProductMutation} from '../../store/slices/apiSlice';
 import { useAppSelector } from '../../store/hooks';
+import { showAlert } from '../../utils/sweetAlert';
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000');
 
@@ -10,6 +11,7 @@ const SupplierProductManagement = () => {
     const { user } = useAppSelector((state) => state.auth);
     const { data: productsData, isLoading: loading } = useGetSupplierProductsQuery();
     const [createProduct] = useCreateProductMutation();
+    const [deleteProduct] = useDeleteProductMutation();
     
     const products = productsData?.data || [];
     const isKycApproved = user?.kycStatus !== 'rejected';
@@ -126,19 +128,21 @@ const SupplierProductManagement = () => {
 
 
     const handleDelete = async (productId) => {
-        if (!window.confirm('Are you sure you want to delete this product?')) return;
+        const result = await showAlert({
+            type: 'warning',
+            title: 'Delete Product?',
+            text: 'This action cannot be undone.',
+            confirmText: 'Yes, Delete',
+            showCancel: true,
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
-            const data = await apiClient.delete(`/api/supplier/products/${productId}`);
-
-            if (data.success) {
-                toast.success('Product deleted successfully');
-                fetchProducts();
-            } else {
-                toast.error(data.message || 'Failed to delete product');
-            }
+            await deleteProduct({ id: productId}).unwrap();
+            toast.success('Product deleted successfully');
         } catch (error) {
-            console.error('Delete product error:', error);
+            console.error('Product deletion failed:', error);
             toast.error('Network error. Please try again.');
         }
     };
@@ -153,7 +157,7 @@ const SupplierProductManagement = () => {
 
     const productStats = {
         total: products.length,
-        available: products.filter(p => p.isAvailable).length,
+        available:  products.reduce((sum, p) => sum + (p.stock || 0), 0),
         outOfStock: products.filter(p => p.stock === 0).length,
         lowStock: products.filter(p => p.stock > 0 && p.stock < 10).length
     };

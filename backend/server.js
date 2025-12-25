@@ -20,6 +20,7 @@ const adminRoutes = require('./routes/admin.routes');
 const sellerRoutes = require('./routes/seller.routes');
 const supplierRoutes = require('./routes/supplier.routes');
 const testRoutes = require('./routes/testRoutes');
+const notificationRoutes = require('./routes/notification.routes');
 
 // --------------------
 // APP SETUP
@@ -39,6 +40,7 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/kyc', kycRoutes);
 app.use('/api/products', productRoutes);

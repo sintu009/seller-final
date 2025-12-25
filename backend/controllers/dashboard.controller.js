@@ -6,8 +6,20 @@ const getAdminDashboardCounts = async (req, res) => {
   try {
     // USERS
     const [totalSellers, totalSuppliers] = await Promise.all([
-      User.countDocuments({ role: 'seller' }),
-      User.countDocuments({ role: 'supplier' }),
+      User.countDocuments({
+        role: 'seller',
+         $or: [
+            { isDeleted: false },
+            { isDeleted: { $exists: false } },
+          ],
+      }),
+      User.countDocuments({
+        role: 'supplier',
+        $or: [
+          { isDeleted: false },
+          { isDeleted: { $exists: false } },
+        ],
+      }),
     ]);
 
     // PRODUCTS

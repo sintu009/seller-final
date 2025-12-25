@@ -73,6 +73,30 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  status: {
+  type: String,
+  enum: ['active', 'blocked'],
+  default: 'active'
+  },
+  blockReason: {
+    type: String
+  },
+  blockedAt:{
+    type: Date
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
+  deletedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  deletedOn: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true
