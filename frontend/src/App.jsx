@@ -7,6 +7,7 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import TestLogin from './pages/TestLogin';
+import SuperAdminLogin from './pages/SuperAdminLogin';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import SupplierDashboard from './pages/supplier/SupplierDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -54,6 +55,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/test-login" element={<TestLogin />} />
+            <Route path="/super-admin-login" element={<SuperAdminLogin />} />
             <Route path="/login/:role" element={<LoginPage />} />
             <Route path="/signup/:role" element={<SignupPage />} />
             <Route

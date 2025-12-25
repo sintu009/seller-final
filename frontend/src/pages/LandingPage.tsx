@@ -134,6 +134,12 @@ const LandingPage = () => {
               &copy; 2025 MarketPlace Platform. Built for sellers, suppliers,
               and administrators.
             </p>
+            <button
+              onClick={() => navigate('/super-admin-login')}
+              className="mt-4 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              Super Admin Access
+            </button>
           </div>
         </div>
       </footer>
