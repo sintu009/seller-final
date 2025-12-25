@@ -199,10 +199,10 @@ const FinanceWallet = () => {
                 {financeStats.map((stat, index) => (
                     <div
                         key={index}
-                        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
+                        className="bg-white rounded-md p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <div className={`p-3 rounded-xl ${stat.color}`}>
+                            <div className={`p-3 rounded-md ${stat.color}`}>
                                 <stat.icon className="w-6 h-6" />
                             </div>
                             <div className={`flex items-center text-sm font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
@@ -226,11 +226,11 @@ const FinanceWallet = () => {
             {/* Charts */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Revenue Breakdown */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Revenue Breakdown</h3>
                         <select
-                            className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            className="bg-gray-50 border border-gray-200 rounded-mdg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
                             value={selectedPeriod}
                             onChange={(e) => setSelectedPeriod(e.target.value)}
                         >
@@ -296,7 +296,7 @@ const FinanceWallet = () => {
                 </div>
 
                 {/* Commission by Platform */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-6">Commission by Platform</h3>
                     <div className="flex items-center justify-center mb-6">
                         <ResponsiveContainer width="100%" height={200}>
@@ -345,7 +345,7 @@ const FinanceWallet = () => {
     const renderWalletsTab = () => (
         <div className="space-y-6">
             {/* Seller Wallet Balances */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-semibold text-gray-900">Seller Wallet Balances</h3>
                     <button className="text-orange-600 hover:text-orange-700 text-sm font-medium">
@@ -384,7 +384,7 @@ const FinanceWallet = () => {
                                         </span>
                                     </td>
                                     <td className="py-3 px-4">
-                                        <button className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors">
+                                        <button className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-mdg transition-colors">
                                             <Eye className="w-4 h-4" />
                                         </button>
                                     </td>
@@ -396,11 +396,11 @@ const FinanceWallet = () => {
             </div>
 
             {/* Recent Transactions */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-semibold text-gray-900">Recent Wallet Transactions</h3>
                     <div className="flex items-center space-x-3">
-                        <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                        <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
                             <Filter className="w-4 h-4 mr-2" />
                             Filter
                         </button>
@@ -478,7 +478,7 @@ const FinanceWallet = () => {
                     <p className="text-gray-600 mt-1">Monitor platform finances, wallet transactions, and commission management</p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center">
                         <Download className="w-4 h-4 mr-2" />
                         Export Report
                     </button>
@@ -486,13 +486,13 @@ const FinanceWallet = () => {
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex space-x-1 mb-6">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`px-4 py-2 rounded-xl font-medium transition-colors ${activeTab === tab.id
+                            className={`px-4 py-2 rounded-md font-medium transition-colors ${activeTab === tab.id
                                 ? 'bg-orange-100 text-orange-700 border border-orange-200'
                                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                 }`}

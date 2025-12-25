@@ -136,13 +136,13 @@ const SellerOverview = () => {
       </div>
 
       {/* Business Information Card */}
-      {/* <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      {/* <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Business Information</h2> */}
 
       {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> */}
       {/* Business Name */}
       {/* <div className="flex items-start space-x-4">
-            <div className="p-3 bg-blue-50 rounded-xl">
+            <div className="p-3 bg-blue-50 rounded-md">
               <Building2 className="w-6 h-6 text-blue-600" />
             </div>
             <div>
@@ -155,7 +155,7 @@ const SellerOverview = () => {
 
       {/* Phone Number */}
       {/* <div className="flex items-start space-x-4">
-            <div className="p-3 bg-green-50 rounded-xl">
+            <div className="p-3 bg-green-50 rounded-md">
               <Phone className="w-6 h-6 text-green-600" />
             </div>
             <div>
@@ -168,7 +168,7 @@ const SellerOverview = () => {
 
       {/* GST Number */}
       {/* <div className="flex items-start space-x-4">
-            <div className="p-3 bg-purple-50 rounded-xl">
+            <div className="p-3 bg-purple-50 rounded-md">
               <FileText className="w-6 h-6 text-purple-600" />
             </div>
             <div>
@@ -181,7 +181,7 @@ const SellerOverview = () => {
 
       {/* PAN Number */}
       {/* <div className="flex items-start space-x-4">
-            <div className="p-3 bg-orange-50 rounded-xl">
+            <div className="p-3 bg-orange-50 rounded-md">
               <CreditCard className="w-6 h-6 text-orange-600" />
             </div>
             <div>
@@ -221,12 +221,12 @@ const SellerOverview = () => {
       </div> */}
 
       {/* Documents Section */}
-      {/* <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      {/* <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Uploaded Documents</h2> */}
 
       {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> */}
       {/* GST Certificate */}
-      {/* <div className="border border-gray-200 rounded-xl p-4">
+      {/* <div className="border border-gray-200 rounded-md p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-gray-600" />
@@ -236,7 +236,7 @@ const SellerOverview = () => {
       {/* {userData?.kycDocuments?.gstCertificate ? (
               <button
                 onClick={() => handleViewDocument(userData.kycDocuments.gstCertificate)}
-                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors"
+                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-mdg font-medium flex items-center justify-center space-x-2 transition-colors"
               >
                 <Eye className="w-4 h-4" />
                 <span>View Document</span>
@@ -249,7 +249,7 @@ const SellerOverview = () => {
           </div> */}
 
       {/* PAN Card */}
-      {/* <div className="border border-gray-200 rounded-xl p-4">
+      {/* <div className="border border-gray-200 rounded-md p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <CreditCard className="w-5 h-5 text-gray-600" />
@@ -259,7 +259,7 @@ const SellerOverview = () => {
             {userData?.kycDocuments?.panCard ? (
               <button
                 onClick={() => handleViewDocument(userData.kycDocuments.panCard)}
-                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors"
+                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-mdg font-medium flex items-center justify-center space-x-2 transition-colors"
               >
                 <Eye className="w-4 h-4" />
                 <span>View Document</span>
@@ -272,7 +272,7 @@ const SellerOverview = () => {
           </div> */}
 
       {/* Cancelled Cheque */}
-      {/* <div className="border border-gray-200 rounded-xl p-4">
+      {/* <div className="border border-gray-200 rounded-md p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-gray-600" />
@@ -282,7 +282,7 @@ const SellerOverview = () => {
             {userData?.kycDocuments?.cancelledCheque ? (
               <button
                 onClick={() => handleViewDocument(userData.kycDocuments.cancelledCheque)}
-                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2 transition-colors"
+                className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-mdg font-medium flex items-center justify-center space-x-2 transition-colors"
               >
                 <Eye className="w-4 h-4" />
                 <span>View Document</span>
@@ -301,10 +301,10 @@ const SellerOverview = () => {
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
+            className="bg-white rounded-md p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
           >
             <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-xl ${stat.color}`}>
+              <div className={`p-3 rounded-md ${stat.color}`}>
                 <stat.icon className="w-6 h-6" />
               </div>
               <div
@@ -331,7 +331,7 @@ const SellerOverview = () => {
       {/* Revenue and Order Trends */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Revenue Trends */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
               Revenue Trends
@@ -375,7 +375,7 @@ const SellerOverview = () => {
         </div>
 
         {/* Order Volume Trends */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
               Order Volume Trends

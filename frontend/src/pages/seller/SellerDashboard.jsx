@@ -34,7 +34,7 @@ const SellerDashboard = () => {
   ];
 
   return (
-    <DashboardLayout sidebarItems={sidebarItems} title="Seller Central">
+    <DashboardLayout sidebarItems={sidebarItems} title="Kyzen Seller">
       <Routes>
         <Route path="/dashboard" element={<SellerOverview />} />
         <Route path="/products" element={<ProductManagement />} />

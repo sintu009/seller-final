@@ -3,7 +3,16 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../store/hooks";
 import { useRegisterMutation } from "../store/slices/apiSlice";
 import { setCredentials } from "../store/slices/authSlice";
-import { Store, Truck, Shield, Eye, EyeOff, ArrowLeft, Upload, CheckCircle } from "lucide-react";
+import {
+  Store,
+  Truck,
+  Shield,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  Upload,
+  CheckCircle,
+} from "lucide-react";
 import { toast } from "react-toastify";
 
 const SignupPage = () => {
@@ -33,9 +42,8 @@ const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [passwordError, setPasswordError] = useState('');
-  const [panError, setPanError] = useState('');
-
+  const [passwordError, setPasswordError] = useState("");
+  const [panError, setPanError] = useState("");
 
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
   const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
@@ -56,51 +64,58 @@ const SignupPage = () => {
       [e.target.name]: e.target.value,
     });
 
-  if (name === 'password') {
-    if (value.length < 8) {
-      setPasswordError('Password must be at least 8 characters long');
-    } else if (!/[A-Za-z]/.test(value)) {
-      setPasswordError('Password must contain at least 1 letter');
-    } else if (!/\d/.test(value)) {
-      setPasswordError('Password must contain at least 1 number');
-    } else {
-      setPasswordError('');
+    if (name === "password") {
+      if (value.length < 8) {
+        setPasswordError("Password must be at least 8 characters long");
+      } else if (!/[A-Za-z]/.test(value)) {
+        setPasswordError("Password must contain at least 1 letter");
+      } else if (!/\d/.test(value)) {
+        setPasswordError("Password must contain at least 1 number");
+      } else {
+        setPasswordError("");
+      }
     }
-  }
 
-  const formattedValue = name === 'panNumber' ? value.toUpperCase() : value;
+    const formattedValue = name === "panNumber" ? value.toUpperCase() : value;
 
-  if (name === 'confirmPassword') {
-    if (value !== formData.password) {
-      setPasswordError('Passwords do not match');
-    } else {
-      setPasswordError('');
+    if (name === "confirmPassword") {
+      if (value !== formData.password) {
+        setPasswordError("Passwords do not match");
+      } else {
+        setPasswordError("");
+      }
     }
-  }
 
-  if (name === 'panNumber') {
-    if (!panRegex.test(formattedValue)) {
-      setPanError('PAN format should be ABCDE1234F');
-    } else {
-      setPanError('');
+    if (name === "panNumber") {
+      if (!panRegex.test(formattedValue)) {
+        setPanError("PAN format should be ABCDE1234F");
+      } else {
+        setPanError("");
+      }
     }
-  }
-};
+  };
 
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    fieldName: string
+  ) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+      const allowedTypes = [
+        "application/pdf",
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+      ];
       const maxSize = 5 * 1024 * 1024;
 
       if (!allowedTypes.includes(file.type)) {
-        toast.error('Please upload PDF, JPG, or PNG files only');
+        toast.error("Please upload PDF, JPG, or PNG files only");
         return;
       }
 
       if (file.size > maxSize) {
-        toast.error('File size must be less than 5MB');
+        toast.error("File size must be less than 5MB");
         return;
       }
 
@@ -117,7 +132,7 @@ const SignupPage = () => {
     setError("");
 
     if (!panRegex.test(formData.panNumber)) {
-      setPanError('Invalid PAN number format');
+      setPanError("Invalid PAN number format");
       setLoading(false);
       return;
     }
@@ -127,15 +142,15 @@ const SignupPage = () => {
       return;
     }
 
-   if (!passwordRegex.test(formData.password)) {
+    if (!passwordRegex.test(formData.password)) {
       setPasswordError(
-        'Password must be at least 8 characters and contain at least 1 letter and 1 number'
+        "Password must be at least 8 characters and contain at least 1 letter and 1 number"
       );
       setLoading(false);
       return;
     }
 
-    if (role !== 'admin') {
+    if (role !== "admin") {
       if (!files.gstCertificate || !files.panCard || !files.cancelledCheque) {
         setError("Please upload all required documents");
         setLoading(false);
@@ -145,26 +160,29 @@ const SignupPage = () => {
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('password', formData.password);
-      formDataToSend.append('role', role!);
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("password", formData.password);
+      formDataToSend.append("role", role!);
 
-      if (role !== 'admin') {
-        formDataToSend.append('phoneNumber', formData.phoneNumber);
-        formDataToSend.append('businessName', formData.businessName);
-        formDataToSend.append('gstNumber', formData.gstNumber);
-        formDataToSend.append('panNumber', formData.panNumber);
+      if (role !== "admin") {
+        formDataToSend.append("phoneNumber", formData.phoneNumber);
+        formDataToSend.append("businessName", formData.businessName);
+        formDataToSend.append("gstNumber", formData.gstNumber);
+        formDataToSend.append("panNumber", formData.panNumber);
 
-        if (files.gstCertificate) formDataToSend.append('gstCertificate', files.gstCertificate);
-        if (files.panCard) formDataToSend.append('panCard', files.panCard);
-        if (files.cancelledCheque) formDataToSend.append('cancelledCheque', files.cancelledCheque);
+        if (files.gstCertificate)
+          formDataToSend.append("gstCertificate", files.gstCertificate);
+        if (files.panCard) formDataToSend.append("panCard", files.panCard);
+        if (files.cancelledCheque)
+          formDataToSend.append("cancelledCheque", files.cancelledCheque);
       }
 
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const API_URL =
+        import.meta.env.VITE_API_URL || "http://localhost:5000/api";
       const response = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        credentials: 'include',
+        method: "POST",
+        credentials: "include",
         body: formDataToSend,
       });
 
@@ -174,19 +192,19 @@ const SignupPage = () => {
         if (data.token) {
           dispatch(setCredentials(data.data));
         }
-        toast.success(data.message || 'Registration successful!');
-        if (role === 'admin') {
+        toast.success(data.message || "Registration successful!");
+        if (role === "admin") {
           navigate(`/admin/dashboard`);
         } else {
           navigate(`/login/${role}`);
         }
       } else {
-        setError(data.message || 'Registration failed');
-        toast.error(data.message || 'Registration failed');
+        setError(data.message || "Registration failed");
+        toast.error(data.message || "Registration failed");
       }
     } catch (err) {
-      setError('Network error. Please try again.');
-      toast.error('Network error. Please try again.');
+      setError("Network error. Please try again.");
+      toast.error("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -197,7 +215,7 @@ const SignupPage = () => {
   }
 
   const IconComponent = config.icon;
-  const isAdminRole = role === 'admin';
+  const isAdminRole = role === "admin";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
@@ -210,10 +228,10 @@ const SignupPage = () => {
           Back to Home
         </Link>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-md shadow-xl p-8">
           <div className="text-center mb-8">
             <div
-              className={`w-16 h-16 bg-${config.color}-600 rounded-2xl flex items-center justify-center mx-auto mb-4`}
+              className={`w-16 h-16 bg-${config.color}-600 rounded-md flex items-center justify-center mx-auto mb-4`}
             >
               <IconComponent className="w-8 h-8 text-white" />
             </div>
@@ -226,7 +244,10 @@ const SignupPage = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Full Name *
                 </label>
                 <input
@@ -235,14 +256,17 @@ const SignupPage = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                   placeholder="Enter your full name"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Email Address *
                 </label>
                 <input
@@ -251,7 +275,7 @@ const SignupPage = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                   placeholder="Enter your email"
                   required
                 />
@@ -262,7 +286,10 @@ const SignupPage = () => {
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="phoneNumber"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Phone Number *
                     </label>
                     <input
@@ -272,14 +299,17 @@ const SignupPage = () => {
                       value={formData.phoneNumber}
                       maxLength={10}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                       placeholder="Enter phone number"
                       required
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="businessName"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Business Name *
                     </label>
                     <input
@@ -288,7 +318,7 @@ const SignupPage = () => {
                       name="businessName"
                       value={formData.businessName}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                       placeholder="Enter business name"
                       required
                     />
@@ -297,7 +327,10 @@ const SignupPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="gstNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="gstNumber"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       GST Number *
                     </label>
                     <input
@@ -306,14 +339,17 @@ const SignupPage = () => {
                       name="gstNumber"
                       value={formData.gstNumber}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                       placeholder="Enter GST number"
                       required
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="panNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="panNumber"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       PAN Number *
                     </label>
                     <input
@@ -323,8 +359,12 @@ const SignupPage = () => {
                       value={formData.panNumber}
                       onChange={handleChange}
                       maxLength={10}
-                      className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-colors
-                        ${panError ? 'border-red-400 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+                      className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 transition-colors
+                        ${
+                          panError
+                            ? "border-red-400 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-blue-500"
+                        }
                       `}
                       placeholder="ABCDE1234F"
                       required
@@ -339,115 +379,161 @@ const SignupPage = () => {
                       <p className="text-sm text-red-600 mt-1">{panError}</p>
                     )}
                   </div>
-
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Document Uploads</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Document Uploads
+                  </h3>
 
-                  {['gstCertificate', 'panCard', 'cancelledCheque'].map((docType) => (
-                    <div key={docType} className="border border-gray-300 rounded-xl p-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {docType === 'gstCertificate' && 'GST Certificate *'}
-                        {docType === 'panCard' && 'PAN Card *'}
-                        {docType === 'cancelledCheque' && 'Cancelled Cheque *'}
-                      </label>
-                      <div className="flex items-center space-x-4">
-                        <label className="flex-1 cursor-pointer">
-                          <div className="flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 transition-colors">
-                            {files[docType as keyof typeof files] ? (
-                              <div className="flex items-center text-green-600">
-                                <CheckCircle className="w-5 h-5 mr-2" />
-                                <span className="text-sm">{files[docType as keyof typeof files]!.name}</span>
-                              </div>
-                            ) : (
-                              <div className="flex items-center text-gray-500">
-                                <Upload className="w-5 h-5 mr-2" />
-                                <span className="text-sm">Click to upload (PDF, JPG, PNG - Max 5MB)</span>
-                              </div>
-                            )}
-                          </div>
-                          <input
-                            type="file"
-                            className="hidden"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange(e, docType)}
-                          />
+                  {["gstCertificate", "panCard", "cancelledCheque"].map(
+                    (docType) => (
+                      <div
+                        key={docType}
+                        className="border border-gray-300 rounded-md p-4"
+                      >
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          {docType === "gstCertificate" && "GST Certificate *"}
+                          {docType === "panCard" && "PAN Card *"}
+                          {docType === "cancelledCheque" &&
+                            "Cancelled Cheque *"}
                         </label>
+                        <div className="flex items-center space-x-4">
+                          <label className="flex-1 cursor-pointer">
+                            <div className="flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-md hover:border-blue-500 transition-colors">
+                              {files[docType as keyof typeof files] ? (
+                                <div className="flex items-center text-green-600">
+                                  <CheckCircle className="w-5 h-5 mr-2" />
+                                  <span className="text-sm">
+                                    {files[docType as keyof typeof files]!.name}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center text-gray-500">
+                                  <Upload className="w-5 h-5 mr-2" />
+                                  <span className="text-sm">
+                                    Click to upload (PDF, JPG, PNG - Max 5MB)
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <input
+                              type="file"
+                              className="hidden"
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              onChange={(e) => handleFileChange(e, docType)}
+                            />
+                          </label>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               </>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password *
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 pr-12
-                    ${passwordError ? 'border-red-400 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
-                  `}
-                  placeholder="Create a strong password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
+                  Password *
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 pr-12
+                    ${
+                      passwordError
+                        ? "border-red-400 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
+                    }
+                  `}
+                    placeholder="Create a strong password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+
+                {/* 🔥 Validation rules */}
+                <ul className="mt-2 text-xs space-y-1">
+                  <li
+                    className={
+                      formData.password.length >= 8
+                        ? "text-green-600"
+                        : "text-gray-500"
+                    }
+                  >
+                    • At least 8 characters
+                  </li>
+                  <li
+                    className={
+                      /[A-Za-z]/.test(formData.password)
+                        ? "text-green-600"
+                        : "text-gray-500"
+                    }
+                  >
+                    • At least 1 letter
+                  </li>
+                  <li
+                    className={
+                      /\d/.test(formData.password)
+                        ? "text-green-600"
+                        : "text-gray-500"
+                    }
+                  >
+                    • At least 1 number
+                  </li>
+                </ul>
+
+                {passwordError && (
+                  <p className="text-sm text-red-600 mt-2">{passwordError}</p>
+                )}
               </div>
 
-              {/* 🔥 Validation rules */}
-              <ul className="mt-2 text-xs space-y-1">
-                <li className={formData.password.length >= 8 ? 'text-green-600' : 'text-gray-500'}>
-                  • At least 8 characters
-                </li>
-                <li className={/[A-Za-z]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}>
-                  • At least 1 letter
-                </li>
-                <li className={/\d/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}>
-                  • At least 1 number
-                </li>
-              </ul>
-
-              {passwordError && (
-                <p className="text-sm text-red-600 mt-2">{passwordError}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Confirm Password *
-              </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2
-                  ${passwordError ? 'border-red-400 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Confirm Password *
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2
+                  ${
+                    passwordError
+                      ? "border-red-400 focus:ring-red-500"
+                      : "border-gray-300 focus:ring-blue-500"
+                  }
                 `}
-                placeholder="Confirm your password"
-                required
-              />
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
             </div>
-          </div>
-
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
                 {error}
               </div>
             )}
@@ -455,7 +541,7 @@ const SignupPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full bg-${config.color}-600 hover:bg-${config.color}-700 text-white py-3 px-6 rounded-xl font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
+              className={`w-full bg-${config.color}-600 hover:bg-${config.color}-700 text-white py-3 px-6 rounded-md font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
             >
               {loading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -477,19 +563,30 @@ const SignupPage = () => {
             </p>
 
             <div className="border-t pt-4 space-y-2">
-              <p className="text-sm text-gray-500 mb-3">Need different access?</p>
+              <p className="text-sm text-gray-500 mb-3">
+                Need different access?
+              </p>
               {role !== "seller" && (
-                <Link to="/signup/seller" className="block text-sm text-blue-600 hover:text-blue-700 font-medium">
+                <Link
+                  to="/signup/seller"
+                  className="block text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
                   Need seller access? Seller Signup
                 </Link>
               )}
               {role !== "supplier" && (
-                <Link to="/signup/supplier" className="block text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+                <Link
+                  to="/signup/supplier"
+                  className="block text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                >
                   Need supplier access? Supplier Signup
                 </Link>
               )}
               {role !== "admin" && (
-                <Link to="/signup/admin" className="block text-sm text-orange-600 hover:text-orange-700 font-medium">
+                <Link
+                  to="/signup/admin"
+                  className="block text-sm text-orange-600 hover:text-orange-700 font-medium"
+                >
                   Admin access? Admin Signup
                 </Link>
               )}

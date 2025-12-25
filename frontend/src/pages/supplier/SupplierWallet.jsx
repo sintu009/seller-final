@@ -173,13 +173,13 @@ const SupplierWallet = () => {
                     </p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center">
                         <Download className="w-4 h-4 mr-2" />
                         Export Report
                     </button>
                     <button
                         onClick={() => setShowWithdrawModal(true)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-xl font-semibold transition-colors flex items-center"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-md font-semibold transition-colors flex items-center"
                     >
                         <CreditCard className="w-4 h-4 mr-2" />
                         Withdraw Funds
@@ -189,9 +189,9 @@ const SupplierWallet = () => {
 
             {/* Wallet Balance Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-2xl p-6 text-white">
+                <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-md p-6 text-white">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="p-3 bg-white bg-opacity-20 rounded-xl">
+                        <div className="p-3 bg-white bg-opacity-20 rounded-md">
                             <Wallet className="w-6 h-6" />
                         </div>
                         <div className="text-right">
@@ -201,15 +201,15 @@ const SupplierWallet = () => {
                     </div>
                     <button
                         onClick={() => setShowWithdrawModal(true)}
-                        className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-2 px-4 rounded-xl font-medium transition-colors"
+                        className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-2 px-4 rounded-md font-medium transition-colors"
                     >
                         Withdraw Funds
                     </button>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="p-3 bg-yellow-100 rounded-xl">
+                        <div className="p-3 bg-yellow-100 rounded-md">
                             <Calendar className="w-6 h-6 text-yellow-600" />
                         </div>
                         <div className="text-right">
@@ -220,9 +220,9 @@ const SupplierWallet = () => {
                     <div className="text-sm text-gray-500">From recent orders</div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="p-3 bg-blue-100 rounded-xl">
+                        <div className="p-3 bg-blue-100 rounded-md">
                             <DollarSign className="w-6 h-6 text-blue-600" />
                         </div>
                         <div className="text-right">
@@ -240,11 +240,11 @@ const SupplierWallet = () => {
             {/* Charts */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Earnings Trend */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Earnings Trend</h3>
                         <select
-                            className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            className="bg-gray-50 border border-gray-200 rounded-mdg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             value={selectedPeriod}
                             onChange={(e) => setSelectedPeriod(e.target.value)}
                         >
@@ -281,7 +281,7 @@ const SupplierWallet = () => {
                 </div>
 
                 {/* Monthly Summary */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Monthly Summary</h3>
                         <button className="text-emerald-600 hover:text-emerald-700 text-sm font-medium flex items-center">
@@ -291,18 +291,18 @@ const SupplierWallet = () => {
                     </div>
                     <div className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-emerald-50 rounded-xl">
+                            <div className="p-4 bg-emerald-50 rounded-md">
                                 <div className="text-emerald-600 text-sm font-medium">Total Earnings</div>
                                 <div className="text-2xl font-bold text-emerald-700">₹63,000</div>
                                 <div className="text-xs text-emerald-600 mt-1">This month</div>
                             </div>
-                            <div className="p-4 bg-blue-50 rounded-xl">
+                            <div className="p-4 bg-blue-50 rounded-md">
                                 <div className="text-blue-600 text-sm font-medium">Commission Paid</div>
                                 <div className="text-2xl font-bold text-blue-700">₹6,300</div>
                                 <div className="text-xs text-blue-600 mt-1">10% platform fee</div>
                             </div>
                         </div>
-                        <div className="p-4 bg-green-50 rounded-xl">
+                        <div className="p-4 bg-green-50 rounded-md">
                             <div className="text-green-600 text-sm font-medium">Net Earnings</div>
                             <div className="text-2xl font-bold text-green-700">₹56,700</div>
                             <div className="text-xs text-green-600 mt-1">After commission deduction</div>
@@ -314,7 +314,7 @@ const SupplierWallet = () => {
             {/* Withdrawal Modal */}
             {showWithdrawModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                    <div className="bg-white rounded-md p-8 max-w-md w-full mx-4">
                         <div className="text-center mb-6">
                             <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <CreditCard className="w-8 h-8 text-emerald-600" />
@@ -324,7 +324,7 @@ const SupplierWallet = () => {
                         </div>
 
                         <div className="space-y-4">
-                            <div className="bg-gray-50 p-4 rounded-xl">
+                            <div className="bg-gray-50 p-4 rounded-md">
                                 <div className="text-sm text-gray-600">Available Balance</div>
                                 <div className="text-2xl font-bold text-gray-900">₹{walletBalance.available.toLocaleString()}</div>
                             </div>
@@ -338,11 +338,11 @@ const SupplierWallet = () => {
                                     value={withdrawAmount}
                                     onChange={(e) => setWithdrawAmount(e.target.value)}
                                     placeholder={`Minimum ₹${walletBalance.minimumWithdraw}`}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                 />
                             </div>
 
-                            <div className="bg-blue-50 p-4 rounded-xl">
+                            <div className="bg-blue-50 p-4 rounded-md">
                                 <div className="flex items-start">
                                     <AlertTriangle className="w-5 h-5 text-blue-600 mr-2 mt-0.5" />
                                     <div className="text-sm text-blue-800">
@@ -355,14 +355,14 @@ const SupplierWallet = () => {
                             <div className="flex space-x-3 pt-4">
                                 <button
                                     onClick={() => setShowWithdrawModal(false)}
-                                    className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                                    className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleWithdraw}
                                     disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0}
-                                    className="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Withdraw
                                 </button>
@@ -373,12 +373,12 @@ const SupplierWallet = () => {
             )}
 
             {/* Transaction History */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                         <h3 className="text-lg font-semibold text-gray-900">Transaction History</h3>
                         <div className="flex items-center space-x-3">
-                            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
                                 <Filter className="w-4 h-4 mr-2" />
                                 Filter
                             </button>
@@ -411,7 +411,7 @@ const SupplierWallet = () => {
                                     </td>
                                     <td className="py-4 px-6">
                                         <div className="flex items-center">
-                                            <div className={`p-2 rounded-lg mr-3 ${transaction.type === 'Credit' ? 'bg-green-100' : 'bg-red-100'
+                                            <div className={`p-2 rounded-mdg mr-3 ${transaction.type === 'Credit' ? 'bg-green-100' : 'bg-red-100'
                                                 }`}>
                                                 {transaction.type === 'Credit' ? (
                                                     <ArrowDownRight className={`w-4 h-4 ${getTransactionColor(transaction.type, transaction.status)}`} />
@@ -459,7 +459,7 @@ const SupplierWallet = () => {
             </div>
 
             {/* Withdrawal History */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900">Withdrawal History</h3>
                 </div>

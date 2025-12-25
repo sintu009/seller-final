@@ -27,11 +27,11 @@ import { useAppSelector } from '../../store/hooks';
 
 const SupplierOverview = () => {
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-    
+
     const { data: productsData, isLoading: productsLoading } = useGetSupplierProductsQuery(undefined, {
         skip: !isAuthenticated || user?.role !== 'supplier'
     });
-    
+
     const { data: ordersData, isLoading: ordersLoading } = useGetSupplierOrdersQuery(undefined, {
         skip: !isAuthenticated || user?.role !== 'supplier'
     });
@@ -111,12 +111,12 @@ const SupplierOverview = () => {
     const getWeeklyData = () => {
         const weeklyData = {};
         const now = new Date();
-        
+
         orders.forEach(order => {
             const orderDate = new Date(order.createdAt);
             const daysDiff = Math.floor((now - orderDate) / (1000 * 60 * 60 * 24));
             const weekNumber = Math.floor(daysDiff / 7) + 1;
-            
+
             if (weekNumber <= 4) {
                 const weekKey = `Week ${weekNumber}`;
                 if (!weeklyData[weekKey]) {
@@ -125,7 +125,7 @@ const SupplierOverview = () => {
                 weeklyData[weekKey] += 1;
             }
         });
-        
+
         return ['Week 1', 'Week 2', 'Week 3', 'Week 4'].map(week => ({
             name: week,
             orders: weeklyData[week] || 0
@@ -146,9 +146,9 @@ const SupplierOverview = () => {
         product: order.product?.name || 'N/A',
         quantity: order.quantity,
         amount: order.totalPrice,
-        status: order.status === 'pushed' ? 'Processing' : 
-               order.status === 'shipped' ? 'Shipped' : 
-               order.status === 'delivered' ? 'Delivered' : 'Pending',
+        status: order.status === 'pushed' ? 'Processing' :
+            order.status === 'shipped' ? 'Shipped' :
+                order.status === 'delivered' ? 'Delivered' : 'Pending',
         date: new Date(order.createdAt).toLocaleDateString()
     }));
 
@@ -187,7 +187,7 @@ const SupplierOverview = () => {
     if (productsLoading || ordersLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <div className="bg-white p-8 rounded-lg shadow-md text-center">
+                <div className="bg-white p-8 rounded-mdg shadow-md text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">Loading dashboard...</p>
                 </div>
@@ -206,7 +206,7 @@ const SupplierOverview = () => {
                     </p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center transition-colors">
+                    <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-md font-semibold flex items-center transition-colors">
                         <Package className="w-5 h-5 mr-2" />
                         Add New Product
                     </button>
@@ -218,16 +218,15 @@ const SupplierOverview = () => {
                 {stats.map((stat, index) => (
                     <div
                         key={index}
-                        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
+                        className="bg-white rounded-md p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <div className={`p-3 rounded-xl ${stat.color}`}>
+                            <div className={`p-3 rounded-md ${stat.color}`}>
                                 <stat.icon className="w-6 h-6" />
                             </div>
                             {stat.change !== 'N/A' && (
-                                <div className={`flex items-center text-sm font-medium ${
-                                    stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                                }`}>
+                                <div className={`flex items-center text-sm font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                                    }`}>
                                     <TrendingUp className={`w-4 h-4 mr-1 ${stat.trend === 'down' ? 'rotate-180' : ''}`} />
                                     {stat.change}
                                 </div>
@@ -244,7 +243,7 @@ const SupplierOverview = () => {
             {/* Charts Section */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Revenue Trends */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Revenue Trends</h3>
                         <div className="flex items-center space-x-4">
@@ -286,7 +285,7 @@ const SupplierOverview = () => {
                 </div>
 
                 {/* Orders Trend */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Orders Trend</h3>
                         <div className="flex items-center space-x-2">
@@ -316,7 +315,7 @@ const SupplierOverview = () => {
             {/* Recent Orders & Top Products */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Recent Orders */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
                         <button className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
@@ -325,9 +324,9 @@ const SupplierOverview = () => {
                     </div>
                     <div className="space-y-4">
                         {recentOrders.map((order, index) => (
-                            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
                                 <div className="flex items-center space-x-4">
-                                    <div className="p-2 bg-emerald-100 rounded-lg">
+                                    <div className="p-2 bg-emerald-100 rounded-mdg">
                                         <ShoppingCart className="w-5 h-5 text-emerald-600" />
                                     </div>
                                     <div>
@@ -348,7 +347,7 @@ const SupplierOverview = () => {
                 </div>
 
                 {/* Top Products */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Top Selling Products</h3>
                         <button className="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
@@ -357,9 +356,9 @@ const SupplierOverview = () => {
                     </div>
                     <div className="space-y-4">
                         {topProducts.map((product, index) => (
-                            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
                                 <div className="flex items-center space-x-4">
-                                    <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                                    <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-mdg flex items-center justify-center text-white font-bold text-sm">
                                         {index + 1}
                                     </div>
                                     <div>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Bell, Package, CheckCircle, XCircle, DollarSign, AlertTriangle, Clock, Filter, BookMarked as MarkAsRead, Trash2 } from 'lucide-react';
 
-import { useGetMyNotificationsQuery, useMarkNotificationsReadMutation, useDeleteNotificationsMutation
+import {
+    useGetMyNotificationsQuery, useMarkNotificationsReadMutation, useDeleteNotificationsMutation
 } from '../../store/slices/apiSlice';
 
 const SupplierNotifications = () => {
@@ -111,24 +112,24 @@ const SupplierNotifications = () => {
     const mapNotification = (n) => {
         const map = {
             success: {
-            icon: CheckCircle,
-            color: 'bg-green-100 text-green-600',
-            type: 'approval',
+                icon: CheckCircle,
+                color: 'bg-green-100 text-green-600',
+                type: 'approval',
             },
             error: {
-            icon: XCircle,
-            color: 'bg-red-100 text-red-600',
-            type: 'approval',
+                icon: XCircle,
+                color: 'bg-red-100 text-red-600',
+                type: 'approval',
             },
             system: {
-            icon: AlertTriangle,
-            color: 'bg-yellow-100 text-yellow-600',
-            type: 'system',
+                icon: AlertTriangle,
+                color: 'bg-yellow-100 text-yellow-600',
+                type: 'system',
             },
             payment: {
-            icon: DollarSign,
-            color: 'bg-emerald-100 text-emerald-600',
-            type: 'payment',
+                icon: DollarSign,
+                color: 'bg-emerald-100 text-emerald-600',
+                type: 'payment',
             },
         };
 
@@ -207,14 +208,14 @@ const SupplierNotifications = () => {
                         <>
                             <button
                                 onClick={handleMarkAsRead}
-                                className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center"
+                                className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center"
                             >
                                 <MarkAsRead className="w-4 h-4 mr-2" />
                                 Mark as Read
                             </button>
                             <button
                                 onClick={handleDelete}
-                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium transition-colors flex items-center"
+                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center"
                             >
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Delete
@@ -225,13 +226,13 @@ const SupplierNotifications = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex flex-wrap gap-3">
                     {filters.map((filter) => (
                         <button
                             key={filter.id}
                             onClick={() => setSelectedFilter(filter.id)}
-                            className={`px-4 py-2 rounded-xl font-medium transition-colors flex items-center ${selectedFilter === filter.id
+                            className={`px-4 py-2 rounded-md font-medium transition-colors flex items-center ${selectedFilter === filter.id
                                 ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                 }`}
@@ -267,7 +268,7 @@ const SupplierNotifications = () => {
                 {filteredNotifications.map((notification) => (
                     <div
                         key={notification.id}
-                        className={`bg-white rounded-2xl p-6 shadow-sm border transition-all duration-200 ${notification.read
+                        className={`bg-white rounded-md p-6 shadow-sm border transition-all duration-200 ${notification.read
                             ? 'border-gray-100'
                             : 'border-emerald-200 bg-emerald-50/30'
                             } ${selectedNotifications.includes(notification.id)
@@ -285,7 +286,7 @@ const SupplierNotifications = () => {
                             />
 
                             {/* Icon */}
-                            <div className={`p-3 rounded-xl ${notification.color} flex-shrink-0`}>
+                            <div className={`p-3 rounded-md ${notification.color} flex-shrink-0`}>
                                 <notification.icon className="w-5 h-5" />
                             </div>
 
@@ -322,7 +323,7 @@ const SupplierNotifications = () => {
                                                 </div>
                                             )}
                                             {notification.rejectionReason && (
-                                                <div className="bg-red-50 p-3 rounded-lg">
+                                                <div className="bg-red-50 p-3 rounded-mdg">
                                                     <div className="text-sm">
                                                         <span className="text-red-800 font-medium">Rejection Reason:</span>
                                                         <span className="ml-2 text-red-700">{notification.rejectionReason}</span>
@@ -349,7 +350,7 @@ const SupplierNotifications = () => {
                 ))}
 
                 {filteredNotifications.length === 0 && (
-                    <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100">
+                    <div className="text-center py-12 bg-white rounded-md shadow-sm border border-gray-100">
                         <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                         <div className="text-gray-500 text-lg mb-2">No notifications found</div>
                         <p className="text-gray-400">
@@ -364,19 +365,19 @@ const SupplierNotifications = () => {
 
             {/* Pagination */}
             {filteredNotifications.length > 0 && (
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between">
                         <div className="text-gray-600">
                             Showing {filteredNotifications.length} notifications
                         </div>
                         <div className="flex items-center space-x-2">
-                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-mdg hover:bg-gray-50 transition-colors">
                                 Previous
                             </button>
-                            <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
+                            <button className="px-4 py-2 bg-emerald-600 text-white rounded-mdg hover:bg-emerald-700 transition-colors">
                                 1
                             </button>
-                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-mdg hover:bg-gray-50 transition-colors">
                                 Next
                             </button>
                         </div>

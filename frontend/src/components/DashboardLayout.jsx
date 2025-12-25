@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { useLogoutMutation, useGetProfileQuery } from '../store/slices/apiSlice';
 import { logout as logoutAction, updateUser } from '../store/slices/authSlice';
+import SellerCentralLogo from './SellerCentralLogo';
 import {
   Menu,
   X,
@@ -21,6 +22,8 @@ import {
 const DashboardLayout = ({ children, sidebarItems, title }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const notificationCount = 3;
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const [logoutMutation] = useLogoutMutation();
@@ -81,7 +84,10 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
       {/* Sidebar */}
       <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-          <h1 className="text-xl font-bold text-gray-900">{title}</h1>
+          <div className="flex items-center space-x-3">
+            <SellerCentralLogo className="h-8" />
+            <h1 className="text-xl font-bold text-gray-900">{title}</h1>
+          </div>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500"
@@ -100,7 +106,7 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
                 <Link
                   key={item.id}
                   to={item.path}
-                  className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-200 ${isActive
+                  className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-md transition-colors duration-200 ${isActive
                     ? 'bg-blue-50 text-blue-600 border border-blue-200'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
@@ -146,7 +152,7 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
               {connectedStores && connectedStores.length > 0 ? (
                 <div className="space-y-3">
                   {connectedStores.map((store) => (
-                    <div key={store.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div key={store.id} className="bg-gray-50 rounded-mdg p-4 border border-gray-200">
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="text-sm font-medium text-gray-900 flex-1 mr-2" title={store.url}>
                           {store.url.length > 12 ? `${store.url.substring(0, 12)}...` : store.url}
@@ -202,18 +208,17 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
                 <input
                   type="text"
                   placeholder="Search..."
-                  className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+                  className="pl-10 pr-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
                 />
               </div>
 
               {(user?.plan || user?.role === 'seller') && (
                 <div className="ml-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    user?.plan === 'starter' ? 'bg-blue-100 text-blue-800' :
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${user?.plan === 'starter' ? 'bg-blue-100 text-blue-800' :
                     user?.plan === 'growth' ? 'bg-green-100 text-green-800' :
-                    user?.plan === 'scale' ? 'bg-purple-100 text-purple-800' :
-                    'bg-orange-100 text-orange-800'
-                  }`}>
+                      user?.plan === 'scale' ? 'bg-purple-100 text-purple-800' :
+                        'bg-orange-100 text-orange-800'
+                    }`}>
                     {user?.plan ? `${user.plan.charAt(0).toUpperCase() + user.plan.slice(1)} Plan` : 'No Plan Selected'}
                   </span>
                 </div>
@@ -222,10 +227,62 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
 
             <div className="flex items-center space-x-4">
               {/* Notifications */}
-              <button className="relative p-2 text-gray-400 hover:text-gray-500 rounded-full hover:bg-gray-100">
-                <Bell className="w-5 h-5" />
-                {/* <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 transform translate-x-1/2 -translate-y-1/2"></span> */}
-              </button>
+              <div className="relative">
+                <button 
+                  onClick={() => setNotificationOpen(!notificationOpen)}
+                  className="relative p-2 text-gray-400 hover:text-gray-500 rounded-full hover:bg-gray-100"
+                >
+                  <Bell className="w-5 h-5" />
+                  {notificationCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                      {notificationCount > 9 ? '9+' : notificationCount}
+                    </span>
+                  )}
+                </button>
+                
+                {notificationOpen && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50">
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto">
+                      <div className="px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                          <div className="flex-1">
+                            <p className="text-sm text-gray-900">New order received</p>
+                            <p className="text-xs text-gray-500 mt-1">Order #12345 has been placed</p>
+                            <p className="text-xs text-gray-400 mt-1">2 minutes ago</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                          <div className="flex-1">
+                            <p className="text-sm text-gray-900">Payment received</p>
+                            <p className="text-xs text-gray-500 mt-1">$250.00 payment confirmed</p>
+                            <p className="text-xs text-gray-400 mt-1">1 hour ago</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="px-4 py-3 hover:bg-gray-50">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
+                          <div className="flex-1">
+                            <p className="text-sm text-gray-900">Low stock alert</p>
+                            <p className="text-xs text-gray-500 mt-1">Product ABC is running low</p>
+                            <p className="text-xs text-gray-400 mt-1">3 hours ago</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-4 py-2 border-t border-gray-200">
+                      <button className="text-xs text-blue-600 hover:text-blue-800">View all notifications</button>
+                    </div>
+                  </div>
+                )}
+              </div>
               <button className="relative p-2 text-gray-400 hover:text-gray-500 rounded-full hover:bg-gray-100">
                 <Settings className="w-5 h-5" />
               </button>
@@ -234,9 +291,9 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
               <div className="relative">
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="flex items-center space-x-3 p-2 rounded-md hover:bg-gray-100 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-[#2c3338] flex items-center justify-center">
                     {user?.avatar ? (
                       <img src={user.avatar} alt="" className="w-8 h-8 rounded-full" />
                     ) : (
@@ -248,12 +305,11 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
                     <div className="flex items-center space-x-2">
                       <div className="text-xs text-gray-500 capitalize">{user?.role}</div>
                       {user?.plan && (
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                          user.plan === 'starter' ? 'bg-blue-100 text-blue-800' :
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${user.plan === 'starter' ? 'bg-blue-100 text-blue-800' :
                           user.plan === 'growth' ? 'bg-green-100 text-green-800' :
-                          user.plan === 'scale' ? 'bg-purple-100 text-purple-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
+                            user.plan === 'scale' ? 'bg-purple-100 text-purple-800' :
+                              'bg-gray-100 text-gray-800'
+                          }`}>
                           {user.plan}
                         </span>
                       )}
@@ -263,7 +319,7 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
                 </button>
 
                 {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-2 z-50">
                     <button
                       onClick={handleLogout}
                       className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"

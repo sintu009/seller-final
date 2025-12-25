@@ -136,7 +136,7 @@ const AdminSettings = () => {
 
     const renderPlatformTab = () => (
         <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">General Platform Settings</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -148,7 +148,7 @@ const AdminSettings = () => {
                             type="text"
                             value={platformSettings.platformName}
                             onChange={(e) => setPlatformSettings({ ...platformSettings, platformName: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
 
@@ -160,7 +160,7 @@ const AdminSettings = () => {
                             type="number"
                             value={platformSettings.defaultGstRate}
                             onChange={(e) => setPlatformSettings({ ...platformSettings, defaultGstRate: parseInt(e.target.value) })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
 
@@ -172,7 +172,7 @@ const AdminSettings = () => {
                             type="number"
                             value={platformSettings.defaultShippingCharges}
                             onChange={(e) => setPlatformSettings({ ...platformSettings, defaultShippingCharges: parseInt(e.target.value) })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
 
@@ -184,7 +184,7 @@ const AdminSettings = () => {
                             type="number"
                             value={platformSettings.minimumOrderValue}
                             onChange={(e) => setPlatformSettings({ ...platformSettings, minimumOrderValue: parseInt(e.target.value) })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
 
@@ -196,13 +196,13 @@ const AdminSettings = () => {
                             type="number"
                             value={platformSettings.maxProductsPerSeller}
                             onChange={(e) => setPlatformSettings({ ...platformSettings, maxProductsPerSeller: parseInt(e.target.value) })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
                 </div>
 
                 <div className="mt-6 space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
                         <div>
                             <div className="font-medium text-gray-900">Auto Product Approval</div>
                             <div className="text-sm text-gray-600">Automatically approve products that meet basic criteria</div>
@@ -218,7 +218,7 @@ const AdminSettings = () => {
                         </label>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl border border-red-200">
+                    <div className="flex items-center justify-between p-4 bg-red-50 rounded-md border border-red-200">
                         <div className="flex items-center">
                             <AlertTriangle className="w-5 h-5 text-red-600 mr-3" />
                             <div>
@@ -241,7 +241,7 @@ const AdminSettings = () => {
                 <div className="flex justify-end pt-6 border-t border-gray-200 mt-8">
                     <button
                         onClick={handleSavePlatformSettings}
-                        className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center transition-colors"
+                        className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-md font-semibold flex items-center transition-colors"
                     >
                         <Save className="w-5 h-5 mr-2" />
                         Save Platform Settings
@@ -253,7 +253,7 @@ const AdminSettings = () => {
 
     const renderCommissionTab = () => (
         <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">Commission & Fee Structure</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -266,7 +266,7 @@ const AdminSettings = () => {
                             step="0.1"
                             value={commissionSettings.amazonCommission}
                             onChange={(e) => setCommissionSettings({ ...commissionSettings, amazonCommission: parseFloat(e.target.value) })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
 
@@ -279,7 +279,7 @@ const AdminSettings = () => {
                             step="0.1"
                             value={commissionSettings.flipkartCommission}
                             onChange={(e) => setCommissionSettings({ ...commissionSettings, flipkartCommission: parseFloat(e.target.value) })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
 
@@ -292,7 +292,7 @@ const AdminSettings = () => {
                             step="0.1"
                             value={commissionSettings.meeshoCommission}
                             onChange={(e) => setCommissionSettings({ ...commissionSettings, meeshoCommission: parseFloat(e.target.value) })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
 
@@ -305,7 +305,7 @@ const AdminSettings = () => {
                             step="0.1"
                             value={commissionSettings.platformFee}
                             onChange={(e) => setCommissionSettings({ ...commissionSettings, platformFee: parseFloat(e.target.value) })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
 
@@ -318,7 +318,7 @@ const AdminSettings = () => {
                             step="0.1"
                             value={commissionSettings.paymentGatewayFee}
                             onChange={(e) => setCommissionSettings({ ...commissionSettings, paymentGatewayFee: parseFloat(e.target.value) })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
 
@@ -330,7 +330,7 @@ const AdminSettings = () => {
                             type="number"
                             value={commissionSettings.gstOnCommission}
                             onChange={(e) => setCommissionSettings({ ...commissionSettings, gstOnCommission: parseInt(e.target.value) })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         />
                     </div>
                 </div>
@@ -338,7 +338,7 @@ const AdminSettings = () => {
                 <div className="flex justify-end pt-6 border-t border-gray-200 mt-8">
                     <button
                         onClick={handleSaveCommissionSettings}
-                        className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center transition-colors"
+                        className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-md font-semibold flex items-center transition-colors"
                     >
                         <Save className="w-5 h-5 mr-2" />
                         Save Commission Settings
@@ -350,12 +350,12 @@ const AdminSettings = () => {
 
     const renderApiTab = () => (
         <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-semibold text-gray-900">API Configuration</h3>
                     <button
                         onClick={() => setShowApiModal(true)}
-                        className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-xl font-medium transition-colors flex items-center"
+                        className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center"
                     >
                         <Plus className="w-4 h-4 mr-2" />
                         Add API Key
@@ -393,10 +393,10 @@ const AdminSettings = () => {
                                     <td className="py-3 px-4 text-gray-600">{key.lastUsed}</td>
                                     <td className="py-3 px-4">
                                         <div className="flex items-center space-x-2">
-                                            <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                            <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors">
                                                 <Edit3 className="w-4 h-4" />
                                             </button>
-                                            <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                            <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-mdg transition-colors">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -412,12 +412,12 @@ const AdminSettings = () => {
 
     const renderNotificationsTab = () => (
         <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">Notification Settings</h3>
 
                 <div className="space-y-4">
                     {Object.entries(notificationSettings).map(([key, value]) => (
-                        <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
                             <div>
                                 <div className="font-medium text-gray-900 capitalize">
                                     {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
@@ -451,7 +451,7 @@ const AdminSettings = () => {
                 <div className="flex justify-end pt-6 border-t border-gray-200 mt-8">
                     <button
                         onClick={handleSaveNotificationSettings}
-                        className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center transition-colors"
+                        className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-md font-semibold flex items-center transition-colors"
                     >
                         <Save className="w-5 h-5 mr-2" />
                         Save Notification Settings
@@ -463,10 +463,10 @@ const AdminSettings = () => {
 
     const renderRolesTab = () => (
         <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-semibold text-gray-900">Admin Role Management</h3>
-                    <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-xl font-medium transition-colors flex items-center">
+                    <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center">
                         <Plus className="w-4 h-4 mr-2" />
                         Create New Role
                     </button>
@@ -474,15 +474,15 @@ const AdminSettings = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {adminRoles.map((role) => (
-                        <div key={role.id} className="border border-gray-200 rounded-xl p-6">
+                        <div key={role.id} className="border border-gray-200 rounded-md p-6">
                             <div className="flex items-center justify-between mb-4">
                                 <h4 className="text-lg font-semibold text-gray-900">{role.name}</h4>
                                 <div className="flex items-center space-x-2">
-                                    <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                    <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors">
                                         <Edit3 className="w-4 h-4" />
                                     </button>
                                     {role.name !== 'Super Admin' && (
-                                        <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                        <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-mdg transition-colors">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     )}
@@ -531,11 +531,11 @@ const AdminSettings = () => {
                     <p className="text-gray-600 mt-1">Configure platform-wide settings and preferences</p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center">
                         <Download className="w-4 h-4 mr-2" />
                         Export Config
                     </button>
-                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center">
                         <Upload className="w-4 h-4 mr-2" />
                         Import Config
                     </button>
@@ -543,15 +543,15 @@ const AdminSettings = () => {
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex space-x-1 mb-6 overflow-x-auto">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`px-4 py-2 rounded-xl font-medium transition-colors flex items-center whitespace-nowrap ${activeTab === tab.id
-                                    ? 'bg-orange-100 text-orange-700 border border-orange-200'
-                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                            className={`px-4 py-2 rounded-md font-medium transition-colors flex items-center whitespace-nowrap ${activeTab === tab.id
+                                ? 'bg-orange-100 text-orange-700 border border-orange-200'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                 }`}
                         >
                             <tab.icon className="w-4 h-4 mr-2" />
@@ -572,7 +572,7 @@ const AdminSettings = () => {
             {/* API Modal */}
             {showApiModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                    <div className="bg-white rounded-md p-8 max-w-md w-full mx-4">
                         <div className="text-center mb-6">
                             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Key className="w-8 h-8 text-orange-600" />
@@ -584,7 +584,7 @@ const AdminSettings = () => {
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Platform</label>
-                                <select className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                <select className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                                     <option>Select Platform</option>
                                     <option>Amazon</option>
                                     <option>Flipkart</option>
@@ -596,7 +596,7 @@ const AdminSettings = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">API Key</label>
                                 <input
                                     type="password"
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                     placeholder="Enter API key"
                                 />
                             </div>
@@ -604,11 +604,11 @@ const AdminSettings = () => {
                             <div className="flex space-x-3 pt-4">
                                 <button
                                     onClick={() => setShowApiModal(false)}
-                                    className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                                    className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
-                                <button className="flex-1 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-semibold transition-colors">
+                                <button className="flex-1 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-md font-semibold transition-colors">
                                     Add API Key
                                 </button>
                             </div>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Package, 
-  User, 
-  Calendar, 
-  DollarSign, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
+import {
+  Package,
+  User,
+  Calendar,
+  DollarSign,
+  CheckCircle,
+  XCircle,
+  Clock,
   Search,
   Filter,
   Eye,
@@ -23,20 +23,20 @@ const OrderManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [actionType, setActionType] = useState('');
   const [actionNotes, setActionNotes] = useState('');
-  
+
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
   const shouldFetch = isAuthenticated && user?.role === 'admin';
 
-  const { 
-    data: ordersData, 
-    isLoading, 
-    error, 
-    refetch 
+  const {
+    data: ordersData,
+    isLoading,
+    error,
+    refetch
   } = useGetAdminOrdersQuery(undefined, {
     skip: !shouldFetch
   });
-  
+
   const [approveOrder, { isLoading: approving }] = useApproveOrderMutation();
   const [rejectOrder, { isLoading: rejecting }] = useRejectOrderMutation();
 
@@ -49,7 +49,7 @@ const OrderManagement = () => {
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
+        <div className="bg-white p-8 rounded-mdg shadow-md text-center">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Authentication Required</h2>
           <p className="text-gray-600">Please log in as an admin to access order management.</p>
         </div>
@@ -60,7 +60,7 @@ const OrderManagement = () => {
   if (user?.role !== 'admin') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
+        <div className="bg-white p-8 rounded-mdg shadow-md text-center">
           <h2 className="text-xl font-semibold text-red-600 mb-4">Access Denied</h2>
           <p className="text-gray-600">Only administrators can access order management.</p>
         </div>
@@ -71,14 +71,14 @@ const OrderManagement = () => {
   const orders = ordersData?.data || [];
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
+    const matchesSearch =
       order.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.seller?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.supplier?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -111,7 +111,7 @@ const OrderManagement = () => {
         }).unwrap();
         toast.success('Order rejected successfully!');
       }
-      
+
       setShowModal(false);
       setSelectedOrder(null);
       setActionNotes('');
@@ -134,7 +134,7 @@ const OrderManagement = () => {
     };
 
     const config = statusConfig[status] || { color: 'bg-gray-100 text-gray-800', label: status };
-    
+
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.color}`}>
         {config.label}
@@ -152,7 +152,7 @@ const OrderManagement = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
+        <div className="bg-white p-8 rounded-mdg shadow-md text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading orders...</p>
         </div>
@@ -170,7 +170,7 @@ const OrderManagement = () => {
         <button
           onClick={() => refetch()}
           disabled={isLoading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center"
+          className="px-4 py-2 bg-blue-600 text-white rounded-mdg hover:bg-blue-700 disabled:opacity-50 flex items-center"
         >
           {isLoading ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -180,12 +180,12 @@ const OrderManagement = () => {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div className="bg-red-50 border border-red-200 rounded-mdg p-4 mb-6">
           <h3 className="font-semibold text-red-800 mb-2">Error Loading Orders:</h3>
           <p className="text-red-700 mb-2">{error?.data?.message || 'Failed to load orders'}</p>
-          <button 
+          <button
             onClick={() => refetch()}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            className="px-4 py-2 bg-red-600 text-white rounded-mdg hover:bg-red-700"
           >
             Retry
           </button>
@@ -194,39 +194,39 @@ const OrderManagement = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Total Orders</div>
           <div className="text-2xl font-bold text-gray-900">{orderStats.total}</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Pending Review</div>
           <div className="text-2xl font-bold text-yellow-600">{orderStats.pending}</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Pushed</div>
           <div className="text-2xl font-bold text-green-600">{orderStats.approved}</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Rejected</div>
           <div className="text-2xl font-bold text-red-600">{orderStats.rejected}</div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               placeholder="Search orders..."
-              className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <select
-            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -239,7 +239,7 @@ const OrderManagement = () => {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
         {filteredOrders.length === 0 ? (
           <div className="p-12 text-center">
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -299,7 +299,7 @@ const OrderManagement = () => {
                             <button
                               onClick={() => handleAction(order, 'approve')}
                               disabled={approving || rejecting}
-                              className="p-2 text-green-600 hover:bg-green-50 rounded-lg disabled:opacity-50"
+                              className="p-2 text-green-600 hover:bg-green-50 rounded-mdg disabled:opacity-50"
                               title="Approve Order"
                             >
                               <CheckCircle className="w-4 h-4" />
@@ -307,7 +307,7 @@ const OrderManagement = () => {
                             <button
                               onClick={() => handleAction(order, 'reject')}
                               disabled={approving || rejecting}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-mdg disabled:opacity-50"
                               title="Reject Order"
                             >
                               <XCircle className="w-4 h-4" />
@@ -316,7 +316,7 @@ const OrderManagement = () => {
                         )}
                         <button
                           onClick={() => setSelectedOrder(order)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-mdg"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
@@ -334,19 +334,19 @@ const OrderManagement = () => {
       {/* Action Modal */}
       {showModal && selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+          <div className="bg-white rounded-md p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
                 {actionType === 'approve' ? 'Approve Order' : 'Reject Order'}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-gray-100 rounded-mdg"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">Order: {selectedOrder.orderNumber}</p>
               <p className="text-sm text-gray-600 mb-2">Product: {selectedOrder.product?.name}</p>
@@ -361,7 +361,7 @@ const OrderManagement = () => {
                 value={actionNotes}
                 onChange={(e) => setActionNotes(e.target.value)}
                 placeholder={actionType === 'approve' ? 'Add any notes...' : 'Please provide reason for rejection...'}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-mdg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={3}
                 required={actionType === 'reject'}
               />
@@ -370,16 +370,15 @@ const OrderManagement = () => {
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-mdg hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmAction}
                 disabled={approving || rejecting || (actionType === 'reject' && !actionNotes.trim())}
-                className={`flex-1 px-4 py-2 text-white rounded-lg disabled:opacity-50 ${
-                  actionType === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
-                }`}
+                className={`flex-1 px-4 py-2 text-white rounded-mdg disabled:opacity-50 ${actionType === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
+                  }`}
               >
                 {(approving || rejecting) ? (
                   <div className="flex items-center justify-center">

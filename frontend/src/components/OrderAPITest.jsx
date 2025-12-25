@@ -3,7 +3,7 @@ import { useGetAdminOrdersQuery, useApproveOrderMutation, useRejectOrderMutation
 
 const OrderAPITest = () => {
   const [testResults, setTestResults] = useState([]);
-  
+
   const { data: ordersData, error: ordersError } = useGetAdminOrdersQuery();
   const [approveOrder] = useApproveOrderMutation();
   const [rejectOrder] = useRejectOrderMutation();
@@ -69,25 +69,25 @@ const OrderAPITest = () => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
+    <div className="p-6 bg-white rounded-mdg shadow-md">
       <h2 className="text-xl font-bold mb-4">Order API Test Panel</h2>
-      
+
       <div className="space-y-4 mb-6">
-        <button 
+        <button
           onClick={testGetOrders}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Test Get Orders
         </button>
-        
-        <button 
+
+        <button
           onClick={testApproveOrder}
           className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
         >
           Test Approve Order
         </button>
-        
-        <button 
+
+        <button
           onClick={testRejectOrder}
           className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
         >
@@ -98,11 +98,10 @@ const OrderAPITest = () => {
       <div className="space-y-2">
         <h3 className="font-semibold">Test Results:</h3>
         {testResults.map((result, index) => (
-          <div key={index} className={`p-2 rounded text-sm ${
-            result.result === 'SUCCESS' ? 'bg-green-100 text-green-800' :
-            result.result === 'FAILED' ? 'bg-red-100 text-red-800' :
-            'bg-yellow-100 text-yellow-800'
-          }`}>
+          <div key={index} className={`p-2 rounded text-sm ${result.result === 'SUCCESS' ? 'bg-green-100 text-green-800' :
+              result.result === 'FAILED' ? 'bg-red-100 text-red-800' :
+                'bg-yellow-100 text-yellow-800'
+            }`}>
             <strong>{result.test}:</strong> {result.result}
             {result.error && <div className="text-xs mt-1">{JSON.stringify(result.error)}</div>}
           </div>

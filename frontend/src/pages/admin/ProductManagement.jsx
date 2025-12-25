@@ -155,7 +155,7 @@ const ProductManagement = () => {
                     <p className="text-gray-600 mt-1">Review and manage supplier product submissions</p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center">
                         <Download className="w-4 h-4 mr-2" />
                         Export Products
                     </button>
@@ -164,22 +164,22 @@ const ProductManagement = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Total Products</div>
                     <div className="text-2xl font-bold text-gray-900">{productStats.total}</div>
                     <div className="text-xs text-gray-500 mt-1">All submissions</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Approved Products</div>
                     <div className="text-2xl font-bold text-green-600">{productStats.approved}</div>
                     <div className="text-xs text-gray-500 mt-1">Live for sellers</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Pending Approval</div>
                     <div className="text-2xl font-bold text-yellow-600">{productStats.pending}</div>
                     <div className="text-xs text-gray-500 mt-1">Awaiting review</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Rejected Products</div>
                     <div className="text-2xl font-bold text-red-600">{productStats.rejected}</div>
                     <div className="text-xs text-gray-500 mt-1">Need revision</div>
@@ -187,7 +187,7 @@ const ProductManagement = () => {
             </div>
 
             {/* Filters and Search */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex flex-col lg:flex-row gap-4">
                     {/* Search */}
                     <div className="relative flex-1">
@@ -195,7 +195,7 @@ const ProductManagement = () => {
                         <input
                             type="text"
                             placeholder="Search products by name or supplier..."
-                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -204,7 +204,7 @@ const ProductManagement = () => {
                     {/* Filters */}
                     <div className="flex gap-3">
                         <select
-                            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             value={selectedStatus}
                             onChange={(e) => setSelectedStatus(e.target.value)}
                         >
@@ -219,7 +219,7 @@ const ProductManagement = () => {
             </div>
 
             {/* Products Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-gray-50 border-b border-gray-200">
@@ -243,10 +243,10 @@ const ProductManagement = () => {
                                                 <img
                                                     src={product.images[0]}
                                                     alt={product.name}
-                                                    className="w-12 h-12 rounded-lg object-cover mr-4"
+                                                    className="w-12 h-12 rounded-mdg object-cover mr-4"
                                                 />
                                             ) : (
-                                                <div className="w-12 h-12 rounded-lg bg-gray-200 mr-4 flex items-center justify-center">
+                                                <div className="w-12 h-12 rounded-mdg bg-gray-200 mr-4 flex items-center justify-center">
                                                     <Package className="w-6 h-6 text-gray-400" />
                                                 </div>
                                             )}
@@ -304,7 +304,7 @@ const ProductManagement = () => {
                                                 <span className="ml-2">{getStatusLabel(product.approvalStatus)}</span>
                                             </span>
                                             {product.approvalStatus === 'rejected' && product.rejectionReason && (
-                                                <div className="text-xs text-red-600 bg-red-50 p-2 rounded-lg max-w-xs">
+                                                <div className="text-xs text-red-600 bg-red-50 p-2 rounded-mdg max-w-xs">
                                                     <strong>Reason:</strong> {product.rejectionReason}
                                                 </div>
                                             )}
@@ -326,14 +326,14 @@ const ProductManagement = () => {
                                                 <>
                                                     <button
                                                         onClick={() => handleApprove(product)}
-                                                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                        className="p-2 text-green-600 hover:bg-green-50 rounded-mdg transition-colors"
                                                         title="Approve"
                                                     >
                                                         <CheckCircle className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleReject(product)}
-                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-mdg transition-colors"
                                                         title="Reject"
                                                     >
                                                         <XCircle className="w-4 h-4" />
@@ -360,7 +360,7 @@ const ProductManagement = () => {
             {/* Approve Modal */}
             {showApproveModal && selectedProduct && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                    <div className="bg-white rounded-md p-8 max-w-md w-full mx-4">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-2xl font-bold text-gray-900">Approve Product</h3>
                             <button
@@ -389,10 +389,10 @@ const ProductManagement = () => {
                                 value={margin}
                                 onChange={(e) => setMargin(e.target.value)}
                                 placeholder="Enter margin amount in rupees"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                             />
                             {margin && (
-                                <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                                <div className="mt-3 p-3 bg-green-50 rounded-mdg">
                                     <div className="text-sm text-gray-600">Final Price Preview:</div>
                                     <div className="text-2xl font-bold text-green-600">
                                         ₹{(parseFloat(selectedProduct.price) + parseFloat(margin)).toFixed(2)}
@@ -405,14 +405,14 @@ const ProductManagement = () => {
                             <button
                                 onClick={() => setShowApproveModal(false)}
                                 disabled={actionLoading}
-                                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={confirmApprove}
                                 disabled={actionLoading || !margin}
-                                className="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                                className="flex-1 px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center"
                             >
                                 {actionLoading ? (
                                     <>Processing...</>
@@ -431,7 +431,7 @@ const ProductManagement = () => {
             {/* Reject Modal */}
             {showRejectModal && selectedProduct && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                    <div className="bg-white rounded-md p-8 max-w-md w-full mx-4">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-2xl font-bold text-gray-900">Reject Product</h3>
                             <button
@@ -457,7 +457,7 @@ const ProductManagement = () => {
                                 onChange={(e) => setRejectionReason(e.target.value)}
                                 placeholder="Please provide a clear reason for rejection..."
                                 rows="4"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
                             />
                             <div className="text-xs text-gray-500 mt-1">
                                 This will be visible to the supplier
@@ -468,14 +468,14 @@ const ProductManagement = () => {
                             <button
                                 onClick={() => setShowRejectModal(false)}
                                 disabled={actionLoading}
-                                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={confirmReject}
                                 disabled={actionLoading || !rejectionReason.trim()}
-                                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center"
                             >
                                 {actionLoading ? (
                                     <>Processing...</>

@@ -35,35 +35,35 @@ import { io } from 'socket.io-client';
 
 
 const socket = io("http://localhost:5000", {
-  withCredentials: true,
+    withCredentials: true,
 });
 
 const AdminOverview = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('30days');
     const { isAuthenticated } = useAppSelector((state) => state.auth);
-    
+
     const {
-            data: dashboardResponse,
-            isLoading: dashboardLoading,
-        } = useGetAdminDashboardCountsQuery(undefined, {
-            skip: !isAuthenticated,
-            pollingInterval: 30000,
-            refetchOnFocus: false,
-            refetchOnReconnect: false,
-        });
+        data: dashboardResponse,
+        isLoading: dashboardLoading,
+    } = useGetAdminDashboardCountsQuery(undefined, {
+        skip: !isAuthenticated,
+        pollingInterval: 30000,
+        refetchOnFocus: false,
+        refetchOnReconnect: false,
+    });
 
     // 🔥 KEEP VARIABLE NAME SAME
     const dashboardData = dashboardResponse?.data ?? {
-    totalSellers: 0,
-    totalSuppliers: 0,
-    totalProducts: 0,
-    totalOrders: 0,
-    totalRevenue: null,
-    pendingApprovals: 0,
-    breakdown: {
-        pendingProducts: 0,
-        pendingKyc: 0,
-    },
+        totalSellers: 0,
+        totalSuppliers: 0,
+        totalProducts: 0,
+        totalOrders: 0,
+        totalRevenue: null,
+        pendingApprovals: 0,
+        breakdown: {
+            pendingProducts: 0,
+            pendingKyc: 0,
+        },
     };
 
     const loading = dashboardLoading;
@@ -197,7 +197,7 @@ const AdminOverview = () => {
                 </div>
                 <div className="flex items-center space-x-3">
                     <select
-                        className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="bg-white border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
                         value={selectedPeriod}
                         onChange={(e) => setSelectedPeriod(e.target.value)}
                     >
@@ -214,10 +214,10 @@ const AdminOverview = () => {
                 {stats.map((stat, index) => (
                     <div
                         key={index}
-                        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
+                        className="bg-white rounded-md p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <div className={`p-3 rounded-xl ${stat.color}`}>
+                            <div className={`p-3 rounded-md ${stat.color}`}>
                                 <stat.icon className="w-6 h-6" />
                             </div>
                             {stat.change !== 'N/A' && (
@@ -243,7 +243,7 @@ const AdminOverview = () => {
             {/* Charts Section */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Revenue Trends */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Revenue Trends</h3>
                         <div className="flex items-center space-x-4">
@@ -285,7 +285,7 @@ const AdminOverview = () => {
                 </div>
 
                 {/* Orders by Platform */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-6">Orders by Platform</h3>
                     <div className="flex items-center justify-center mb-6">
                         <ResponsiveContainer width="100%" height={200}>
@@ -330,7 +330,7 @@ const AdminOverview = () => {
             </div>
 
             {/* Performance Comparison */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-semibold text-gray-900">Seller vs Supplier Performance</h3>
                     <div className="flex items-center space-x-4">
@@ -365,7 +365,7 @@ const AdminOverview = () => {
             {/* Bottom Section */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Recent Activities */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Recent Activities</h3>
                         <button className="text-orange-600 hover:text-orange-700 text-sm font-medium">
@@ -375,7 +375,7 @@ const AdminOverview = () => {
                     <div className="space-y-4">
                         {recentActivities.map((activity, index) => (
                             <div key={index} className="flex items-start space-x-4">
-                                <div className={`p-2 rounded-lg ${activity.color} flex-shrink-0`}>
+                                <div className={`p-2 rounded-mdg ${activity.color} flex-shrink-0`}>
                                     <activity.icon className="w-4 h-4" />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -388,7 +388,7 @@ const AdminOverview = () => {
                 </div>
 
                 {/* Pending Approvals */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Pending Approvals</h3>
                         <button className="text-orange-600 hover:text-orange-700 text-sm font-medium">
@@ -397,7 +397,7 @@ const AdminOverview = () => {
                     </div>
                     <div className="space-y-4">
                         {pendingApprovals.map((approval, index) => (
-                            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
                                 <div>
                                     <div className="font-medium text-gray-900">{approval.type}</div>
                                     <div className="text-sm text-gray-600">Requires immediate attention</div>

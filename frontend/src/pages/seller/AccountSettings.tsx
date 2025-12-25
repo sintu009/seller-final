@@ -79,7 +79,7 @@ const AccountSettings = () => {
       {/* Profile Photo */}
       <div className="flex items-center space-x-6">
         <div className="relative">
-          <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+          <div className="w-20 h-20 bg-[#2c3338] rounded-full flex items-center justify-center">
             <User className="w-8 h-8 text-white" />
           </div>
           <button className="absolute -bottom-1 -right-1 bg-white rounded-full p-2 shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors">
@@ -91,7 +91,7 @@ const AccountSettings = () => {
             Profile Picture
           </h3>
           <p className="text-gray-600 text-sm">Update your profile photo</p>
-          <button className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+          <button className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
             Change Photo
           </button>
         </div>
@@ -106,7 +106,7 @@ const AccountSettings = () => {
           <input
             type="text"
             defaultValue="John"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
         <div>
@@ -116,7 +116,7 @@ const AccountSettings = () => {
           <input
             type="text"
             defaultValue="Smith"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
       </div>
@@ -131,7 +131,7 @@ const AccountSettings = () => {
             <input
               type="email"
               defaultValue="john.smith@example.com"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -144,7 +144,7 @@ const AccountSettings = () => {
             <input
               type="tel"
               defaultValue="+91 98765 43210"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -158,7 +158,7 @@ const AccountSettings = () => {
           <MapPin className="absolute left-3 top-4 w-5 h-5 text-gray-400" />
           <textarea
             defaultValue="123 Main Street, Mumbai, Maharashtra 400001"
-            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             rows={3}
           />
         </div>
@@ -176,14 +176,14 @@ const AccountSettings = () => {
           <input
             type="text"
             defaultValue="Smith Electronics"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Business Type
           </label>
-          <select className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <select className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option>Individual</option>
             <option>Partnership</option>
             <option>Private Limited</option>
@@ -200,7 +200,7 @@ const AccountSettings = () => {
           <input
             type="text"
             defaultValue="22AAAAA0000A1Z5"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
         <div>
@@ -210,7 +210,7 @@ const AccountSettings = () => {
           <input
             type="text"
             defaultValue="ABCTY1234D"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
       </div>
@@ -221,7 +221,7 @@ const AccountSettings = () => {
         </label>
         <textarea
           defaultValue="456 Business Park, Sector 18, Noida, Uttar Pradesh 201301"
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           rows={3}
         />
       </div>
@@ -235,7 +235,7 @@ const AccountSettings = () => {
           <input
             type="url"
             defaultValue="https://smithelectronics.com"
-            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
       </div>
@@ -246,7 +246,7 @@ const AccountSettings = () => {
         </label>
         <textarea
           defaultValue="We are a leading electronics retailer specializing in consumer electronics, gadgets, and accessories."
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           rows={4}
         />
       </div>
@@ -257,14 +257,14 @@ const AccountSettings = () => {
           Business Documents
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors">
+          <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center hover:border-blue-400 transition-colors">
             <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
             <p className="text-sm text-gray-600 mb-2">GST Certificate</p>
             <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
               Upload File
             </button>
           </div>
-          <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors">
+          <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center hover:border-blue-400 transition-colors">
             <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
             <p className="text-sm text-gray-600 mb-2">PAN Card</p>
             <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
@@ -280,7 +280,7 @@ const AccountSettings = () => {
     <div className="space-y-6">
       {/* KYC Status Overview */}
       <div
-        className={`p-6 rounded-2xl border-2 ${
+        className={`p-6 rounded-md border-2 ${
           kycStatus.overall === "complete"
             ? "bg-green-50 border-green-200"
             : kycStatus.overall === "partial"
@@ -334,7 +334,7 @@ const AccountSettings = () => {
         </div>
 
         {kycStatus.overall !== "complete" && (
-          <div className="bg-white p-4 rounded-xl">
+          <div className="bg-white p-4 rounded-md">
             <h4 className="font-semibold text-gray-900 mb-2">
               Required Actions:
             </h4>
@@ -367,7 +367,7 @@ const AccountSettings = () => {
         </h3>
 
         {/* GST Certificate */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <div className="bg-white border border-gray-200 rounded-md p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <FileText className="w-6 h-6 text-gray-400 mr-3" />
@@ -391,7 +391,7 @@ const AccountSettings = () => {
           </div>
 
           {kycStatus.gstCertificate === "verified" ? (
-            <div className="bg-green-50 p-4 rounded-xl">
+            <div className="bg-green-50 p-4 rounded-md">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
@@ -405,12 +405,12 @@ const AccountSettings = () => {
               </div>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors">
+            <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center hover:border-blue-400 transition-colors">
               <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 mb-4">
                 Drag and drop your GST certificate here, or click to browse
               </p>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-medium transition-colors">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors">
                 Choose File
               </button>
               <p className="text-xs text-gray-500 mt-2">
@@ -421,7 +421,7 @@ const AccountSettings = () => {
         </div>
 
         {/* PAN Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <div className="bg-white border border-gray-200 rounded-md p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <FileText className="w-6 h-6 text-gray-400 mr-3" />
@@ -443,7 +443,7 @@ const AccountSettings = () => {
           </div>
 
           {kycStatus.panCard === "verified" ? (
-            <div className="bg-green-50 p-4 rounded-xl">
+            <div className="bg-green-50 p-4 rounded-md">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
@@ -457,12 +457,12 @@ const AccountSettings = () => {
               </div>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors">
+            <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center hover:border-blue-400 transition-colors">
               <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 mb-4">
                 Drag and drop your PAN card here, or click to browse
               </p>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-medium transition-colors">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors">
                 Choose File
               </button>
               <p className="text-xs text-gray-500 mt-2">
@@ -473,7 +473,7 @@ const AccountSettings = () => {
         </div>
 
         {/* Cancelled Cheque */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <div className="bg-white border border-gray-200 rounded-md p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <FileText className="w-6 h-6 text-gray-400 mr-3" />
@@ -499,7 +499,7 @@ const AccountSettings = () => {
           </div>
 
           {kycStatus.cancelledCheque === "pending" ? (
-            <div className="bg-yellow-50 p-4 rounded-xl">
+            <div className="bg-yellow-50 p-4 rounded-md">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Clock className="w-5 h-5 text-yellow-600 mr-2" />
@@ -513,12 +513,12 @@ const AccountSettings = () => {
               </div>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors">
+            <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center hover:border-blue-400 transition-colors">
               <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 mb-4">
                 Drag and drop your cancelled cheque here, or click to browse
               </p>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl font-medium transition-colors">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors">
                 Choose File
               </button>
               <p className="text-xs text-gray-500 mt-2">
@@ -530,7 +530,7 @@ const AccountSettings = () => {
       </div>
 
       {/* Verification Notes */}
-      <div className="bg-blue-50 p-6 rounded-2xl">
+      <div className="bg-blue-50 p-6 rounded-md">
         <h4 className="font-semibold text-blue-900 mb-3">Important Notes:</h4>
         <ul className="space-y-2 text-sm text-blue-800">
           <li>• All documents must be clear and readable</li>
@@ -553,7 +553,7 @@ const AccountSettings = () => {
         </h3>
 
         {/* Change Password */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
+        <div className="bg-white border border-gray-200 rounded-md p-6 mb-6">
           <h4 className="font-semibold text-gray-900 mb-4">Change Password</h4>
           <div className="space-y-4">
             <div>
@@ -563,7 +563,7 @@ const AccountSettings = () => {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
                   placeholder="Enter current password"
                 />
                 <button
@@ -587,7 +587,7 @@ const AccountSettings = () => {
               <div className="relative">
                 <input
                   type={showNewPassword ? "text" : "password"}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
                   placeholder="Enter new password"
                 />
                 <button
@@ -610,19 +610,19 @@ const AccountSettings = () => {
               </label>
               <input
                 type="password"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Confirm new password"
               />
             </div>
 
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-semibold transition-colors">
               Update Password
             </button>
           </div>
         </div>
 
         {/* Two-Factor Authentication */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6">
+        <div className="bg-white border border-gray-200 rounded-md p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h4 className="font-semibold text-gray-900">
@@ -656,7 +656,7 @@ const AccountSettings = () => {
           {Object.entries(notifications).map(([key, value]) => (
             <div
               key={key}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-md"
             >
               <div>
                 <div className="font-medium text-gray-900 capitalize">
@@ -712,13 +712,13 @@ const AccountSettings = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-md p-4 shadow-sm border border-gray-100">
             <nav className="space-y-2">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors ${
                     activeTab === tab.id
                       ? "bg-blue-50 text-blue-600 border border-blue-200"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -734,7 +734,7 @@ const AccountSettings = () => {
 
         {/* Content */}
         <div className="lg:col-span-3">
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-md p-8 shadow-sm border border-gray-100">
             {activeTab === "profile" && renderProfileTab()}
             {activeTab === "business" && renderBusinessTab()}
             {activeTab === "kyc" && renderKycTab()}
@@ -757,7 +757,7 @@ const AccountSettings = () => {
               activeTab === "business" ||
               activeTab === "notifications") && (
               <div className="flex justify-end pt-6 border-t border-gray-200 mt-8">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center transition-colors">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-semibold flex items-center transition-colors">
                   <Save className="w-5 h-5 mr-2" />
                   Save Changes
                 </button>

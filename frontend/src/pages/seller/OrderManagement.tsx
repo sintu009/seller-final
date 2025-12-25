@@ -209,11 +209,11 @@ const OrderManagement = () => {
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl font-medium transition-colors flex items-center">
+          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center">
             <Package className="w-4 h-4 mr-2" />
             Sync Orders
           </button>
-          <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+          <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center">
             <Download className="w-4 h-4 mr-2" />
             Export
           </button>
@@ -222,35 +222,35 @@ const OrderManagement = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Total Orders</div>
           <div className="text-2xl font-bold text-gray-900">
             {orderStats.total}
           </div>
           <div className="text-xs text-gray-500 mt-1">All platforms</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Total Revenue</div>
           <div className="text-2xl font-bold text-green-600">
             ₹{orderStats.totalRevenue.toLocaleString()}
           </div>
           <div className="text-xs text-gray-500 mt-1">Confirmed orders</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Pending</div>
           <div className="text-2xl font-bold text-yellow-600">
             {orderStats.pending}
           </div>
           <div className="text-xs text-gray-500 mt-1">Awaiting action</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">In Transit</div>
           <div className="text-2xl font-bold text-purple-600">
             {orderStats.inTransit}
           </div>
           <div className="text-xs text-gray-500 mt-1">Being shipped</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Delivered</div>
           <div className="text-2xl font-bold text-green-600">
             {orderStats.delivered}
@@ -262,7 +262,7 @@ const OrderManagement = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Search */}
           <div className="relative flex-1">
@@ -270,7 +270,7 @@ const OrderManagement = () => {
             <input
               type="text"
               placeholder="Search by Order ID, Customer Name, Product, or Platform..."
-              className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -279,7 +279,7 @@ const OrderManagement = () => {
           {/* Filters */}
           <div className="flex gap-3">
             <select
-              className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
             >
@@ -291,7 +291,7 @@ const OrderManagement = () => {
             </select>
 
             <select
-              className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={selectedTimeframe}
               onChange={(e) => setSelectedTimeframe(e.target.value)}
             >
@@ -302,7 +302,7 @@ const OrderManagement = () => {
               ))}
             </select>
 
-            <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+            <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
               <Filter className="w-4 h-4 mr-2" />
               More Filters
             </button>
@@ -311,7 +311,7 @@ const OrderManagement = () => {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -438,7 +438,7 @@ const OrderManagement = () => {
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
-                      <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                      <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors">
                         <X className="w-4 h-4 " />
                       </button>
                     </div>
@@ -462,22 +462,22 @@ const OrderManagement = () => {
 
       {/* Pagination */}
       {filteredOrders.length > 0 && (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div className="text-gray-600">
               Showing {filteredOrders.length} of {orders.length} orders
             </div>
             <div className="flex items-center space-x-2">
-              <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+              <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-mdg hover:bg-gray-50 transition-colors">
                 Previous
               </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-mdg hover:bg-blue-700 transition-colors">
                 1
               </button>
-              <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+              <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-mdg hover:bg-gray-50 transition-colors">
                 2
               </button>
-              <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+              <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-mdg hover:bg-gray-50 transition-colors">
                 Next
               </button>
             </div>

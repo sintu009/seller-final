@@ -10,11 +10,11 @@ const ProductManagement = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [pushQuantity, setPushQuantity] = useState(1);
   const [pushNotes, setPushNotes] = useState('');
-  
+
   const { data: productsData, isLoading: loading } = useGetSellerProductsQuery();
   const [createOrder, { isLoading: pushing }] = useCreateOrderMutation();
   const products = productsData?.data?.filter(p => p.approvalStatus === 'approved') || [];
-  
+
   const categories = ['all', 'Electronics', 'Accessories', 'Office', 'Gaming', 'Mobile', 'Home', 'Fashion', 'Health'];
 
   const handlePushClick = (product) => {
@@ -79,39 +79,39 @@ const ProductManagement = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Total Products</div>
           <div className="text-2xl font-bold text-gray-900">{productStats.total}</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Available</div>
           <div className="text-2xl font-bold text-green-600">{productStats.available}</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Low Stock</div>
           <div className="text-2xl font-bold text-yellow-600">{productStats.lowStock}</div>
         </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Out of Stock</div>
           <div className="text-2xl font-bold text-red-600">{productStats.outOfStock}</div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               placeholder="Search products..."
-              className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
           <select
-            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -131,7 +131,7 @@ const ProductManagement = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <div key={product._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group">
+            <div key={product._id} className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group">
               <div className="relative">
                 {product.images && product.images.length > 0 ? (
                   <img
@@ -186,7 +186,7 @@ const ProductManagement = () => {
                 <button
                   onClick={() => handlePushClick(product)}
                   disabled={product.stock === 0}
-                  className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center ${product.stock > 0
+                  className={`w-full py-3 px-4 rounded-md font-semibold transition-all duration-300 flex items-center justify-center ${product.stock > 0
                     ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
@@ -201,7 +201,7 @@ const ProductManagement = () => {
       )}
 
       {!loading && filteredProducts.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100">
+        <div className="text-center py-12 bg-white rounded-md shadow-sm border border-gray-100">
           <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <div className="text-gray-500 text-lg mb-2">No products found</div>
           <p className="text-gray-400">Try adjusting your search or filters</p>
@@ -210,7 +210,7 @@ const ProductManagement = () => {
 
       {showPushModal && selectedProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-md max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-gray-900">Push to Admin</h3>
@@ -229,10 +229,10 @@ const ProductManagement = () => {
                   <img
                     src={`http://localhost:5000/${selectedProduct.images[0]}`}
                     alt={selectedProduct.name}
-                    className="w-24 h-24 rounded-lg object-cover"
+                    className="w-24 h-24 rounded-mdg object-cover"
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-lg bg-gray-200 flex items-center justify-center">
+                  <div className="w-24 h-24 rounded-mdg bg-gray-200 flex items-center justify-center">
                     <Package className="w-12 h-12 text-gray-400" />
                   </div>
                 )}
@@ -263,7 +263,7 @@ const ProductManagement = () => {
                   max={selectedProduct.stock}
                   value={pushQuantity}
                   onChange={(e) => setPushQuantity(parseInt(e.target.value) || 1)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter quantity"
                 />
               </div>
@@ -275,13 +275,13 @@ const ProductManagement = () => {
                 <textarea
                   value={pushNotes}
                   onChange={(e) => setPushNotes(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   rows={4}
                   placeholder="Add any special instructions or notes..."
                 />
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-4">
+              <div className="bg-gray-50 rounded-md p-4">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Unit Price:</span>
                   <span className="font-semibold">
@@ -305,14 +305,14 @@ const ProductManagement = () => {
               <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
                 <button
                   onClick={() => setShowPushModal(false)}
-                  className="px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 border border-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handlePushToAdmin}
                   disabled={pushing}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
                   {pushing ? (
                     <>

@@ -187,40 +187,40 @@ const SupportHelpdesk = () => {
         <div className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Total Tickets</div>
                     <div className="text-2xl font-bold text-gray-900">{ticketStats.total}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Open Tickets</div>
                     <div className="text-2xl font-bold text-red-600">{ticketStats.open}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">In Progress</div>
                     <div className="text-2xl font-bold text-yellow-600">{ticketStats.inProgress}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Resolved</div>
                     <div className="text-2xl font-bold text-green-600">{ticketStats.resolved}</div>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex flex-col lg:flex-row gap-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Search tickets by title, user, or ticket ID..."
-                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <div className="flex gap-3">
                         <select
-                            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             value={selectedStatus}
                             onChange={(e) => setSelectedStatus(e.target.value)}
                         >
@@ -231,7 +231,7 @@ const SupportHelpdesk = () => {
                             ))}
                         </select>
                         <select
-                            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             value={selectedPriority}
                             onChange={(e) => setSelectedPriority(e.target.value)}
                         >
@@ -241,7 +241,7 @@ const SupportHelpdesk = () => {
                                 </option>
                             ))}
                         </select>
-                        <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                        <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
                             <Filter className="w-4 h-4 mr-2" />
                             More Filters
                         </button>
@@ -252,10 +252,10 @@ const SupportHelpdesk = () => {
             {/* Tickets List */}
             <div className="space-y-4">
                 {filteredTickets.map((ticket) => (
-                    <div key={ticket.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div key={ticket.id} className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex items-start space-x-4">
-                                <div className={`p-3 rounded-xl ${ticket.userType === 'Seller' ? 'bg-blue-100' : 'bg-emerald-100'
+                                <div className={`p-3 rounded-md ${ticket.userType === 'Seller' ? 'bg-blue-100' : 'bg-emerald-100'
                                     }`}>
                                     {ticket.userType === 'Seller' ? (
                                         <User className="w-6 h-6 text-blue-600" />
@@ -290,10 +290,10 @@ const SupportHelpdesk = () => {
                                 </div>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <button className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors">
+                                <button className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-mdg transition-colors">
                                     <Eye className="w-4 h-4" />
                                 </button>
-                                <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors">
                                     <MessageSquare className="w-4 h-4" />
                                 </button>
                             </div>
@@ -323,17 +323,17 @@ const SupportHelpdesk = () => {
                                 <div className="flex items-center space-x-3">
                                     <button
                                         onClick={() => handleUpdateStatus(ticket.id, 'In Progress')}
-                                        className="px-4 py-2 bg-yellow-600 text-white rounded-xl hover:bg-yellow-700 transition-colors"
+                                        className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors"
                                     >
                                         Start Working
                                     </button>
                                     <button
                                         onClick={() => handleAssignTicket(ticket.id, 'Specialist')}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                                     >
                                         Assign to Specialist
                                     </button>
-                                    <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors">
+                                    <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
                                         Add Note
                                     </button>
                                 </div>
@@ -343,7 +343,7 @@ const SupportHelpdesk = () => {
                 ))}
 
                 {filteredTickets.length === 0 && (
-                    <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100">
+                    <div className="text-center py-12 bg-white rounded-md shadow-sm border border-gray-100">
                         <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                         <div className="text-gray-500 text-lg mb-2">No tickets found</div>
                         <p className="text-gray-400">Try adjusting your search filters</p>
@@ -357,7 +357,7 @@ const SupportHelpdesk = () => {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">FAQ Management</h3>
-                <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-xl font-medium transition-colors flex items-center">
+                <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center">
                     <Plus className="w-4 h-4 mr-2" />
                     Add New FAQ
                 </button>
@@ -365,7 +365,7 @@ const SupportHelpdesk = () => {
 
             <div className="space-y-4">
                 {faqs.map((faq) => (
-                    <div key={faq.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div key={faq.id} className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
                                 <div className="flex items-center space-x-3 mb-2">
@@ -387,10 +387,10 @@ const SupportHelpdesk = () => {
                                 </div>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors">
                                     <Eye className="w-4 h-4" />
                                 </button>
-                                <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                                <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-mdg transition-colors">
                                     <MessageSquare className="w-4 h-4" />
                                 </button>
                             </div>
@@ -410,7 +410,7 @@ const SupportHelpdesk = () => {
                     <p className="text-gray-600 mt-1">Manage support tickets and FAQ from sellers and suppliers</p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-xl font-medium transition-colors flex items-center">
+                    <button className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center">
                         <Plus className="w-4 h-4 mr-2" />
                         Create Ticket
                     </button>
@@ -418,13 +418,13 @@ const SupportHelpdesk = () => {
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex space-x-1 mb-6">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`px-4 py-2 rounded-xl font-medium transition-colors flex items-center ${activeTab === tab.id
+                            className={`px-4 py-2 rounded-md font-medium transition-colors flex items-center ${activeTab === tab.id
                                 ? 'bg-orange-100 text-orange-700 border border-orange-200'
                                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                 }`}

@@ -31,7 +31,7 @@ const KYCCompliance = () => {
     const [rejectKYC] = useRejectKYCMutation();
 
     const kycSubmissions = kycData?.data || [];
-    
+
     // Debug: Log the first submission to see data structure
     if (kycSubmissions.length > 0) {
         console.log('First submission data:', kycSubmissions[0]);
@@ -142,7 +142,7 @@ const KYCCompliance = () => {
                 console.error('Error approving seller KYC:', error);
                 alert(error.data?.message || 'Failed to approve seller KYC');
             }
-        } 
+        }
         // 🔥 Supplier → no plan needed
         else {
             try {
@@ -207,7 +207,7 @@ const KYCCompliance = () => {
                         <p className="text-gray-600 mt-1">Review and manage KYC documents from sellers and suppliers</p>
                     </div>
                     <div className="flex items-center space-x-3">
-                        <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+                        <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center">
                             <Download className="w-4 h-4 mr-2" />
                             Export Report
                         </button>
@@ -215,23 +215,23 @@ const KYCCompliance = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                         <div className="text-sm text-gray-600 mb-1">Total Submissions</div>
                         <div className="text-2xl font-bold text-gray-900">{kycSubmissions.length}</div>
                     </div>
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                         <div className="text-sm text-gray-600 mb-1">Pending Review</div>
                         <div className="text-2xl font-bold text-yellow-600">
                             {kycSubmissions.filter(k => k.kycStatus === 'pending').length}
                         </div>
                     </div>
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                         <div className="text-sm text-gray-600 mb-1">Verified</div>
                         <div className="text-2xl font-bold text-green-600">
                             {kycSubmissions.filter(k => k.kycStatus === 'approved').length}
                         </div>
                     </div>
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                         <div className="text-sm text-gray-600 mb-1">Rejected</div>
                         <div className="text-2xl font-bold text-red-600">
                             {kycSubmissions.filter(k => k.kycStatus === 'rejected').length}
@@ -239,7 +239,7 @@ const KYCCompliance = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex space-x-1">
                         {mainTabs.map((tab) => (
                             <button
@@ -248,7 +248,7 @@ const KYCCompliance = () => {
                                     setMainTab(tab.id);
                                     setActiveTab('pending');
                                 }}
-                                className={`px-6 py-3 rounded-xl font-semibold transition-colors flex items-center ${mainTab === tab.id
+                                className={`px-6 py-3 rounded-md font-semibold transition-colors flex items-center ${mainTab === tab.id
                                     ? 'bg-orange-600 text-white shadow-md'
                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                     }`}
@@ -263,13 +263,13 @@ const KYCCompliance = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex space-x-1 mb-6">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`px-4 py-2 rounded-xl font-medium transition-colors flex items-center ${activeTab === tab.id
+                                className={`px-4 py-2 rounded-md font-medium transition-colors flex items-center ${activeTab === tab.id
                                     ? 'bg-orange-100 text-orange-700 border border-orange-200'
                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                     }`}
@@ -288,13 +288,13 @@ const KYCCompliance = () => {
                             <input
                                 type="text"
                                 placeholder="Search by name or email..."
-                                className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
                         <div className="flex gap-3">
-                            <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                            <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
                                 <Filter className="w-4 h-4 mr-2" />
                                 More Filters
                             </button>
@@ -304,10 +304,10 @@ const KYCCompliance = () => {
 
                 <div className="space-y-4">
                     {filteredSubmissions.map((submission) => (
-                        <div key={submission._id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <div key={submission._id} className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-start space-x-4">
-                                    <div className={`p-3 rounded-xl ${submission.role === 'seller' ? 'bg-blue-100' : 'bg-emerald-100'
+                                    <div className={`p-3 rounded-md ${submission.role === 'seller' ? 'bg-blue-100' : 'bg-emerald-100'
                                         }`}>
                                         {submission.role === 'seller' ? (
                                             <User className="w-6 h-6 text-blue-600" />
@@ -356,7 +356,7 @@ const KYCCompliance = () => {
                                             <button
                                                 onClick={() => handleApprove(submission._id, submission.role)}
                                                 disabled={submission.role === 'seller' && !selectedPlans[submission._id]}
-                                                className={`px-4 py-2 rounded-xl transition-colors flex items-center ${submission.role === 'seller' && !selectedPlans[submission._id]
+                                                className={`px-4 py-2 rounded-md transition-colors flex items-center ${submission.role === 'seller' && !selectedPlans[submission._id]
                                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                                     : 'bg-green-600 text-white hover:bg-green-700'
                                                     }`}
@@ -366,7 +366,7 @@ const KYCCompliance = () => {
                                             </button>
                                             <button
                                                 onClick={() => openRejectModal(submission._id)}
-                                                className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors flex items-center"
+                                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
                                             >
                                                 <XCircle className="w-4 h-4 mr-2" />
                                                 Reject
@@ -377,7 +377,7 @@ const KYCCompliance = () => {
                             </div>
 
                             {submission.kycStatus === 'approved' && submission.role === 'seller' && (
-                                <div className="mb-4 bg-green-50 border border-green-200 rounded-xl p-4">
+                                <div className="mb-4 bg-green-50 border border-green-200 rounded-md p-4">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center">
                                             <Crown className="w-5 h-5 text-green-600 mr-2" />
@@ -402,7 +402,7 @@ const KYCCompliance = () => {
                             )}
 
                             {submission.kycStatus === 'pending' && submission.role === 'seller' && (
-                                <div className="mb-4 bg-orange-50 border border-orange-200 rounded-xl p-4">
+                                <div className="mb-4 bg-orange-50 border border-orange-200 rounded-md p-4">
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center">
                                             <Crown className="w-5 h-5 text-orange-600 mr-2" />
@@ -427,7 +427,7 @@ const KYCCompliance = () => {
                                             <button
                                                 key={plan.id}
                                                 onClick={() => handlePlanSelect(submission._id, plan.id)}
-                                                className={`p-3 rounded-xl border-2 transition-all text-left ${selectedPlans[submission._id] === plan.id
+                                                className={`p-3 rounded-md border-2 transition-all text-left ${selectedPlans[submission._id] === plan.id
                                                     ? 'border-orange-500 bg-orange-50'
                                                     : 'border-gray-200 bg-white hover:border-gray-300'
                                                     }`}
@@ -446,7 +446,7 @@ const KYCCompliance = () => {
                                 </div>
                             )}
 
-                            <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                            <div className="bg-gray-50 rounded-md p-4 mb-4">
                                 <h4 className="font-semibold text-gray-900 mb-3">Business Information</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                                     <div>
@@ -469,7 +469,7 @@ const KYCCompliance = () => {
                                     <h4 className="font-semibold text-gray-900">Submitted Documents</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         {submission.kycDocuments?.idProof && (
-                                            <div className="border border-gray-200 rounded-xl p-4">
+                                            <div className="border border-gray-200 rounded-md p-4">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <div className="flex items-center">
                                                         <FileText className="w-4 h-4 mr-2 text-gray-400" />
@@ -478,7 +478,7 @@ const KYCCompliance = () => {
                                                 </div>
                                                 <button
                                                     onClick={() => handleViewDocument(submission.kycDocuments.idProof)}
-                                                    className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
+                                                    className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-mdg hover:bg-gray-200 transition-colors flex items-center justify-center"
                                                 >
                                                     <Eye className="w-4 h-4 mr-2" />
                                                     View Document
@@ -486,7 +486,7 @@ const KYCCompliance = () => {
                                             </div>
                                         )}
                                         {submission.kycDocuments?.addressProof && (
-                                            <div className="border border-gray-200 rounded-xl p-4">
+                                            <div className="border border-gray-200 rounded-md p-4">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <div className="flex items-center">
                                                         <FileText className="w-4 h-4 mr-2 text-gray-400" />
@@ -495,7 +495,7 @@ const KYCCompliance = () => {
                                                 </div>
                                                 <button
                                                     onClick={() => handleViewDocument(submission.kycDocuments.addressProof)}
-                                                    className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
+                                                    className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-mdg hover:bg-gray-200 transition-colors flex items-center justify-center"
                                                 >
                                                     <Eye className="w-4 h-4 mr-2" />
                                                     View Document
@@ -503,7 +503,7 @@ const KYCCompliance = () => {
                                             </div>
                                         )}
                                         {submission.kycDocuments?.bankDetails?.cancelledChequePath && (
-                                            <div className="border border-gray-200 rounded-xl p-4">
+                                            <div className="border border-gray-200 rounded-md p-4">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <div className="flex items-center">
                                                         <FileText className="w-4 h-4 mr-2 text-gray-400" />
@@ -512,7 +512,7 @@ const KYCCompliance = () => {
                                                 </div>
                                                 <button
                                                     onClick={() => handleViewDocument(submission.kycDocuments.bankDetails.cancelledChequePath)}
-                                                    className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
+                                                    className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-mdg hover:bg-gray-200 transition-colors flex items-center justify-center"
                                                 >
                                                     <Eye className="w-4 h-4 mr-2" />
                                                     View Document
@@ -524,7 +524,7 @@ const KYCCompliance = () => {
                             )}
 
                             {submission.kycStatus === 'rejected' && submission.kycRejectionReason && (
-                                <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-4">
+                                <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
                                     <div className="flex items-start">
                                         <AlertTriangle className="w-5 h-5 text-red-600 mr-2 mt-0.5" />
                                         <div>
@@ -538,7 +538,7 @@ const KYCCompliance = () => {
                     ))}
 
                     {filteredSubmissions.length === 0 && (
-                        <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100">
+                        <div className="text-center py-12 bg-white rounded-md shadow-sm border border-gray-100">
                             <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                             <div className="text-gray-500 text-lg mb-2">No KYC submissions found</div>
                             <p className="text-gray-400">Try adjusting your search filters</p>
@@ -549,11 +549,11 @@ const KYCCompliance = () => {
 
             {showRejectModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+                    <div className="bg-white rounded-md p-6 max-w-md w-full mx-4">
                         <h3 className="text-xl font-bold text-gray-900 mb-4">Reject KYC Application</h3>
                         <p className="text-gray-600 mb-4">Please provide a reason for rejecting this KYC application:</p>
                         <textarea
-                            className="w-full border border-gray-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="w-full border border-gray-200 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             rows="4"
                             placeholder="Enter rejection reason..."
                             value={rejectionReason}
@@ -566,13 +566,13 @@ const KYCCompliance = () => {
                                     setRejectionReason('');
                                     setSelectedUserId(null);
                                 }}
-                                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleReject}
-                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
                             >
                                 Reject
                             </button>
