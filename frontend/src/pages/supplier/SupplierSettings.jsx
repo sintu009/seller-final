@@ -83,7 +83,7 @@ const SupplierSettings = () => {
                 <div>
                     <h3 className="text-lg font-semibold text-gray-900">Profile Picture</h3>
                     <p className="text-gray-600 text-sm">Update your profile photo</p>
-                    <button className="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+                    <button className="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
                         Change Photo
                     </button>
                 </div>
@@ -98,7 +98,7 @@ const SupplierSettings = () => {
                     <input
                         type="text"
                         defaultValue="Rajesh"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     />
                 </div>
                 <div>
@@ -108,7 +108,7 @@ const SupplierSettings = () => {
                     <input
                         type="text"
                         defaultValue="Kumar"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     />
                 </div>
             </div>
@@ -123,7 +123,7 @@ const SupplierSettings = () => {
                         <input
                             type="email"
                             defaultValue="rajesh.kumar@supplier.com"
-                            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         />
                     </div>
                 </div>
@@ -136,7 +136,7 @@ const SupplierSettings = () => {
                         <input
                             type="tel"
                             defaultValue="+91 98765 43210"
-                            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         />
                     </div>
                 </div>
@@ -150,7 +150,7 @@ const SupplierSettings = () => {
                     <MapPin className="absolute left-3 top-4 w-5 h-5 text-gray-400" />
                     <textarea
                         defaultValue="123 Industrial Area, Sector 25, Gurgaon, Haryana 122001"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         rows={3}
                     />
                 </div>
@@ -168,14 +168,14 @@ const SupplierSettings = () => {
                     <input
                         type="text"
                         defaultValue="Kumar Electronics Manufacturing"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Business Type
                     </label>
-                    <select className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                    <select className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                         <option>Manufacturer</option>
                         <option>Wholesaler</option>
                         <option>Distributor</option>
@@ -192,7 +192,7 @@ const SupplierSettings = () => {
                     <input
                         type="text"
                         defaultValue="06AAAAA0000A1Z5"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     />
                 </div>
                 <div>
@@ -202,7 +202,7 @@ const SupplierSettings = () => {
                     <input
                         type="text"
                         defaultValue="ABCDE1234F"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     />
                 </div>
             </div>
@@ -213,7 +213,7 @@ const SupplierSettings = () => {
                 </label>
                 <textarea
                     defaultValue="Plot No. 456, Industrial Area Phase-II, Sector 25, Gurgaon, Haryana 122001"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     rows={3}
                 />
             </div>
@@ -223,7 +223,7 @@ const SupplierSettings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Years in Business
                     </label>
-                    <select className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                    <select className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                         <option>1-2 years</option>
                         <option>3-5 years</option>
                         <option>6-10 years</option>
@@ -234,7 +234,7 @@ const SupplierSettings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Annual Turnover
                     </label>
-                    <select className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                    <select className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
                         <option>Under ₹1 Crore</option>
                         <option>₹1-5 Crores</option>
                         <option>₹5-10 Crores</option>
@@ -249,7 +249,7 @@ const SupplierSettings = () => {
                 </label>
                 <textarea
                     defaultValue="We are a leading manufacturer of consumer electronics and accessories with over 10 years of experience in the industry."
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     rows={4}
                 />
             </div>
@@ -259,7 +259,7 @@ const SupplierSettings = () => {
     const renderKycTab = () => (
         <div className="space-y-6">
             {/* KYC Status Overview */}
-            <div className="p-6 rounded-2xl border-2 bg-green-50 border-green-200">
+            <div className="p-6 rounded-md border-2 bg-green-50 border-green-200">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                         <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
@@ -279,7 +279,7 @@ const SupplierSettings = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Document Status</h3>
 
                 {/* GST Certificate */}
-                <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <div className="bg-white border border-gray-200 rounded-md p-6">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center">
                             <FileText className="w-6 h-6 text-gray-400 mr-3" />
@@ -293,7 +293,7 @@ const SupplierSettings = () => {
                             <span className="ml-2 capitalize">{kycStatus.gstCertificate}</span>
                         </div>
                     </div>
-                    <div className="bg-green-50 p-4 rounded-xl">
+                    <div className="bg-green-50 p-4 rounded-md">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
                                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
@@ -307,7 +307,7 @@ const SupplierSettings = () => {
                 </div>
 
                 {/* PAN Card */}
-                <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <div className="bg-white border border-gray-200 rounded-md p-6">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center">
                             <FileText className="w-6 h-6 text-gray-400 mr-3" />
@@ -321,7 +321,7 @@ const SupplierSettings = () => {
                             <span className="ml-2 capitalize">{kycStatus.panCard}</span>
                         </div>
                     </div>
-                    <div className="bg-green-50 p-4 rounded-xl">
+                    <div className="bg-green-50 p-4 rounded-md">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
                                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
@@ -335,7 +335,7 @@ const SupplierSettings = () => {
                 </div>
 
                 {/* Cancelled Cheque */}
-                <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <div className="bg-white border border-gray-200 rounded-md p-6">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center">
                             <FileText className="w-6 h-6 text-gray-400 mr-3" />
@@ -349,7 +349,7 @@ const SupplierSettings = () => {
                             <span className="ml-2 capitalize">{kycStatus.cancelledCheque}</span>
                         </div>
                     </div>
-                    <div className="bg-green-50 p-4 rounded-xl">
+                    <div className="bg-green-50 p-4 rounded-md">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center">
                                 <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
@@ -367,7 +367,7 @@ const SupplierSettings = () => {
 
     const renderBankTab = () => (
         <div className="space-y-6">
-            <div className="bg-green-50 p-6 rounded-2xl border border-green-200">
+            <div className="bg-green-50 p-6 rounded-md border border-green-200">
                 <div className="flex items-center">
                     <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
                     <div>
@@ -385,7 +385,7 @@ const SupplierSettings = () => {
                     <input
                         type="text"
                         defaultValue="Kumar Electronics Manufacturing"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         disabled
                     />
                 </div>
@@ -396,7 +396,7 @@ const SupplierSettings = () => {
                     <input
                         type="text"
                         defaultValue="State Bank of India"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         disabled
                     />
                 </div>
@@ -410,7 +410,7 @@ const SupplierSettings = () => {
                     <input
                         type="text"
                         defaultValue="****1234"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         disabled
                     />
                 </div>
@@ -421,7 +421,7 @@ const SupplierSettings = () => {
                     <input
                         type="text"
                         defaultValue="SBIN0001234"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         disabled
                     />
                 </div>
@@ -433,13 +433,13 @@ const SupplierSettings = () => {
                 </label>
                 <textarea
                     defaultValue="SBI Branch, Sector 14, Gurgaon, Haryana 122001"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     rows={2}
                     disabled
                 />
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-xl">
+            <div className="bg-blue-50 p-4 rounded-md">
                 <div className="flex items-start">
                     <AlertCircle className="w-5 h-5 text-blue-600 mr-2 mt-0.5" />
                     <div className="text-sm text-blue-800">
@@ -457,7 +457,7 @@ const SupplierSettings = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Notification Preferences</h3>
                 <div className="space-y-4">
                     {Object.entries(notifications).map(([key, value]) => (
-                        <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
                             <div>
                                 <div className="font-medium text-gray-900 capitalize">
                                     {key === 'orders' ? 'New Order Notifications' :
@@ -499,7 +499,7 @@ const SupplierSettings = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">Security Settings</h3>
 
                 {/* Change Password */}
-                <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-6">
+                <div className="bg-white border border-gray-200 rounded-md p-6 mb-6">
                     <h4 className="font-semibold text-gray-900 mb-4">Change Password</h4>
                     <div className="space-y-4">
                         <div>
@@ -509,7 +509,7 @@ const SupplierSettings = () => {
                             <div className="relative">
                                 <input
                                     type={showPassword ? 'text' : 'password'}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent pr-12"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent pr-12"
                                     placeholder="Enter current password"
                                 />
                                 <button
@@ -529,7 +529,7 @@ const SupplierSettings = () => {
                             <div className="relative">
                                 <input
                                     type={showNewPassword ? 'text' : 'password'}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent pr-12"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent pr-12"
                                     placeholder="Enter new password"
                                 />
                                 <button
@@ -548,19 +548,19 @@ const SupplierSettings = () => {
                             </label>
                             <input
                                 type="password"
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                 placeholder="Confirm new password"
                             />
                         </div>
 
-                        <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors">
+                        <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-md font-semibold transition-colors">
                             Update Password
                         </button>
                     </div>
                 </div>
 
                 {/* Two-Factor Authentication */}
-                <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <div className="bg-white border border-gray-200 rounded-md p-6">
                     <div className="flex items-center justify-between mb-4">
                         <div>
                             <h4 className="font-semibold text-gray-900">Two-Factor Authentication</h4>
@@ -592,15 +592,15 @@ const SupplierSettings = () => {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 {/* Sidebar */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                    <div className="bg-white rounded-md p-4 shadow-sm border border-gray-100">
                         <nav className="space-y-2">
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors ${activeTab === tab.id
-                                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors ${activeTab === tab.id
+                                        ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                         }`}
                                 >
                                     <tab.icon className="w-5 h-5 mr-3" />
@@ -613,7 +613,7 @@ const SupplierSettings = () => {
 
                 {/* Content */}
                 <div className="lg:col-span-3">
-                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                    <div className="bg-white rounded-md p-8 shadow-sm border border-gray-100">
                         {activeTab === 'profile' && renderProfileTab()}
                         {activeTab === 'business' && renderBusinessTab()}
                         {activeTab === 'kyc' && renderKycTab()}
@@ -624,7 +624,7 @@ const SupplierSettings = () => {
                         {/* Save Button */}
                         {(activeTab === 'profile' || activeTab === 'business' || activeTab === 'notifications') && (
                             <div className="flex justify-end pt-6 border-t border-gray-200 mt-8">
-                                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center transition-colors">
+                                <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-md font-semibold flex items-center transition-colors">
                                     <Save className="w-5 h-5 mr-2" />
                                     Save Changes
                                 </button>

@@ -22,12 +22,12 @@ const SupplierOrders = () => {
     const [selectedStatus, setSelectedStatus] = useState('all');
 
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-    
-    const { 
-        data: ordersData, 
-        isLoading, 
-        error, 
-        refetch 
+
+    const {
+        data: ordersData,
+        isLoading,
+        error,
+        refetch
     } = useGetSupplierOrdersQuery(undefined, {
         skip: !isAuthenticated || user?.role !== 'supplier'
     });
@@ -68,7 +68,7 @@ const SupplierOrders = () => {
     };
 
     const filteredOrders = orders.filter(order => {
-        const matchesSearch = 
+        const matchesSearch =
             order.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             order.seller?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             order.product?.name?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -88,7 +88,7 @@ const SupplierOrders = () => {
     if (!isAuthenticated || user?.role !== 'supplier') {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <div className="bg-white p-8 rounded-lg shadow-md text-center">
+                <div className="bg-white p-8 rounded-mdg shadow-md text-center">
                     <h2 className="text-xl font-semibold text-red-600 mb-4">Access Denied</h2>
                     <p className="text-gray-600">Only suppliers can access this page.</p>
                 </div>
@@ -99,7 +99,7 @@ const SupplierOrders = () => {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <div className="bg-white p-8 rounded-lg shadow-md text-center">
+                <div className="bg-white p-8 rounded-mdg shadow-md text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">Loading orders...</p>
                 </div>
@@ -118,9 +118,9 @@ const SupplierOrders = () => {
                     </p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button 
+                    <button
                         onClick={() => refetch()}
-                        className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center"
+                        className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center"
                     >
                         <Download className="w-4 h-4 mr-2" />
                         Refresh
@@ -129,12 +129,12 @@ const SupplierOrders = () => {
             </div>
 
             {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="bg-red-50 border border-red-200 rounded-mdg p-4">
                     <h3 className="font-semibold text-red-800 mb-2">Error Loading Orders:</h3>
                     <p className="text-red-700 mb-2">{error?.data?.message || 'Failed to load orders'}</p>
-                    <button 
+                    <button
                         onClick={() => refetch()}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                        className="px-4 py-2 bg-red-600 text-white rounded-mdg hover:bg-red-700"
                     >
                         Retry
                     </button>
@@ -143,47 +143,47 @@ const SupplierOrders = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Total Orders</div>
                     <div className="text-2xl font-bold text-gray-900">{orderStats.total}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Admin Review</div>
                     <div className="text-2xl font-bold text-yellow-600">{orderStats.pending}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Approved</div>
                     <div className="text-2xl font-bold text-green-600">{orderStats.approved}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Rejected</div>
                     <div className="text-2xl font-bold text-red-600">{orderStats.rejected}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Shipped</div>
                     <div className="text-2xl font-bold text-blue-600">{orderStats.shipped}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Delivered</div>
                     <div className="text-2xl font-bold text-green-600">{orderStats.delivered}</div>
                 </div>
             </div>
 
             {/* Filters and Search */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex flex-col lg:flex-row gap-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Search by Order ID, Seller Name, or Product..."
-                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <select
-                        className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        className="px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         value={selectedStatus}
                         onChange={(e) => setSelectedStatus(e.target.value)}
                     >
@@ -198,7 +198,7 @@ const SupplierOrders = () => {
             </div>
 
             {/* Orders Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
                 {filteredOrders.length === 0 ? (
                     <div className="text-center py-12">
                         <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />

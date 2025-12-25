@@ -1,9 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 
-import { useGetUnreadNotificationCountQuery } 
-from '../../store/slices/apiSlice';
+import { useGetUnreadNotificationCountQuery } from "../../store/slices/apiSlice";
 
 import DashboardLayout from "../../components/DashboardLayout";
 import SupplierOverview from "./SupplierOverview";
@@ -21,9 +20,7 @@ import {
   Bell,
 } from "lucide-react";
 
-
 const SupplierDashboard = () => {
-
   const { data } = useGetUnreadNotificationCountQuery(undefined);
   const unreadCount = data?.count || 0;
 
@@ -69,7 +66,7 @@ const SupplierDashboard = () => {
   ];
 
   return (
-    <DashboardLayout sidebarItems={sidebarItems} title="Supplier Portal">
+    <DashboardLayout sidebarItems={sidebarItems} title="Kyzen Supplier">
       <Routes>
         <Route path="/dashboard" element={<SupplierOverview />} />
         <Route path="/products" element={<SupplierProductManagement />} />

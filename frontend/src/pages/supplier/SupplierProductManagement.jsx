@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Search, ListFilter as Filter, Upload, CreditCard as Edit3, Trash2, Eye, Clock, CheckCircle, Circle as XCircle, Image as ImageIcon, Package, AlertTriangle } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useGetSupplierProductsQuery, useCreateProductMutation, useDeleteProductMutation} from '../../store/slices/apiSlice';
+import { useGetSupplierProductsQuery, useCreateProductMutation, useDeleteProductMutation } from '../../store/slices/apiSlice';
 import { useAppSelector } from '../../store/hooks';
 import { showAlert } from '../../utils/sweetAlert';
 
@@ -12,7 +12,7 @@ const SupplierProductManagement = () => {
     const { data: productsData, isLoading: loading } = useGetSupplierProductsQuery();
     const [createProduct] = useCreateProductMutation();
     const [deleteProduct] = useDeleteProductMutation();
-    
+
     const products = productsData?.data || [];
     const isKycApproved = user?.kycStatus !== 'rejected';
     const [searchTerm, setSearchTerm] = useState('');
@@ -100,7 +100,7 @@ const SupplierProductManagement = () => {
             formDataToSend.append('price', formData.price);
             formDataToSend.append('gstPercentage', formData.gstPercentage);
             formDataToSend.append('stock', formData.stock);
-            
+
             images.forEach((image) => {
                 formDataToSend.append('images', image);
             });
@@ -139,7 +139,7 @@ const SupplierProductManagement = () => {
         if (!result.isConfirmed) return;
 
         try {
-            await deleteProduct({ id: productId}).unwrap();
+            await deleteProduct({ id: productId }).unwrap();
             toast.success('Product deleted successfully');
         } catch (error) {
             console.error('Product deletion failed:', error);
@@ -157,7 +157,7 @@ const SupplierProductManagement = () => {
 
     const productStats = {
         total: products.length,
-        available:  products.reduce((sum, p) => sum + (p.stock || 0), 0),
+        available: products.reduce((sum, p) => sum + (p.stock || 0), 0),
         outOfStock: products.filter(p => p.stock === 0).length,
         lowStock: products.filter(p => p.stock > 0 && p.stock < 10).length
     };
@@ -172,11 +172,10 @@ const SupplierProductManagement = () => {
                 <button
                     onClick={() => setShowAddModal(true)}
                     disabled={!isKycApproved}
-                    className={`px-6 py-2 rounded-xl font-semibold flex items-center transition-colors ${
-                        isKycApproved 
-                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
+                    className={`px-6 py-2 rounded-md font-semibold flex items-center transition-colors ${isKycApproved
+                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
                 >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Product
@@ -184,7 +183,7 @@ const SupplierProductManagement = () => {
             </div>
 
             {user?.kycStatus === 'rejected' && (
-                <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start space-x-3">
+                <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-start space-x-3">
                     <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
                     <div>
                         <h3 className="font-medium text-red-800">KYC Rejected</h3>
@@ -196,38 +195,38 @@ const SupplierProductManagement = () => {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Total Products</div>
                     <div className="text-2xl font-bold text-gray-900">{productStats.total}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Available</div>
                     <div className="text-2xl font-bold text-green-600">{productStats.available}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Low Stock</div>
                     <div className="text-2xl font-bold text-yellow-600">{productStats.lowStock}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Out of Stock</div>
                     <div className="text-2xl font-bold text-red-600">{productStats.outOfStock}</div>
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex flex-col lg:flex-row gap-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Search products..."
-                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <select
-                        className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        className="px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
                     >
@@ -245,7 +244,7 @@ const SupplierProductManagement = () => {
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gray-50 border-b border-gray-200">
@@ -267,10 +266,10 @@ const SupplierProductManagement = () => {
                                                     <img
                                                         src={`${API_URL}/${product.images[0]}`}
                                                         alt={product.name}
-                                                        className="w-12 h-12 rounded-lg object-cover mr-3"
+                                                        className="w-12 h-12 rounded-mdg object-cover mr-3"
                                                     />
                                                 ) : (
-                                                    <div className="w-12 h-12 rounded-lg bg-gray-200 flex items-center justify-center mr-3">
+                                                    <div className="w-12 h-12 rounded-mdg bg-gray-200 flex items-center justify-center mr-3">
                                                         <Package className="w-6 h-6 text-gray-400" />
                                                     </div>
                                                 )}
@@ -317,7 +316,7 @@ const SupplierProductManagement = () => {
                                             <div className="flex items-center space-x-2">
                                                 <button
                                                     onClick={() => handleDelete(product._id)}
-                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-mdg transition-colors"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -341,7 +340,7 @@ const SupplierProductManagement = () => {
 
             {showAddModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-md max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-6 border-b border-gray-200">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-xl font-bold text-gray-900">Add New Product</h3>
@@ -365,7 +364,7 @@ const SupplierProductManagement = () => {
                                         name="name"
                                         value={formData.name}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                         placeholder="Enter product name"
                                         required
                                     />
@@ -379,7 +378,7 @@ const SupplierProductManagement = () => {
                                         name="category"
                                         value={formData.category}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                         required
                                     >
                                         <option value="">Select Category</option>
@@ -400,7 +399,7 @@ const SupplierProductManagement = () => {
                                         name="price"
                                         value={formData.price}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                         placeholder="0"
                                         min="0"
                                         required
@@ -415,7 +414,7 @@ const SupplierProductManagement = () => {
                                         name="gstPercentage"
                                         value={formData.gstPercentage}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                         required
                                     >
                                         <option value="0">0%</option>
@@ -435,7 +434,7 @@ const SupplierProductManagement = () => {
                                         name="stock"
                                         value={formData.stock}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                         placeholder="0"
                                         min="0"
                                         required
@@ -447,7 +446,7 @@ const SupplierProductManagement = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Product Images * (Max 5)
                                 </label>
-                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-emerald-400 transition-colors">
+                                <div className="border-2 border-dashed border-gray-300 rounded-md p-8 text-center hover:border-emerald-400 transition-colors">
                                     <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                     <input
                                         type="file"
@@ -458,7 +457,7 @@ const SupplierProductManagement = () => {
                                         id="image-upload"
                                     />
                                     <label htmlFor="image-upload" className="cursor-pointer">
-                                        <span className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-xl font-medium transition-colors inline-block">
+                                        <span className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-md font-medium transition-colors inline-block">
                                             Choose Files
                                         </span>
                                     </label>
@@ -473,7 +472,7 @@ const SupplierProductManagement = () => {
                                                 <img
                                                     src={URL.createObjectURL(image)}
                                                     alt={`Preview ${index + 1}`}
-                                                    className="w-full h-20 object-cover rounded-lg"
+                                                    className="w-full h-20 object-cover rounded-mdg"
                                                 />
                                                 <button
                                                     type="button"
@@ -496,7 +495,7 @@ const SupplierProductManagement = () => {
                                     name="description"
                                     value={formData.description}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                                     rows={4}
                                     placeholder="Enter detailed product description..."
                                     required
@@ -507,14 +506,14 @@ const SupplierProductManagement = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShowAddModal(false)}
-                                    className="px-6 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                                    className="px-6 py-3 border border-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={uploading}
-                                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                                 >
                                     {uploading ? (
                                         <>

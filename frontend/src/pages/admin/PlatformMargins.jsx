@@ -206,7 +206,7 @@ const PlatformMargins = () => {
                 </div>
                 <div className="flex items-center space-x-3">
                     <select
-                        className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="bg-white border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
                         value={selectedPeriod}
                         onChange={(e) => setSelectedPeriod(e.target.value)}
                     >
@@ -215,7 +215,7 @@ const PlatformMargins = () => {
                         <option value="90days">Last 90 days</option>
                         <option value="year">This year</option>
                     </select>
-                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+                    <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center">
                         <Download className="w-4 h-4 mr-2" />
                         Export Report
                     </button>
@@ -227,10 +227,10 @@ const PlatformMargins = () => {
                 {marginStats.map((stat, index) => (
                     <div
                         key={index}
-                        className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
+                        className="bg-white rounded-md p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <div className={`p-3 rounded-xl ${stat.color}`}>
+                            <div className={`p-3 rounded-md ${stat.color}`}>
                                 <stat.icon className="w-6 h-6" />
                             </div>
                             <div className={`flex items-center text-sm font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
@@ -252,7 +252,7 @@ const PlatformMargins = () => {
             </div>
 
             {/* Margin Collection Formula */}
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-md p-6 text-white">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                         <DollarSign className="w-8 h-8 mr-3" />
@@ -262,7 +262,7 @@ const PlatformMargins = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-white bg-opacity-20 rounded-xl p-4">
+                <div className="bg-white bg-opacity-20 rounded-md p-4">
                     <div className="text-sm space-y-2">
                         <div><strong>Supplier Cost:</strong> ₹200 (example)</div>
                         <div><strong>Platform Add-on:</strong> +₹20 (automatic)</div>
@@ -275,7 +275,7 @@ const PlatformMargins = () => {
             {/* Charts Section */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {/* Margin Collection Trends */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-lg font-semibold text-gray-900">Margin Collection Trends</h3>
                         <div className="flex items-center space-x-4">
@@ -320,7 +320,7 @@ const PlatformMargins = () => {
                 </div>
 
                 {/* Platform Breakdown */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <h3 className="text-lg font-semibold text-gray-900 mb-6">Margin by Platform</h3>
                     <div className="space-y-4">
                         {platformMarginData.map((platform, index) => (
@@ -346,13 +346,13 @@ const PlatformMargins = () => {
             </div>
 
             {/* Margin Collection Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                         <h3 className="text-lg font-semibold text-gray-900">Platform Margin Collections</h3>
                         <div className="flex items-center space-x-3">
                             <select
-                                className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                className="px-4 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                                 value={selectedFilter}
                                 onChange={(e) => setSelectedFilter(e.target.value)}
                             >
@@ -364,7 +364,7 @@ const PlatformMargins = () => {
                                     </option>
                                 ))}
                             </select>
-                            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
                                 <Filter className="w-4 h-4 mr-2" />
                                 More Filters
                             </button>
@@ -431,7 +431,7 @@ const PlatformMargins = () => {
             </div>
 
             {/* Wallet Recharge Tracking */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900">Wallet Recharge & Margin Collection</h3>
                 </div>
@@ -488,20 +488,20 @@ const PlatformMargins = () => {
             </div>
 
             {/* Summary Section */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Margin Collection Summary</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="p-4 bg-green-50 rounded-xl">
+                    <div className="p-4 bg-green-50 rounded-md">
                         <div className="text-green-600 text-sm font-medium">Total Collected</div>
                         <div className="text-2xl font-bold text-green-700">₹{recentMarginCollections.filter(m => m.status === 'Collected').length * 20}</div>
                         <div className="text-xs text-green-600 mt-1">From completed orders</div>
                     </div>
-                    <div className="p-4 bg-yellow-50 rounded-xl">
+                    <div className="p-4 bg-yellow-50 rounded-md">
                         <div className="text-yellow-600 text-sm font-medium">Pending Collection</div>
                         <div className="text-2xl font-bold text-yellow-700">₹{recentMarginCollections.filter(m => m.status === 'Pending').length * 20}</div>
                         <div className="text-xs text-yellow-600 mt-1">Awaiting wallet recharge</div>
                     </div>
-                    <div className="p-4 bg-blue-50 rounded-xl">
+                    <div className="p-4 bg-blue-50 rounded-md">
                         <div className="text-blue-600 text-sm font-medium">Average Daily</div>
                         <div className="text-2xl font-bold text-blue-700">₹2,340</div>
                         <div className="text-xs text-blue-600 mt-1">Platform margin per day</div>

@@ -19,7 +19,8 @@ import {
     Trash2
 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useGetAllUsersQuery, useGetAllKYCQuery, useApproveUserMutation, useRejectUserMutation, useBlockUserMutation,useUnBlockUserMutation 
+import {
+    useGetAllUsersQuery, useGetAllKYCQuery, useApproveUserMutation, useRejectUserMutation, useBlockUserMutation, useUnBlockUserMutation
     , useDeleteUserMutation
 } from '../../store/slices/apiSlice';
 import { useAppSelector } from '../../store/hooks';
@@ -32,11 +33,11 @@ const UserManagement = () => {
 
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
-    const { 
-        data: usersData, 
-        isLoading: usersLoading, 
+    const {
+        data: usersData,
+        isLoading: usersLoading,
         error: usersError,
-        refetch: refetchUsers 
+        refetch: refetchUsers
     } = useGetAllUsersQuery(undefined, {
         skip: !isAuthenticated || user?.role !== 'admin'
     });
@@ -145,7 +146,7 @@ const UserManagement = () => {
             });
 
             if (!result.isConfirmed) return;
-            
+
             await rejectUser({ userId: id, reason: 'Admin rejection' }).unwrap();
             toast.success('User rejected successfully!');
             refetchUsers();
@@ -235,7 +236,7 @@ const UserManagement = () => {
     if (usersLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <div className="bg-white p-8 rounded-lg shadow-md text-center">
+                <div className="bg-white p-8 rounded-mdg shadow-md text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">Loading users...</p>
                 </div>
@@ -247,23 +248,23 @@ const UserManagement = () => {
         <div className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Total Sellers</div>
                     <div className="text-2xl font-bold text-gray-900">{sellers.length}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Active Sellers</div>
                     <div className="text-2xl font-bold text-green-600">
                         {sellers.filter(s => s.status === 'Active').length}
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Pending Approval</div>
                     <div className="text-2xl font-bold text-yellow-600">
                         {sellers.filter(s => s.status === 'Pending').length}
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">KYC Approved</div>
                     <div className="text-2xl font-bold text-blue-600">
                         {sellers.filter(s => s.kycStatus === 'Approved').length}
@@ -272,7 +273,7 @@ const UserManagement = () => {
             </div>
 
             {/* Sellers Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-gray-50 border-b border-gray-200">
@@ -344,14 +345,14 @@ const UserManagement = () => {
                                                 <>
                                                     <button
                                                         onClick={() => handleApprove(seller._id, 'seller')}
-                                                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                        className="p-2 text-green-600 hover:bg-green-50 rounded-mdg transition-colors"
                                                         title="Approve Seller"
                                                     >
                                                         <UserCheck className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleReject(seller._id, 'seller')}
-                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-mdg transition-colors"
                                                         title="Reject Seller"
                                                     >
                                                         <UserX className="w-4 h-4" />
@@ -361,7 +362,7 @@ const UserManagement = () => {
                                             {seller.status === 'Active' && (
                                                 <button
                                                     onClick={() => handleBlock(seller._id, 'seller')}
-                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-mdg transition-colors"
                                                     title="Block Seller"
                                                 >
                                                     <Shield className="w-4 h-4" />
@@ -371,20 +372,20 @@ const UserManagement = () => {
                                             {seller.status === 'Blocked' && (
                                                 <button
                                                     onClick={() => handleUnBlock(seller._id, 'seller')}
-                                                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                    className="p-2 text-green-600 hover:bg-green-50 rounded-mdg transition-colors"
                                                     title="Unblock Seller"
                                                 >
                                                     <UserCheck className="w-4 h-4" />
                                                 </button>
                                             )}
-                                                
-                                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                            title="View Seller">
+
+                                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors"
+                                                title="View Seller">
                                                 <Eye className="w-4 h-4" />
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteUser(seller._id, 'seller')}
-                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-mdg transition-colors"
                                                 title="Delete Seller">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -403,23 +404,23 @@ const UserManagement = () => {
         <div className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Total Suppliers</div>
                     <div className="text-2xl font-bold text-gray-900">{suppliers.length}</div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Active Suppliers</div>
                     <div className="text-2xl font-bold text-green-600">
                         {suppliers.filter(s => s.status === 'Active').length}
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">Pending Approval</div>
                     <div className="text-2xl font-bold text-yellow-600">
                         {suppliers.filter(s => s.status === 'Pending').length}
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                     <div className="text-sm text-gray-600 mb-1">KYC Approved</div>
                     <div className="text-2xl font-bold text-blue-600">
                         {suppliers.filter(s => s.kycStatus === 'Approved').length}
@@ -428,7 +429,7 @@ const UserManagement = () => {
             </div>
 
             {/* Suppliers Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-gray-50 border-b border-gray-200">
@@ -494,14 +495,14 @@ const UserManagement = () => {
                                                 <>
                                                     <button
                                                         onClick={() => handleApprove(supplier._id, 'supplier')}
-                                                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                        className="p-2 text-green-600 hover:bg-green-50 rounded-mdg transition-colors"
                                                         title="Approve Supplier"
                                                     >
                                                         <UserCheck className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleReject(supplier._id, 'supplier')}
-                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-mdg transition-colors"
                                                         title="Reject Supplier"
                                                     >
                                                         <UserX className="w-4 h-4" />
@@ -511,7 +512,7 @@ const UserManagement = () => {
                                             {supplier.status === 'Active' && (
                                                 <button
                                                     onClick={() => handleBlock(supplier._id, 'supplier')}
-                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-mdg transition-colors"
                                                     title="Block Supplier"
                                                 >
                                                     <Shield className="w-4 h-4" />
@@ -520,18 +521,18 @@ const UserManagement = () => {
                                             {supplier.status === 'Blocked' && (
                                                 <button
                                                     onClick={() => handleUnBlock(supplier._id, 'supplier')}
-                                                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                    className="p-2 text-green-600 hover:bg-green-50 rounded-mdg transition-colors"
                                                     title="Unblock Supplier"
                                                 >
                                                     <UserCheck className="w-4 h-4" />
                                                 </button>
                                             )}
-                                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors">
                                                 <Eye className="w-4 h-4" />
                                             </button>
-                                           <button
+                                            <button
                                                 onClick={() => handleDeleteUser(supplier._id, 'supplier')}
-                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-mdg transition-colors"
                                                 title="Delete Supplier">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -558,14 +559,14 @@ const UserManagement = () => {
                     </p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button 
+                    <button
                         onClick={() => { refetchUsers(); }}
-                        className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center"
+                        className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center"
                     >
                         <Download className="w-4 h-4 mr-2" />
                         Export Users
                     </button>
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium transition-colors flex items-center">
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center">
                         <UserCheck className="w-4 h-4 mr-2" />
                         Bulk Actions
                     </button>
@@ -573,17 +574,16 @@ const UserManagement = () => {
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
+                <div className="flex space-x-1 bg-gray-100 p-1 rounded-md">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex-1 py-3 px-4 text-sm font-medium rounded-lg transition-colors ${
-                                activeTab === tab.id
-                                    ? 'bg-white text-blue-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-900'
-                            }`}
+                            className={`flex-1 py-3 px-4 text-sm font-medium rounded-mdg transition-colors ${activeTab === tab.id
+                                ? 'bg-white text-blue-600 shadow-sm'
+                                : 'text-gray-600 hover:text-gray-900'
+                                }`}
                         >
                             {tab.label} ({tab.count})
                         </button>
@@ -592,21 +592,21 @@ const UserManagement = () => {
             </div>
 
             {/* Filters and Search */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
                 <div className="flex flex-col lg:flex-row gap-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Search by name, email, or company..."
-                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <div className="flex gap-3">
                         <select
-                            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={selectedStatus}
                             onChange={(e) => setSelectedStatus(e.target.value)}
                         >
@@ -616,7 +616,7 @@ const UserManagement = () => {
                                 </option>
                             ))}
                         </select>
-                        <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+                        <button className="px-4 py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
                             <Filter className="w-4 h-4 mr-2" />
                             More Filters
                         </button>
@@ -628,7 +628,7 @@ const UserManagement = () => {
             {activeTab === 'sellers' && renderSellersTab()}
             {activeTab === 'suppliers' && renderSuppliersTab()}
             {activeTab === 'admins' && (
-                <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
+                <div className="bg-white rounded-md p-12 shadow-sm border border-gray-100 text-center">
                     <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-600 mb-2">Admin Management</h3>
                     <p className="text-gray-500">Admin user management coming soon</p>

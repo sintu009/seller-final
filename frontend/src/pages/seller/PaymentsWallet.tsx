@@ -155,7 +155,7 @@ const PaymentsWallet = () => {
     <div className="space-y-6">
       {/* Low Balance Alert */}
       {isLowBalance && (
-        <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-2xl p-6 text-white">
+        <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-md p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <AlertTriangle className="w-8 h-8 mr-4" />
@@ -169,7 +169,7 @@ const PaymentsWallet = () => {
             </div>
             <button
               onClick={() => setShowRechargeModal(true)}
-              className="bg-white text-red-600 px-6 py-3 rounded-xl font-semibold hover:bg-red-50 transition-colors"
+              className="bg-white text-red-600 px-6 py-3 rounded-md font-semibold hover:bg-red-50 transition-colors"
             >
               Recharge Now
             </button>
@@ -188,13 +188,13 @@ const PaymentsWallet = () => {
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center">
+          <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors flex items-center">
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </button>
           <button
             onClick={() => setShowRechargeModal(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl font-semibold transition-colors flex items-center"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md font-semibold transition-colors flex items-center"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Money
@@ -205,14 +205,14 @@ const PaymentsWallet = () => {
       {/* Wallet Balance Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div
-          className={`rounded-2xl p-6 text-white ${
+          className={`rounded-md p-6 text-white ${
             isLowBalance
               ? "bg-gradient-to-br from-red-500 to-red-600"
               : "bg-gradient-to-br from-blue-600 to-blue-700"
           }`}
         >
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-white bg-opacity-20 rounded-xl">
+            <div className="p-3 bg-white bg-opacity-20 rounded-md">
               <Wallet className="w-6 h-6" />
             </div>
             <div className="text-right">
@@ -235,15 +235,15 @@ const PaymentsWallet = () => {
           </div>
           <button
             onClick={() => setShowRechargeModal(true)}
-            className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-2 px-4 rounded-xl font-medium transition-colors"
+            className="w-full bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-2 px-4 rounded-md font-medium transition-colors"
           >
             {isLowBalance ? "Recharge Wallet" : "Add Money"}
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-yellow-100 rounded-xl">
+            <div className="p-3 bg-yellow-100 rounded-md">
               <Calendar className="w-6 h-6 text-yellow-600" />
             </div>
             <div className="text-right">
@@ -256,9 +256,9 @@ const PaymentsWallet = () => {
           <div className="text-sm text-gray-500">From recent orders...</div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-green-100 rounded-xl">
+            <div className="p-3 bg-green-100 rounded-md">
               <DollarSign className="w-6 h-6 text-green-600" />
             </div>
             <div className="text-right">
@@ -276,7 +276,7 @@ const PaymentsWallet = () => {
       </div>
 
       {/* Quick Recharge Options */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">
             Quick Recharge
@@ -290,7 +290,7 @@ const PaymentsWallet = () => {
             <button
               key={amount}
               onClick={() => handleRecharge(amount)}
-              className="p-4 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-colors text-center"
+              className="p-4 border-2 border-gray-200 rounded-md hover:border-blue-500 hover:bg-blue-50 transition-colors text-center"
             >
               <div className="font-semibold text-gray-900">
                 ₹{amount.toLocaleString()}
@@ -303,13 +303,13 @@ const PaymentsWallet = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Wallet Activity */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
               Wallet Activity
             </h3>
             <select
-              className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-gray-50 border border-gray-200 rounded-mdg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
             >
@@ -341,7 +341,7 @@ const PaymentsWallet = () => {
         </div>
 
         {/* Payment Summary */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
               Payment Summary
@@ -353,14 +353,14 @@ const PaymentsWallet = () => {
           </div>
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-green-50 rounded-xl">
+              <div className="p-4 bg-green-50 rounded-md">
                 <div className="text-green-600 text-sm font-medium">
                   Total Credits
                 </div>
                 <div className="text-2xl font-bold text-green-700">₹45,678</div>
                 <div className="text-xs text-green-600 mt-1">This month</div>
               </div>
-              <div className="p-4 bg-red-50 rounded-xl">
+              <div className="p-4 bg-red-50 rounded-md">
                 <div className="text-red-600 text-sm font-medium">
                   Total Debits
                 </div>
@@ -368,7 +368,7 @@ const PaymentsWallet = () => {
                 <div className="text-xs text-red-600 mt-1">This month</div>
               </div>
             </div>
-            <div className="p-4 bg-blue-50 rounded-xl">
+            <div className="p-4 bg-blue-50 rounded-md">
               <div className="text-blue-600 text-sm font-medium">
                 Net Balance Change
               </div>
@@ -382,7 +382,7 @@ const PaymentsWallet = () => {
       </div>
 
       {/* Platform Margin Information */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-md p-6 text-white">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
             <DollarSign className="w-8 h-8 mr-3" />
@@ -394,7 +394,7 @@ const PaymentsWallet = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white bg-opacity-20 rounded-xl p-4">
+        <div className="bg-white bg-opacity-20 rounded-md p-4">
           <div className="text-sm space-y-2">
             <div>
               <strong>How it works:</strong> ₹20 is automatically included in
@@ -419,7 +419,7 @@ const PaymentsWallet = () => {
       {/* Recharge Modal */}
       {showRechargeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+          <div className="bg-white rounded-md p-8 max-w-md w-full mx-4">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Wallet className="w-8 h-8 text-green-600" />
@@ -433,7 +433,7 @@ const PaymentsWallet = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded-xl">
+              <div className="bg-gray-50 p-4 rounded-md">
                 <div className="text-sm text-gray-600">Available Balance</div>
                 <div className="text-2xl font-bold text-gray-900">
                   ₹{walletBalance.available.toLocaleString()}
@@ -449,7 +449,7 @@ const PaymentsWallet = () => {
                   value={rechargeAmount}
                   onChange={(e) => setRechargeAmount(e.target.value)}
                   placeholder="Enter amount"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
 
@@ -458,14 +458,14 @@ const PaymentsWallet = () => {
                   <button
                     key={amount}
                     onClick={() => setRechargeAmount(amount.toString())}
-                    className="p-2 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-sm"
+                    className="p-2 border border-gray-200 rounded-mdg hover:border-green-500 hover:bg-green-50 transition-colors text-sm"
                   >
                     ₹{amount}
                   </button>
                 ))}
               </div>
 
-              <div className="bg-orange-50 p-4 rounded-xl border border-orange-200">
+              <div className="bg-orange-50 p-4 rounded-md border border-orange-200">
                 <div className="flex items-start">
                   <AlertTriangle className="w-5 h-5 text-orange-600 mr-2 mt-0.5" />
                   <div className="text-sm text-orange-800">
@@ -483,14 +483,14 @@ const PaymentsWallet = () => {
               <div className="flex space-x-3 pt-4">
                 <button
                   onClick={() => setShowRechargeModal(false)}
-                  className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={processRecharge}
                   disabled={!rechargeAmount || parseFloat(rechargeAmount) <= 0}
-                  className="flex-1 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Proceed to Pay
                 </button>
@@ -501,14 +501,14 @@ const PaymentsWallet = () => {
       )}
 
       {/* Recent Transactions */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">
               Recent Transactions
             </h3>
             <div className="flex items-center space-x-3">
-              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors flex items-center">
+              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
                 <Filter className="w-4 h-4 mr-2" />
                 Filter
               </button>
@@ -563,7 +563,7 @@ const PaymentsWallet = () => {
                   <td className="py-4 px-6">
                     <div className="flex items-center">
                       <div
-                        className={`p-2 rounded-lg mr-3 ${
+                        className={`p-2 rounded-mdg mr-3 ${
                           transaction.type === "Credit"
                             ? "bg-green-100"
                             : "bg-red-100"
@@ -649,26 +649,26 @@ const PaymentsWallet = () => {
       </div>
 
       {/* Platform Margin Breakdown */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+      <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">
           Platform Margin Breakdown
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-4 bg-orange-50 rounded-xl">
+          <div className="p-4 bg-orange-50 rounded-md">
             <div className="text-orange-600 text-sm font-medium">
               Total Orders Processed
             </div>
             <div className="text-2xl font-bold text-orange-700">234</div>
             <div className="text-xs text-orange-600 mt-1">This month</div>
           </div>
-          <div className="p-4 bg-orange-50 rounded-xl">
+          <div className="p-4 bg-orange-50 rounded-md">
             <div className="text-orange-600 text-sm font-medium">
               Platform Margin Collected
             </div>
             <div className="text-2xl font-bold text-orange-700">₹4,680</div>
             <div className="text-xs text-orange-600 mt-1">234 orders × ₹20</div>
           </div>
-          <div className="p-4 bg-blue-50 rounded-xl">
+          <div className="p-4 bg-blue-50 rounded-md">
             <div className="text-blue-600 text-sm font-medium">
               Your Net Earnings
             </div>
