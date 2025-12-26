@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'seller', 'supplier'],
+    enum: ['superadmin','admin', 'seller', 'supplier'],
     required: [true, 'Please specify a role']
   },
   isActive: {
@@ -37,7 +37,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'approved', 'rejected'],
     default: function() {
-      return this.role === 'admin' ? 'approved' : 'pending';
+       return ['admin', 'superadmin'].includes(this.role)
+          ? 'approved'
+          : 'pending';
     }
   },
   kycDocuments: {
