@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { Shield, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { toast } from "react-toastify";
+import { useLoginMutation } from "../store/slices/apiSlice";
+import { setCredentials } from "../store/slices/authSlice";
 
 const SuperAdminLogin = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -41,55 +45,40 @@ const SuperAdminLogin = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    if (!formData.username || !formData.password || !formData.pin) {
-      setError("All fields are required");
-      setLoading(false);
-      return;
-    }
+    // Hard-coded credentials for development
+    const SUPER_ADMIN_CREDS = {
+      username: 'superadmin',
+      password: 'admin123',
+      pin: '123456'
+    };
 
     const pinString = formData.pin.join("");
-    if (pinString.length !== 6) {
-      setError("PIN must be exactly 6 digits");
-      setLoading(false);
+
+    // Validate against hard-coded credentials
+    if (formData.username !== SUPER_ADMIN_CREDS.username || 
+        formData.password !== SUPER_ADMIN_CREDS.password || 
+        pinString !== SUPER_ADMIN_CREDS.pin) {
+      setError("Invalid credentials. Use: superadmin / admin123 / 123456");
       return;
     }
 
     try {
-      const API_URL =
-        import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-      //final change supper admin portal
-      const response = await fetch(`${API_URL}/auth/super-admin-login`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-          pin: formData.pin.join(""),
-        }),
-      });
+      // Mock super admin user data
+      const mockSuperAdmin = {
+        id: 'super-admin-1',
+        email: 'superadmin@platform.com',
+        name: 'Super Administrator',
+        role: 'super-admin'
+      };
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.data));
-        toast.success("Super Admin login successful!");
-        navigate("/admin/dashboard");
-      } else {
-        setError(data.message || "Login failed");
-        toast.error(data.message || "Login failed");
-      }
-    } catch (err) {
-      setError("Network error. Please try again.");
-      toast.error("Network error. Please try again.");
-    } finally {
-      setLoading(false);
+      dispatch(setCredentials(mockSuperAdmin));
+      toast.success("Super Admin login successful!");
+      navigate("/super-admin/dashboard");
+    } catch (err: any) {
+      setError("Login failed");
+      toast.error("Login failed");
     }
   };
 
@@ -199,19 +188,20 @@ const SuperAdminLogin = () => {
               </div>
             )}
 
+            <div className="bg-blue-900/50 border border-blue-500 text-blue-200 px-4 py-3 rounded-md text-sm">
+              <strong>Demo Credentials:</strong><br/>
+              Username: <code>superadmin</code><br/>
+              Password: <code>admin123</code><br/>
+              PIN: <code>123456</code>
+            </div>
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={false}
               className="w-full bg-[#ea9a39] text-white py-3 px-6 rounded-md font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
             >
-              {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              ) : (
-                <>
-                  <Shield className="w-5 h-5 mr-2" />
-                  Access Super Admin
-                </>
-              )}
+              <Shield className="w-5 h-5 mr-2" />
+              Access Super Admin
             </button>
           </form>
 

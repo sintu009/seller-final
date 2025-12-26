@@ -14,30 +14,18 @@ const baseQuery = fetchBaseQuery({
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Product', 'User', 'KYC', 'Order', 'Notification'],
+  tagTypes: ['Product', 'User', 'KYC', 'Order', 'Notification', 'Settings', 'ApiKey', 'Role'],
   endpoints: (builder) => ({
     //Dashbaord Counts
      getAdminDashboardCounts: builder.query({
       query: () => '/admin/dashboard-counts',
       providesTags: ['User', 'Product', 'KYC'],
-      transformErrorResponse: (response) => {
-        if (response.status === 401) {
-          window.location.href = '/login/admin';
-        }
-        return response;
-      },
     }),
 
     // Products
     getProducts: builder.query({
       query: () => '/admin/products',
       providesTags: ['Product'],
-      transformErrorResponse: (response) => {
-        if (response.status === 401) {
-          window.location.href = '/login/admin';
-        }
-        return response;
-      },
     }),
     getSupplierProducts: builder.query({
       query: () => '/supplier/products',
@@ -75,12 +63,6 @@ export const apiSlice = createApi({
     getPendingProducts: builder.query({
       query: () => '/admin/products/pending',
       providesTags: ['Product'],
-      transformErrorResponse: (response) => {
-        if (response.status === 401) {
-          window.location.href = '/login/admin';
-        }
-        return response;
-      },
     }),
     deleteProduct: builder.mutation({
       query: ({ id }) => ({
@@ -94,12 +76,6 @@ export const apiSlice = createApi({
     getAllKYC: builder.query({
       query: () => '/kyc/all',
       providesTags: ['KYC'],
-      transformErrorResponse: (response) => {
-        if (response.status === 401) {
-          window.location.href = '/login/admin';
-        }
-        return response;
-      },
     }),
     approveKYC: builder.mutation({
       query: ({ id, plan }) => ({
@@ -175,7 +151,7 @@ export const apiSlice = createApi({
     // Auth
     login: builder.mutation({
       query: (credentials) => ({
-        url: '/auth/login',
+        url: credentials.role === 'super-admin' ? '/auth/super-admin-login' : '/auth/login',
         method: 'POST',
         body: credentials,
       }),
@@ -215,13 +191,6 @@ export const apiSlice = createApi({
     getAdminOrders: builder.query({
       query: () => '/orders/admin',
       providesTags: ['Order'],
-      transformErrorResponse: (response) => {
-        console.error('Admin orders API error:', response);
-        if (response.status === 401) {
-          window.location.href = '/login/admin';
-        }
-        return response;
-      },
     }),
     getSupplierOrders: builder.query({
       query: () => '/orders/supplier',
@@ -276,6 +245,94 @@ export const apiSlice = createApi({
       query: () => '/notifications/unread-count',
       providesTags: ['Notification'],
     }),
+
+    // Super Admin Settings
+    getPlatformSettings: builder.query({
+      query: () => '/admin/settings/platform',
+      providesTags: ['Settings'],
+    }),
+    updatePlatformSettings: builder.mutation({
+      query: (settings) => ({
+        url: '/admin/settings/platform',
+        method: 'PUT',
+        body: settings,
+      }),
+      invalidatesTags: ['Settings'],
+    }),
+    
+    getCommissionSettings: builder.query({
+      query: () => '/admin/settings/commission',
+      providesTags: ['Settings'],
+    }),
+    updateCommissionSettings: builder.mutation({
+      query: (settings) => ({
+        url: '/admin/settings/commission',
+        method: 'PUT',
+        body: settings,
+      }),
+      invalidatesTags: ['Settings'],
+    }),
+    
+    getApiKeys: builder.query({
+      query: () => '/admin/api-keys',
+      providesTags: ['ApiKey'],
+    }),
+    createApiKey: builder.mutation({
+      query: (keyData) => ({
+        url: '/admin/api-keys',
+        method: 'POST',
+        body: keyData,
+      }),
+      invalidatesTags: ['ApiKey'],
+    }),
+    deleteApiKey: builder.mutation({
+      query: (keyId) => ({
+        url: `/admin/api-keys/${keyId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['ApiKey'],
+    }),
+    
+    getNotificationSettings: builder.query({
+      query: () => '/admin/settings/notifications',
+      providesTags: ['Settings'],
+    }),
+    updateNotificationSettings: builder.mutation({
+      query: (settings) => ({
+        url: '/admin/settings/notifications',
+        method: 'PUT',
+        body: settings,
+      }),
+      invalidatesTags: ['Settings'],
+    }),
+    
+    getAdminRoles: builder.query({
+      query: () => '/admin/roles',
+      providesTags: ['Role'],
+    }),
+    createAdminRole: builder.mutation({
+      query: (roleData) => ({
+        url: '/admin/roles',
+        method: 'POST',
+        body: roleData,
+      }),
+      invalidatesTags: ['Role'],
+    }),
+    updateAdminRole: builder.mutation({
+      query: ({ id, ...roleData }) => ({
+        url: `/admin/roles/${id}`,
+        method: 'PUT',
+        body: roleData,
+      }),
+      invalidatesTags: ['Role'],
+    }),
+    deleteAdminRole: builder.mutation({
+      query: (roleId) => ({
+        url: `/admin/roles/${roleId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Role'],
+    }),
   }),
 });
 
@@ -314,4 +371,19 @@ export const {
   useMarkNotificationsReadMutation,
   useDeleteNotificationsMutation,
   useGetUnreadNotificationCountQuery,
+  
+  // Super Admin Settings
+  useGetPlatformSettingsQuery,
+  useUpdatePlatformSettingsMutation,
+  useGetCommissionSettingsQuery,
+  useUpdateCommissionSettingsMutation,
+  useGetApiKeysQuery,
+  useCreateApiKeyMutation,
+  useDeleteApiKeyMutation,
+  useGetNotificationSettingsQuery,
+  useUpdateNotificationSettingsMutation,
+  useGetAdminRolesQuery,
+  useCreateAdminRoleMutation,
+  useUpdateAdminRoleMutation,
+  useDeleteAdminRoleMutation,
 } = apiSlice;

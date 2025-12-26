@@ -26,7 +26,7 @@ const OrderManagement = () => {
 
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
-  const shouldFetch = isAuthenticated && user?.role === 'admin';
+  const shouldFetch = isAuthenticated && (user?.role === 'admin' || user?.role === 'super-admin');
 
   const {
     data: ordersData,
@@ -57,7 +57,7 @@ const OrderManagement = () => {
     );
   }
 
-  if (user?.role !== 'admin') {
+  if (user?.role !== 'admin' && user?.role !== 'super-admin') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="bg-white p-8 rounded-mdg shadow-md text-center">
@@ -170,7 +170,7 @@ const OrderManagement = () => {
         <button
           onClick={() => refetch()}
           disabled={isLoading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-mdg hover:bg-blue-700 disabled:opacity-50 flex items-center"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
         >
           {isLoading ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -180,7 +180,7 @@ const OrderManagement = () => {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-mdg p-4 mb-6">
+        <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
           <h3 className="font-semibold text-red-800 mb-2">Error Loading Orders:</h3>
           <p className="text-red-700 mb-2">{error?.data?.message || 'Failed to load orders'}</p>
           <button

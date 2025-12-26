@@ -4,7 +4,7 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'supplier' | 'seller';
+  role: 'admin' | 'supplier' | 'seller' | 'super-admin';
   kycStatus?: string;
   plan?: string;
 }

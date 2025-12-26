@@ -10,6 +10,7 @@ import TestLogin from './pages/TestLogin';
 import SuperAdminLogin from './pages/SuperAdminLogin';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import SupplierDashboard from './pages/supplier/SupplierDashboard';
+import SupperAdminDashboard from './pages/supperAdmin/SupperAdminDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -71,6 +72,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['supplier']}>
                   <SupplierDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/super-admin/*"
+              element={
+                <ProtectedRoute allowedRoles={['super-admin']}>
+                  <SupperAdminDashboard />
                 </ProtectedRoute>
               }
             />

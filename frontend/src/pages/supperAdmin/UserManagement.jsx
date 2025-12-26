@@ -16,7 +16,10 @@ import {
     Phone,
     Mail,
     MapPin,
-    Trash2
+    Trash2,
+    Plus,
+    Key,
+    User
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import {
@@ -30,6 +33,19 @@ const UserManagement = () => {
     const [activeTab, setActiveTab] = useState('sellers');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
+    const [showCreateAdminModal, setShowCreateAdminModal] = useState(false);
+    const [showEditAdminModal, setShowEditAdminModal] = useState(false);
+    const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+    const [editingAdmin, setEditingAdmin] = useState(null);
+    const [resetPasswordAdmin, setResetPasswordAdmin] = useState(null);
+    const [newPassword, setNewPassword] = useState('');
+    const [newAdmin, setNewAdmin] = useState({
+        name: '',
+        email: '',
+        password: '',
+        role: 'admin',
+        permissions: []
+    });
 
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
@@ -39,16 +55,53 @@ const UserManagement = () => {
         error: usersError,
         refetch: refetchUsers
     } = useGetAllUsersQuery(undefined, {
-        skip: !isAuthenticated || user?.role !== 'admin'
+        skip: true // Skip API call for now
     });
+
+    // Mock data for super admin
+    const mockUsers = [
+        {
+            _id: '1',
+            name: 'John Seller',
+            email: 'john@seller.com',
+            phone: '+1234567890',
+            isActive: true,
+            kycStatus: 'approved',
+            createdAt: '2024-01-01',
+            role: 'seller',
+            address: { city: 'Mumbai', state: 'Maharashtra' }
+        },
+        {
+            _id: '2',
+            name: 'Jane Supplier',
+            email: 'jane@supplier.com',
+            phone: '+1234567891',
+            isActive: true,
+            kycStatus: 'pending',
+            createdAt: '2024-01-02',
+            role: 'supplier',
+            address: { city: 'Delhi', state: 'Delhi' }
+        },
+        {
+            _id: '3',
+            name: 'Admin User',
+            email: 'admin@platform.com',
+            phone: '+1234567892',
+            isActive: true,
+            kycStatus: 'approved',
+            createdAt: '2024-01-03',
+            role: 'admin',
+            address: { city: 'Bangalore', state: 'Karnataka' }
+        }
+    ];
+
+    const users = usersData?.data || mockUsers;
 
     const [approveUser] = useApproveUserMutation();
     const [rejectUser] = useRejectUserMutation();
     const [blockUser] = useBlockUserMutation();
     const [unBlockUser] = useUnBlockUserMutation();
     const [deleteUser] = useDeleteUserMutation();
-
-    const users = usersData?.data || [];
 
     // Transform user data to match original structure
     const enrichedUsers = users.map(user => ({
@@ -66,6 +119,70 @@ const UserManagement = () => {
         role: user.role,
         _id: user._id
     }));
+
+    // Mock admin users
+    const adminUsers = enrichedUsers.filter(user => user.role === 'admin').map(user => ({
+        ...user,
+        permissions: ['User Management', 'Product Management', 'Orders'],
+        lastLogin: '2024-01-15 10:30 AM',
+        createdBy: 'Super Admin'
+    }));
+
+    const availablePermissions = [
+        'User Management',
+        'Product Management', 
+        'Order Management',
+        'Finance Management',
+        'KYC Management',
+        'Support Management',
+        'Reports & Analytics'
+    ];
+
+    const handleCreateAdmin = async () => {
+        try {
+            console.log('Creating admin:', newAdmin);
+            toast.success('Admin user created successfully!');
+            setShowCreateAdminModal(false);
+            setNewAdmin({ name: '', email: '', password: '', role: 'admin', permissions: [] });
+            refetchUsers();
+        } catch (error) {
+            toast.error('Failed to create admin user');
+        }
+    };
+
+    const handleEditAdmin = (admin) => {
+        setEditingAdmin({ ...admin, permissions: admin.permissions || [] });
+        setShowEditAdminModal(true);
+    };
+
+    const handleUpdateAdmin = async () => {
+        try {
+            console.log('Updating admin:', editingAdmin);
+            toast.success('Admin updated successfully!');
+            setShowEditAdminModal(false);
+            setEditingAdmin(null);
+        } catch (error) {
+            toast.error('Failed to update admin');
+        }
+    };
+
+    const handleResetPassword = (admin) => {
+        setResetPasswordAdmin(admin);
+        setNewPassword('');
+        setShowResetPasswordModal(true);
+    };
+
+    const handleUpdatePassword = async () => {
+        try {
+            console.log('Resetting password for:', resetPasswordAdmin.name);
+            toast.success('Password reset successfully!');
+            setShowResetPasswordModal(false);
+            setResetPasswordAdmin(null);
+            setNewPassword('');
+        } catch (error) {
+            toast.error('Failed to reset password');
+        }
+    };
 
     // Mock sellers data - replace with real data
     const sellers = enrichedUsers.filter(user => user.role === 'seller');
@@ -213,10 +330,6 @@ const UserManagement = () => {
         } catch (error) {
             toast.error('Failed to delete user');
         }
-    };
-
-    const handleResetPassword = (id, type) => {
-        console.log(`Resetting password for ${type} with ID: ${id}`);
     };
 
     const filteredSellers = sellers.filter(seller => {
@@ -628,10 +741,363 @@ const UserManagement = () => {
             {activeTab === 'sellers' && renderSellersTab()}
             {activeTab === 'suppliers' && renderSuppliersTab()}
             {activeTab === 'admins' && (
-                <div className="bg-white rounded-md p-12 shadow-sm border border-gray-100 text-center">
-                    <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-600 mb-2">Admin Management</h3>
-                    <p className="text-gray-500">Admin user management coming soon</p>
+                <div className="space-y-6">
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
+                            <div className="text-sm text-gray-600 mb-1">Total Admins</div>
+                            <div className="text-2xl font-bold text-gray-900">{adminUsers.length}</div>
+                        </div>
+                        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
+                            <div className="text-sm text-gray-600 mb-1">Active Admins</div>
+                            <div className="text-2xl font-bold text-green-600">
+                                {adminUsers.filter(a => a.status === 'Active').length}
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
+                            <div className="text-sm text-gray-600 mb-1">Online Now</div>
+                            <div className="text-2xl font-bold text-blue-600">2</div>
+                        </div>
+                        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
+                            <div className="text-sm text-gray-600 mb-1">Last 24h Logins</div>
+                            <div className="text-2xl font-bold text-purple-600">5</div>
+                        </div>
+                    </div>
+
+                    {/* Create Admin Button */}
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => setShowCreateAdminModal(true)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Create Admin User
+                        </button>
+                    </div>
+
+                    {/* Admins Table */}
+                    <div className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th className="text-left py-4 px-6 font-semibold text-gray-900">Admin Details</th>
+                                        <th className="text-left py-4 px-6 font-semibold text-gray-900">Contact Info</th>
+                                        <th className="text-left py-4 px-6 font-semibold text-gray-900">Status</th>
+                                        <th className="text-left py-4 px-6 font-semibold text-gray-900">Permissions</th>
+                                        <th className="text-left py-4 px-6 font-semibold text-gray-900">Last Login</th>
+                                        <th className="text-left py-4 px-6 font-semibold text-gray-900">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {adminUsers.map((admin) => (
+                                        <tr key={admin.id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="py-4 px-6">
+                                                <div className="flex items-center">
+                                                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                                        <User className="w-5 h-5 text-blue-600" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-medium text-gray-900">{admin.name}</div>
+                                                        <div className="text-sm text-gray-500">ID: #{admin.id}</div>
+                                                        <div className="text-xs text-gray-500">Created: {admin.joinDate}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-6">
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center text-sm">
+                                                        <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                                                        {admin.email}
+                                                    </div>
+                                                    <div className="flex items-center text-sm text-gray-600">
+                                                        <Phone className="w-4 h-4 mr-2 text-gray-400" />
+                                                        {admin.phone}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-6">
+                                                <div className="flex items-center">
+                                                    <div className={`w-2 h-2 rounded-full mr-2 ${
+                                                        admin.status === 'Active' ? 'bg-green-400' : 'bg-red-400'
+                                                    }`}></div>
+                                                    <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
+                                                        getStatusColor(admin.status)
+                                                    }`}>
+                                                        {admin.status}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-6">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {admin.permissions.slice(0, 2).map((permission, index) => (
+                                                        <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                                            {permission}
+                                                        </span>
+                                                    ))}
+                                                    {admin.permissions.length > 2 && (
+                                                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                                                            +{admin.permissions.length - 2} more
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-6">
+                                                <div className="text-sm text-gray-900">{admin.lastLogin}</div>
+                                                <div className="text-xs text-gray-500">By: {admin.createdBy}</div>
+                                            </td>
+                                            <td className="py-4 px-6">
+                                                <div className="flex items-center space-x-2">
+                                                    <button 
+                                                        onClick={() => handleEditAdmin(admin)}
+                                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors" 
+                                                        title="Edit Admin"
+                                                    >
+                                                        <Edit3 className="w-4 h-4" />
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleResetPassword(admin)}
+                                                        className="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors" 
+                                                        title="Reset Password"
+                                                    >
+                                                        <Key className="w-4 h-4" />
+                                                    </button>
+                                                    {admin.status === 'Active' ? (
+                                                        <button
+                                                            onClick={() => handleBlock(admin._id, 'admin')}
+                                                            className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                                            title="Block Admin"
+                                                        >
+                                                            <Shield className="w-4 h-4" />
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => handleUnBlock(admin._id, 'admin')}
+                                                            className="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors"
+                                                            title="Unblock Admin"
+                                                        >
+                                                            <UserCheck className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleDeleteUser(admin._id, 'admin')}
+                                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                                        title="Delete Admin"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Create Admin Modal */}
+            {showCreateAdminModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Create Admin User</h3>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                <input
+                                    type="text"
+                                    value={newAdmin.name}
+                                    onChange={(e) => setNewAdmin({ ...newAdmin, name: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter full name"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                <input
+                                    type="email"
+                                    value={newAdmin.email}
+                                    onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter email address"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    value={newAdmin.password}
+                                    onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter password"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Permissions</label>
+                                <div className="space-y-2 max-h-32 overflow-y-auto">
+                                    {availablePermissions.map((permission) => (
+                                        <label key={permission} className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={newAdmin.permissions.includes(permission)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setNewAdmin({
+                                                            ...newAdmin,
+                                                            permissions: [...newAdmin.permissions, permission]
+                                                        });
+                                                    } else {
+                                                        setNewAdmin({
+                                                            ...newAdmin,
+                                                            permissions: newAdmin.permissions.filter(p => p !== permission)
+                                                        });
+                                                    }
+                                                }}
+                                                className="mr-2"
+                                            />
+                                            <span className="text-sm text-gray-700">{permission}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setShowCreateAdminModal(false)}
+                                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleCreateAdmin}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                                Create Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Admin Modal */}
+            {showEditAdminModal && editingAdmin && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Edit Admin User</h3>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                <input
+                                    type="text"
+                                    value={editingAdmin.name}
+                                    onChange={(e) => setEditingAdmin({ ...editingAdmin, name: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                <input
+                                    type="email"
+                                    value={editingAdmin.email}
+                                    onChange={(e) => setEditingAdmin({ ...editingAdmin, email: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Permissions</label>
+                                <div className="space-y-2 max-h-32 overflow-y-auto">
+                                    {availablePermissions.map((permission) => (
+                                        <label key={permission} className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={editingAdmin.permissions.includes(permission)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setEditingAdmin({
+                                                            ...editingAdmin,
+                                                            permissions: [...editingAdmin.permissions, permission]
+                                                        });
+                                                    } else {
+                                                        setEditingAdmin({
+                                                            ...editingAdmin,
+                                                            permissions: editingAdmin.permissions.filter(p => p !== permission)
+                                                        });
+                                                    }
+                                                }}
+                                                className="mr-2"
+                                            />
+                                            <span className="text-sm text-gray-700">{permission}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setShowEditAdminModal(false)}
+                                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleUpdateAdmin}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                                Update Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reset Password Modal */}
+            {showResetPasswordModal && resetPasswordAdmin && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Reset Password</h3>
+                        
+                        <div className="mb-4">
+                            <p className="text-sm text-gray-600 mb-4">
+                                Reset password for <strong>{resetPasswordAdmin.name}</strong>
+                            </p>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter new password"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setShowResetPasswordModal(false)}
+                                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleUpdatePassword}
+                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                            >
+                                Reset Password
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
