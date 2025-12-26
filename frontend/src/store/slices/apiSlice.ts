@@ -139,6 +139,13 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['User'],
     }),
+    resetPasswordUser: builder.mutation({
+      query: (userId) => ({
+        url: `/admin/users/${userId}/reset-password`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['User'],
+    }),
     updateUserPlan: builder.mutation({
       query: ({ userId, plan }) => ({
         url: `/admin/users/${userId}/plan`,
@@ -151,7 +158,7 @@ export const apiSlice = createApi({
     // Auth
     login: builder.mutation({
       query: (credentials) => ({
-        url: credentials.role === 'super-admin' ? '/auth/super-admin-login' : '/auth/login',
+        url: credentials.role === 'super-admin' ? '/superadmin/verify' : '/auth/login',
         method: 'POST',
         body: credentials,
       }),
@@ -355,6 +362,7 @@ export const {
   useBlockUserMutation,
   useUnBlockUserMutation,
   useDeleteUserMutation,
+  useResetPasswordUserMutation,
   useUpdateUserPlanMutation,
   useGetSupplierDashboardQuery,
   useLoginMutation,

@@ -16,12 +16,13 @@ import {
     Phone,
     Mail,
     MapPin,
-    Trash2
+    Trash2,
+   RotateCcw 
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import {
     useGetAllUsersQuery, useGetAllKYCQuery, useApproveUserMutation, useRejectUserMutation, useBlockUserMutation, useUnBlockUserMutation
-    , useDeleteUserMutation
+    , useDeleteUserMutation, useResetPasswordUserMutation
 } from '../../store/slices/apiSlice';
 import { useAppSelector } from '../../store/hooks';
 import { showAlert } from '../../utils/sweetAlert';
@@ -47,6 +48,7 @@ const UserManagement = () => {
     const [blockUser] = useBlockUserMutation();
     const [unBlockUser] = useUnBlockUserMutation();
     const [deleteUser] = useDeleteUserMutation();
+    const [resetPasswordUser] = useResetPasswordUserMutation();
 
     const users = usersData?.data || [];
 
@@ -215,8 +217,24 @@ const UserManagement = () => {
         }
     };
 
-    const handleResetPassword = (id, type) => {
-        console.log(`Resetting password for ${type} with ID: ${id}`);
+    const handleResetPassword = async (id) => {
+       try {
+            const result = await showAlert({
+                type: 'warning',
+                title: 'Reset Password?',
+                text: 'Are you sure want to reset user password.',
+                confirmText: 'Yes, Reset',
+                showCancel: true,
+            });
+
+            if (!result.isConfirmed) return;
+
+            await resetPasswordUser(id).unwrap();
+            toast.success('Password reset successfully. Default password is user phone number!');
+            refetchUsers();
+        } catch (error) {
+            toast.error('Failed to reset password');
+        }
     };
 
     const filteredSellers = sellers.filter(seller => {
@@ -389,6 +407,12 @@ const UserManagement = () => {
                                                 title="Delete Seller">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
+                                            <button
+                                                onClick={() => handleResetPassword(seller._id)}
+                                                className="p-2 text-orange-500 hover:text-orange-700 hover:bg-orange-50 rounded-md transition-colors"
+                                                title="Reset Password">
+                                                <RotateCcw  className="w-4 h-4" />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -536,7 +560,12 @@ const UserManagement = () => {
                                                 title="Delete Supplier">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
-
+                                            <button                   
+                                                onClick={() => handleResetPassword(supplier._id)}
+                                                className="p-2 text-orange-500 hover:text-orange-700 hover:bg-orange-50 rounded-md transition-colors"
+                                                title="Reset Password">
+                                                <RotateCcw  className="w-4 h-4" />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

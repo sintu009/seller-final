@@ -28,6 +28,7 @@ const authSlice = createSlice({
     setCredentials: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
       state.isAuthenticated = true;
+      console.log('Storing user in localStorage:', action.payload);
       localStorage.setItem('user', JSON.stringify(action.payload));
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {

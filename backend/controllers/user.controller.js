@@ -329,6 +329,56 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const resetUserPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required',
+      });
+    }
+
+    const user = await User.findOne({
+      _id: id,
+      isDeleted: false,
+    }).select('+password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    if (!user.phone) {
+      return res.status(400).json({
+        success: false,
+        message: 'User phone number not found. Cannot reset password.',
+      });
+    }
+
+    // 🔐 Reset password = phone number
+    user.password = user.phone;
+    await user.save(); // pre-save hook hashes password
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully. Default password is user phone number.',
+      data: {
+        userId: user._id,
+        email: user.email,
+      },
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   getUserProfile,
@@ -338,5 +388,6 @@ module.exports = {
   rejectUser,
   blockUser,
   unBlockUser,
-  deleteUser
+  deleteUser,
+  resetUserPassword
 };

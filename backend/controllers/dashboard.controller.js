@@ -22,11 +22,30 @@ const getAdminDashboardCounts = async (req, res) => {
       }),
     ]);
 
-    // PRODUCTS
-    const totalProducts = await Product.countDocuments();
-    const pendingProducts = await Product.countDocuments({
-      approvalStatus: 'pending',
-    });
+   // Total products (not deleted OR isDelete field missing)
+const totalProducts = await Product.countDocuments({
+  $and: [
+    {
+      $or: [
+        { isDeleted: false },
+        { isDeleted: { $exists: false } }
+      ]
+    }
+  ]
+});
+
+const pendingProducts = await Product.countDocuments({
+  approvalStatus: 'pending',
+  $and: [
+    {
+      $or: [
+        { isDeleted: false },
+        { isDeleted: { $exists: false } }
+      ]
+    }
+  ]
+});
+
 
     // KYC
     const pendingKyc = await User.countDocuments({

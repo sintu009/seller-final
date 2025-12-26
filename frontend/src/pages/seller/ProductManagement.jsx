@@ -178,9 +178,9 @@ const ProductManagement = () => {
                       (Includes ₹{product.margin.toLocaleString()} platform fee)
                     </div>
                   )}
-                  <div className="text-xs text-gray-600">
+                  {/* <div className="text-xs text-gray-600">
                     Supplier: {product.supplier?.businessName || product.supplier?.name || 'Unknown'}
-                  </div>
+                  </div> */}
                 </div>
 
                 <button

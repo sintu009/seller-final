@@ -1,5 +1,17 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const SuperAdminPin = require('../models/superAdminPin.model');
+
+
+const generateToken = (id) => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET is not defined in environment variables');
+  }
+  return jwt.sign({ id }, secret, {
+    expiresIn: '7d'
+  });
+};
 
 const createSuperAdmin = async (req, res) => {
   try {
@@ -20,10 +32,10 @@ const createSuperAdmin = async (req, res) => {
         });
     }
 
-    if (!/^\d{4}$/.test(pin)) {
+    if (!/^\d{6}$/.test(pin)) {
       return res.status(400).json({
         success: false,
-        message: 'PIN must be exactly 4 digits',
+        message: 'PIN must be exactly 6 digits',
       });
     }
 
@@ -79,18 +91,18 @@ const createSuperAdmin = async (req, res) => {
 
 const verifySuperAdmin = async (req, res) => {
   try {
-    const { email, password, pin } = req.body;
+    const { username, password, pin } = req.body;
 
-    if (!email || !password || !pin) {
+    if (!username || !password || !pin) {
       return res.status(400).json({
         success: false,
-        message: 'Email, password and pin are required',
+        message: 'Username, password and pin are required',
       });
     }
 
     // 🔍 Find super admin
     const user = await User.findOne({
-      email,
+      email: username,
       role: 'superadmin',
       isDeleted: false,
     }).select('+password');
@@ -129,17 +141,10 @@ const verifySuperAdmin = async (req, res) => {
       });
     }
 
-    // 🎟 Generate JWT
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
     res.status(200).json({
       success: true,
       message: 'Super admin verified successfully',
-      token,
+      token: generateToken(user._id),
       data: {
         _id: user._id,
         name: user.name,

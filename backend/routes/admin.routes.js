@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth.middleware');
 const { approveProduct, rejectProduct, getAllProducts, getPendingProducts } = require('../controllers/product.controller');
-const { getAllUsers, approveUser, rejectUser, blockUser,unBlockUser,deleteUser } = require('../controllers/user.controller');
+const { getAllUsers, approveUser, rejectUser, blockUser,unBlockUser,deleteUser,resetUserPassword } = require('../controllers/user.controller');
 const { getOrdersForAdmin, adminApproveOrder, adminRejectOrder } = require('../controllers/order.controller');
 const { getAdminDashboardCounts } = require('../controllers/dashboard.controller');
 
@@ -44,6 +44,7 @@ router.put('/users/:id/reject', rejectUser);
 router.put('/users/:id/block', blockUser);
 router.put('/users/:id/unblock', unBlockUser);
 router.delete('/users/:id', deleteUser);
+router.post('/users/:id/reset-password', resetUserPassword);
 
 router.get('/products/pending', getPendingProducts);
 

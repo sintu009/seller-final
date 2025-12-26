@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { createSuperAdmin } = require('../controllers/superAdmin.controller');
+const { createSuperAdmin,verifySuperAdmin } = require('../controllers/superAdmin.controller');
 
 // ⚠️ Protect this route in production
 router.post('/create', createSuperAdmin);
-
+router.post('/verify', verifySuperAdmin);
 module.exports = router;

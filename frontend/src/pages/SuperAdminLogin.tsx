@@ -7,6 +7,7 @@ import { useLoginMutation } from "../store/slices/apiSlice";
 import { setCredentials } from "../store/slices/authSlice";
 
 const SuperAdminLogin = () => {
+  const [loginMutation] = useLoginMutation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ const SuperAdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,34 +48,19 @@ const SuperAdminLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    // Hard-coded credentials for development
-    const SUPER_ADMIN_CREDS = {
-      username: 'superadmin',
-      password: 'admin123',
-      pin: '123456'
-    };
+  const pinString = formData.pin.join("");
 
-    const pinString = formData.pin.join("");
-
-    // Validate against hard-coded credentials
-    if (formData.username !== SUPER_ADMIN_CREDS.username || 
-        formData.password !== SUPER_ADMIN_CREDS.password || 
-        pinString !== SUPER_ADMIN_CREDS.pin) {
-      setError("Invalid credentials. Use: superadmin / admin123 / 123456");
-      return;
-    }
+  if (!formData.username || !formData.password || pinString.length !== 6) {
+    setError("Email, password and 6-digit PIN are required");
+    return;
+  }
 
     try {
-      // Mock super admin user data
-      const mockSuperAdmin = {
-        id: 'super-admin-1',
-        email: 'superadmin@platform.com',
-        name: 'Super Administrator',
-        role: 'super-admin'
-      };
-
-      dispatch(setCredentials(mockSuperAdmin));
+      const result = await loginMutation({ username: formData.username, password: formData.password, pin: pinString, role:"super-admin" }).unwrap();
+      console.log("Login successful:", result);
+      dispatch(setCredentials(result.data));
       toast.success("Super Admin login successful!");
       navigate("/super-admin/dashboard");
     } catch (err: any) {
@@ -95,9 +82,6 @@ const SuperAdminLogin = () => {
 
         <div className="bg-gray-800 border border-purple-500/30 rounded-md shadow-2xl p-8">
           <div className="text-center mb-8">
-            {/* <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-600 rounded-md flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Shield className="w-10 h-10 text-white" />
-            </div> */}
             <h2 className="text-3xl font-bold text-white mb-2">
               Super Admin Access
             </h2>
@@ -187,13 +171,6 @@ const SuperAdminLogin = () => {
                 {error}
               </div>
             )}
-
-            <div className="bg-blue-900/50 border border-blue-500 text-blue-200 px-4 py-3 rounded-md text-sm">
-              <strong>Demo Credentials:</strong><br/>
-              Username: <code>superadmin</code><br/>
-              Password: <code>admin123</code><br/>
-              PIN: <code>123456</code>
-            </div>
 
             <button
               type="submit"
