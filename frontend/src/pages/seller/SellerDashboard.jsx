@@ -7,6 +7,7 @@ import OrderManagement from './OrderManagement';
 import PaymentsWallet from './PaymentsWallet';
 import AccountSettings from './AccountSettings';
 import ManageDelivery from './ManageDelivery';
+import SellerNotifications from './SellerNotifications';
 
 import {
   LayoutDashboard,
@@ -15,7 +16,8 @@ import {
   Wallet,
   BarChart3,
   Settings,
-  Truck
+  Truck,
+  Bell
 } from 'lucide-react';
 import MyStores from './MyStores';
 
@@ -29,6 +31,7 @@ const SellerDashboard = () => {
     { id: 'orders', label: 'Manage Orders', icon: ShoppingCart, path: '/seller/orders' },
     { id: 'Delivery', label: 'Manage Delivery', icon: Truck, path: '/seller/Delivery' },
     { id: 'payments', label: 'Payments', icon: Wallet, path: '/seller/payments' },
+  { id: 'notifications', label: 'Notifications', icon: Bell, path: '/seller/notifications' },
     // { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/seller/analytics' },
     { id: 'settings', label: 'Settings', icon: Settings, path: '/seller/settings' }
   ];
@@ -42,6 +45,7 @@ const SellerDashboard = () => {
         <Route path="/store" element={<MyStores />} />
         <Route path="/Delivery" element={<ManageDelivery />} />
         <Route path="/payments" element={<PaymentsWallet />} />
+        <Route path="/notifications" element={<SellerNotifications />} />
         <Route path="/settings" element={<AccountSettings />} />
         <Route path="/" element={<Navigate to="/seller/dashboard" replace />} />
       </Routes>
