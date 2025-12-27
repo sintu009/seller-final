@@ -68,7 +68,7 @@ const createSuperAdmin = async (req, res) => {
       success: true,
       message: 'Super admin created successfully',
       data: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -141,15 +141,18 @@ const verifySuperAdmin = async (req, res) => {
       });
     }
 
+    const token = generateToken(user._id);
+
     res.status(200).json({
       success: true,
       message: 'Super admin verified successfully',
-      token: generateToken(user._id),
+      token,
       data: {
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
+        kycStatus: 'approved'
       },
     });
 

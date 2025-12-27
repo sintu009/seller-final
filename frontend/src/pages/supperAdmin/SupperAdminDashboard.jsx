@@ -46,7 +46,7 @@ const SupperAdminDashboard = () => {
   const pendingOrders = dashboardData.breakdown.pendingOrders ?? 0;
 
   const sidebarItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/super-admin/dashboard' },
     { id: 'users', label: 'User Management', icon: Users, path: '/super-admin/users' },
     { id: 'products', label: 'Product Management', icon: Package, path: '/super-admin/products', badge: pendingProducts > 0 ? pendingProducts.toString() : undefined },
     { id: 'orders', label: 'Order Management', icon: ShoppingCart, path: '/super-admin/orders', badge: pendingOrders > 0 ? pendingOrders.toString() : undefined },

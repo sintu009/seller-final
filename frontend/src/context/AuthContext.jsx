@@ -20,15 +20,13 @@ export const AuthProvider = ({ children }) => {
   const [loginMutation] = useLoginMutation();
   const [registerMutation] = useRegisterMutation();
   const [logoutMutation] = useLogoutMutation();
-  const { data: profileData, isLoading: profileLoading } = useGetProfileQuery(undefined, { 
-    skip: !isAuthenticated 
-  });
 
   useEffect(() => {
-    if (profileData?.success && profileData?.data) {
-      dispatch(setCredentials(profileData.data));
+    // Skip profile validation for super admin since they use different auth flow
+    if (isAuthenticated && user?.role !== 'superadmin') {
+      // Only validate profile for regular users
     }
-  }, [profileData, dispatch]);
+  }, [isAuthenticated, user]);
 
   const login = async (email, password) => {
     try {

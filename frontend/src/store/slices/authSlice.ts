@@ -1,10 +1,10 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface User {
-  id: string;
+  _id: string;
   email: string;
   name: string;
-  role: 'admin' | 'supplier' | 'seller' | 'super-admin';
+  role: "admin" | "supplier" | "seller" | "super-admin";
   kycStatus?: string;
   plan?: string;
 }
@@ -16,31 +16,31 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: JSON.parse(localStorage.getItem('user') || 'null'),
-  isAuthenticated: !!localStorage.getItem('user'),
+  user: JSON.parse(localStorage.getItem("user") || "null"),
+  isAuthenticated: !!localStorage.getItem("user"),
   loading: false,
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     setCredentials: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
       state.isAuthenticated = true;
-      console.log('Storing user in localStorage:', action.payload);
-      localStorage.setItem('user', JSON.stringify(action.payload));
+      console.log("Storing user in localStorage:", action.payload);
+      localStorage.setItem("user", JSON.stringify(action.payload));
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
-        localStorage.setItem('user', JSON.stringify(state.user));
+        localStorage.setItem("user", JSON.stringify(state.user));
       }
     },
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
-      localStorage.removeItem('user');
+      localStorage.removeItem("user");
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
@@ -48,5 +48,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, updateUser, logout, setLoading } = authSlice.actions;
+export const { setCredentials, updateUser, logout, setLoading } =
+  authSlice.actions;
 export default authSlice.reducer;
