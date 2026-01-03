@@ -14,28 +14,14 @@ import SuperAdminDashboard from './pages/supperAdmin/SupperAdminDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
-import { socket } from './socket';
+import useSocketEvents from './hooks/useSocketEvents';
 
 function App() {
   
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    socket.on('NEW_SELLER_REGISTERED', (seller) => {
-      console.log('🔥 Socket event received:', seller);
-
-      // ✅ ADMIN-ONLY UI reaction
-      if (user?.role === 'admin') {
-        toast.info(`🆕 New seller registered: ${seller.name}`);
-        dispatch(apiSlice.util.invalidateTags(['User', 'KYC']));
-      }
-    });
-
-    return () => {
-      socket.off('NEW_SELLER_REGISTERED');
-    };
-  }, [user, dispatch]);
+  useSocketEvents();
 
   return (
     <AuthProvider>

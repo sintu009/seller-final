@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGetProductsQuery, useApproveProductMutation, useRejectProductMutation, useGetImageSasUrlQuery } from '../../store/slices/apiSlice';
 import {
     Search,
@@ -18,12 +18,16 @@ import {
 
 import ProductImage from "../../components/ProductImage.jsx";
 import { toast } from 'react-toastify';
-
+import { socket } from '../../socket';
 
 const ProductManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
-    const { data: productsData, isLoading: loading } = useGetProductsQuery();
+    
+    const {data: productsData,isLoading: loading,refetch} = useGetProductsQuery(undefined, {
+  refetchOnMountOrArgChange: true,
+});
+
     const [approveProduct] = useApproveProductMutation();
     const [rejectProduct] = useRejectProductMutation();
     const [showApproveModal, setShowApproveModal] = useState(false);
@@ -44,6 +48,14 @@ const ProductManagement = () => {
 
         return matchesSearch && matchesStatus;
     });
+
+    useEffect(() => {
+        socket.on('NEW_PRODUCT_ADDED', () => {
+            refetch();
+        });
+
+        return () => socket.off('NEW_PRODUCT_ADDED');
+    }, [refetch]);
 
     const getStatusIcon = (status) => {
         switch (status) {

@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Plus, Search, ListFilter as Filter, Upload, CreditCard as Edit3, Trash2, Eye, Clock, CheckCircle, Circle as XCircle, Image as ImageIcon, Package, AlertTriangle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useGetSupplierProductsQuery, useCreateProductMutation, useDeleteProductMutation } from '../../store/slices/apiSlice';
 import { useAppSelector } from '../../store/hooks';
 import { showAlert } from '../../utils/sweetAlert';
 import ProductImage from "../../components/ProductImage.jsx";
+import { socket } from '../../socket';
 
-
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000');
 
 const SupplierProductManagement = () => {
     const { user } = useAppSelector((state) => state.auth);
-    const { data: productsData, isLoading: loading } = useGetSupplierProductsQuery();
+    const { data: productsData, isLoading: loading,refetch } = useGetSupplierProductsQuery(undefined, {
+        refetchOnMountOrArgChange: true,
+      });
     const [createProduct] = useCreateProductMutation();
     const [deleteProduct] = useDeleteProductMutation();
 
@@ -35,6 +36,20 @@ const SupplierProductManagement = () => {
     const categories = ['all', 'Electronics', 'Office', 'Accessories', 'Health', 'Gaming', 'Home', 'Fashion'];
 
 
+     useEffect(() => {
+        const handleProductChange = (product) => {
+        console.log('🔄 Product change detected:', product);
+        refetch();
+        };
+
+        socket.on('PRODUCT_APPROVED', handleProductChange);
+        socket.on('PRODUCT_REJECTED', handleProductChange);
+
+        return () => {
+        socket.off('PRODUCT_APPROVED', handleProductChange);
+        socket.off('PRODUCT_REJECTED', handleProductChange);
+        };
+    }, [refetch]);
 
 
     const handleChange = (e) => {

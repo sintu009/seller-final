@@ -29,6 +29,39 @@ const register = async (req, res) => {
       });
     }
 
+    //check here if same pan number or gst number is already registered
+    if (panNumber) {
+      const existingPanUser = await User.findOne({ 'kycDocuments.businessRegistration': panNumber, isDeleted: false });
+
+      if (existingPanUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'A user with this PAN number is already registered.'
+        });
+      }
+    }
+
+    if (gstNumber) {
+      const existingGstUser = await User.findOne({ 'kycDocuments.taxId': gstNumber, isDeleted: false });
+
+      if (existingGstUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'A user with this GST number is already registered.'
+        });
+      }
+    }
+
+    if(phoneNumber){
+      const existingPhoneUser = await User.findOne({ phone: phoneNumber, isDeleted: false });
+      if (existingPhoneUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'A user with this phone number is already registered.'
+        });
+      }
+    }
+
      // 🔹 Upload KYC docs to Azure
     let uploadedDocs = {};
     if (req.files && Object.keys(req.files).length > 0) {

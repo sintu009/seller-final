@@ -42,7 +42,21 @@ const createProduct = async (req, res) => {
       }
     }
 
-      // ================= UPLOAD TO AZURE =================
+    //chech here if same product name exists for the same supplier
+    const existingProduct = await Product.findOne({ 
+      name: req.body.name, 
+      supplier: supplierId,
+      isDeleted: { $ne: true } 
+    });
+
+    if (existingProduct) {
+      return res.status(400).json({
+        success: false,
+        message: 'You already have a product with this name. Please choose a different name.'
+      });
+    }
+
+    // ================= UPLOAD TO AZURE =================
     let imageUrls = [];
 
     if (req.files && req.files.length > 0) {
@@ -67,6 +81,13 @@ const createProduct = async (req, res) => {
     await product.populate('supplier', 'name email');
 
     console.log('Product created successfully:', product._id);
+
+    if (user.role === 'supplier' && global.io) {
+      global.io.emit('NEW_PRODUCT_ADDED', {
+        id: product._id,
+        name: product.name,
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -359,6 +380,13 @@ const approveProduct = async (req, res) => {
       entityId: product._id,
     });
 
+    if (req.user.role === 'admin' && global.io) {
+      global.io.emit('PRODUCT_APPROVED', {
+        id: product._id,
+        name: product.name,
+      });
+    }
+
     await product.populate('supplier', 'name email businessName phoneNumber');
 
     res.status(200).json({
@@ -418,6 +446,13 @@ const rejectProduct = async (req, res) => {
       entityType: 'product',
       entityId: product._id,
     });
+
+    if (req.user.role === 'admin' && global.io) {
+      global.io.emit('PRODUCT_REJECTED', {
+        id: product._id,
+        name: product.name,
+      });
+    }
 
     await product.populate('supplier', 'name email businessName phoneNumber');
 
