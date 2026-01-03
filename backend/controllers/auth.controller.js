@@ -1,6 +1,13 @@
 const authService = require('../services/auth.service');
 const { createNotification } = require('../utils/notification.helper');
 const User = require('../models/user.model');
+const { uploadKycDocuments } = require('../utils/azureUpload');
+
+const kycFileConfig = [
+  { field: "gstCertificate", target: "idProof" },
+  { field: "panCard", target: "addressProof" },
+  { field: "cancelledCheque", target: "bankDetails.cancelledChequeBlob" },
+];
 
 const register = async (req, res) => {
   try {
@@ -22,23 +29,31 @@ const register = async (req, res) => {
       });
     }
 
+     // 🔹 Upload KYC docs to Azure
+    let uploadedDocs = {};
+    if (req.files && Object.keys(req.files).length > 0) {
+      uploadedDocs = await uploadKycDocuments(req.files, role);
+    }
+
+    // 🔹 Build KYC document object dynamically (ARRAY BASED)
     const kycDocuments = {
       businessName,
       taxId: gstNumber,
-      businessRegistration: panNumber
+      businessRegistration: panNumber,
     };
 
-    if (req.files) {
-      if (req.files.gstCertificate && req.files.gstCertificate[0]) {
-        kycDocuments.idProof = req.files.gstCertificate[0].path;
-      }
-      if (req.files.panCard && req.files.panCard[0]) {
-        kycDocuments.addressProof = req.files.panCard[0].path;
-      }
-      if (req.files.cancelledCheque && req.files.cancelledCheque[0]) {
-        kycDocuments.bankDetails = {
-          cancelledChequePath: req.files.cancelledCheque[0].path
+    for (const cfg of kycFileConfig) {
+      const blobName = uploadedDocs[cfg.field];
+      if (!blobName) continue;
+
+      if (cfg.target.includes(".")) {
+        const [parent, child] = cfg.target.split(".");
+        kycDocuments[parent] = {
+          ...(kycDocuments[parent] || {}),
+          [child]: blobName,
         };
+      } else {
+        kycDocuments[cfg.target] = blobName;
       }
     }
 

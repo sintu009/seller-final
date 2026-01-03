@@ -340,6 +340,16 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Role'],
     }),
+    getImageSasUrl: builder.query<
+      { sasUrl: string },
+      string
+    >({
+      query: (blobName) => ({
+        url: `/files/sas`,
+        params: { blobName },
+      }),
+    }),
+    
   }),
 });
 
@@ -394,4 +404,6 @@ export const {
   useCreateAdminRoleMutation,
   useUpdateAdminRoleMutation,
   useDeleteAdminRoleMutation,
+  useGetImageSasUrlQuery,
+  useLazyGetImageSasUrlQuery
 } = apiSlice;

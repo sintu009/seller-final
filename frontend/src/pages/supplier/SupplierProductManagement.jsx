@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import { useGetSupplierProductsQuery, useCreateProductMutation, useDeleteProductMutation } from '../../store/slices/apiSlice';
 import { useAppSelector } from '../../store/hooks';
 import { showAlert } from '../../utils/sweetAlert';
+import ProductImage from "../../components/ProductImage.jsx";
+
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000');
 
@@ -262,17 +264,11 @@ const SupplierProductManagement = () => {
                                     <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                                         <td className="py-4 px-6">
                                             <div className="flex items-center">
-                                                {product.images && product.images.length > 0 ? (
-                                                    <img
-                                                        src={`${API_URL}/${product.images[0]}`}
-                                                        alt={product.name}
-                                                        className="w-12 h-12 rounded-mdg object-cover mr-3"
-                                                    />
-                                                ) : (
-                                                    <div className="w-12 h-12 rounded-mdg bg-gray-200 flex items-center justify-center mr-3">
-                                                        <Package className="w-6 h-6 text-gray-400" />
-                                                    </div>
-                                                )}
+                                               <ProductImage
+                                                    blobName={product.images?.[0]}
+                                                    alt={product.name}
+                                                />
+
                                                 <div>
                                                     <div className="font-medium text-gray-900">{product.name}</div>
                                                     <div className="text-sm text-gray-500">{product.description.substring(0, 40)}...</div>

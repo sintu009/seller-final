@@ -22,6 +22,7 @@ const supplierRoutes = require('./routes/supplier.routes');
 const testRoutes = require('./routes/testRoutes');
 const notificationRoutes = require('./routes/notification.routes');
 const superAdminRoutes = require('./routes/superAdmin.routes');
+const fileRoutes = require("./routes/file.routes");
 
 // --------------------
 // APP SETUP
@@ -39,6 +40,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use("/api/files", fileRoutes);
 
 // Routes
 app.use('/api/superadmin', superAdminRoutes);

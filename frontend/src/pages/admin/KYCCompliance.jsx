@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useGetAllKYCQuery, useApproveKYCMutation, useRejectKYCMutation } from '../../store/slices/apiSlice';
+import { useGetAllKYCQuery, useApproveKYCMutation, useRejectKYCMutation,useLazyGetImageSasUrlQuery } from '../../store/slices/apiSlice';
 import {
     Search,
     Filter,
@@ -16,6 +16,7 @@ import {
     Phone,
     Crown
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const KYCCompliance = () => {
     const [mainTab, setMainTab] = useState('seller');
@@ -29,6 +30,7 @@ const KYCCompliance = () => {
     const { data: kycData, isLoading: loading, refetch } = useGetAllKYCQuery();
     const [approveKYC] = useApproveKYCMutation();
     const [rejectKYC] = useRejectKYCMutation();
+    const [getSasUrl] = useLazyGetImageSasUrlQuery();
 
     const kycSubmissions = kycData?.data || [];
 
@@ -184,9 +186,15 @@ const KYCCompliance = () => {
         setShowRejectModal(true);
     };
 
-    const handleViewDocument = (filepath) => {
-        if (filepath) {
-            window.open(`http://localhost:5000/${filepath}`, '_blank');
+   const handleViewDocument = async (blobName) => {
+        if (!blobName) return;
+
+        try {
+            const res = await getSasUrl(blobName).unwrap();
+            window.open(res.sasUrl, "_blank");
+        } catch (err) {
+            console.error("Failed to open document", err);
+            alert("Unable to open document");
         }
     };
 

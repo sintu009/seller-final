@@ -1,6 +1,7 @@
 const Product = require('../models/product.model');
 const User = require('../models/user.model');
 const { createNotification } = require('../utils/notification.helper');
+const { uploadFilesToAzure } = require("../utils/azureUpload");
 
 const createProduct = async (req, res) => {
   try {
@@ -41,13 +42,23 @@ const createProduct = async (req, res) => {
       }
     }
 
-    const images = req.files ? req.files.map(file => file.path.replace(/\\/g, '/')) : [];
-    console.log('Processed images:', images);
+      // ================= UPLOAD TO AZURE =================
+    let imageUrls = [];
 
+    if (req.files && req.files.length > 0) {
+      imageUrls = await uploadFilesToAzure(
+        req.files,
+        "product-images"
+      );
+    }
+
+    console.log("Uploaded image URLs:", imageUrls);
+
+     // ================= CREATE PRODUCT =================
     const productData = {
       ...req.body,
       supplier: supplierId,
-      images: images
+      images: imageUrls
     };
     
     console.log('Product data to create:', productData);
