@@ -1,31 +1,31 @@
-import { apiSlice } from './apiSlice';
+import { apiSlice } from "./apiSlice";
 
 export const notificationApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getMyNotifications: builder.query({
-      query: () => '/notifications/my',
-      providesTags: ['Notification'],
+      query: () => "/notifications/my",
+      providesTags: ["Notification"],
     }),
 
     markNotificationAsRead: builder.mutation({
       query: (id) => ({
         url: `/notifications/read/${id}`,
-        method: 'PATCH',
+        method: "PATCH",
       }),
-      invalidatesTags: ['Notification'],
+      invalidatesTags: ["Notification"],
     }),
 
     markAllNotificationsAsRead: builder.mutation({
       query: () => ({
         url: `/notifications/read-all`,
-        method: 'PATCH',
+        method: "PATCH",
       }),
-      invalidatesTags: ['Notification'],
+      invalidatesTags: ["Notification"],
     }),
 
     getUnreadNotificationCount: builder.query({
-      query: () => '/notifications/unread-count',
-      providesTags: ['Notification'],
+      query: () => "/notifications/unread-count",
+      providesTags: ["Notification"],
     }),
   }),
 });

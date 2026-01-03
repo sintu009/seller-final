@@ -3,7 +3,7 @@ import { useGetImageSasUrlQuery } from "../store/slices/apiSlice";
 
 const ProductImage = ({ blobName, alt }) => {
   const { data, isLoading, isError } = useGetImageSasUrlQuery(blobName, {
-    skip: !blobName
+    skip: !blobName,
   });
 
   if (isLoading || isError || !data?.sasUrl) {

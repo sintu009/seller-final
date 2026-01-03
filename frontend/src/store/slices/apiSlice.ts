@@ -19,7 +19,7 @@ export const apiSlice = createApi({
     //Dashbaord Counts
      getAdminDashboardCounts: builder.query({
       query: () => '/admin/dashboard-counts',
-      providesTags: ['User', 'Product', 'KYC'],
+      providesTags: ['User', 'Product', 'KYC','Order'],
     }),
 
     // Products

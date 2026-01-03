@@ -27,6 +27,8 @@ import {
   useMarkNotificationAsReadMutation,
 } from "../store/slices/notificationApiSlice.js";
 
+import { notificationApiSlice } from "../store/slices/notificationApiSlice";
+
 import { mapNotificationsForUI } from "../utils/mapNotifications.js";
 import { socket } from "../socket.js";
 
@@ -49,7 +51,7 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
 
   useEffect(() => {
     socket.on("NEW_NOTIFICATION", () => {
-      dispatch(apiSlice.util.invalidateTags(["Notification"]));
+      dispatch(notificationApiSlice.util.invalidateTags(["Notification"]));
     });
 
     return () => socket.off("NEW_NOTIFICATION");

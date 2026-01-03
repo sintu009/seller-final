@@ -13,6 +13,7 @@ const useSocketEvents = () => {
     if (!user) return;
 
     const onNewNotification = (notification) => {
+      if (notification.user !== user.id) return;
       // Always refresh notification list & badge
       dispatch(notificationApiSlice.util.invalidateTags(["Notification"]));
 
@@ -70,11 +71,31 @@ const useSocketEvents = () => {
       }
     };
 
+    const onNewOrder = (order) => {
+      if (user.role === "supplier" || user.role === "admin") {
+        toast.info(`📦 New order placed: ${order.productName}`);
+        dispatch(apiSlice.util.invalidateTags(["Order"]));
+      }
+    };
+
+    const onOrderApproved = () => {
+      console.log("ORDER_APPROVED received");
+      dispatch(apiSlice.util.invalidateTags(["Order"]));
+    };
+
+    const onOrderRejected = () => {
+      console.log("ORDER_REJECTED received");
+      dispatch(apiSlice.util.invalidateTags(["Order"]));
+    };
+
     socket.on("NEW_NOTIFICATION", onNewNotification);
     socket.on("NEW_SELLER_REGISTERED", onNewSeller);
     socket.on("NEW_PRODUCT_ADDED", onNewProduct);
     socket.on("PRODUCT_APPROVED", onApproved);
     socket.on("PRODUCT_REJECTED", onRejected);
+    socket.on("ORDER_PENDING_APPROVAL", onNewOrder);
+    socket.on("ORDER_APPROVED", onOrderApproved);
+    socket.on("ORDER_REJECTED", onOrderRejected);
 
     return () => {
       socket.off("NEW_NOTIFICATION", onNewNotification);
@@ -82,6 +103,9 @@ const useSocketEvents = () => {
       socket.off("NEW_PRODUCT_ADDED", onNewProduct);
       socket.off("PRODUCT_APPROVED", onApproved);
       socket.off("PRODUCT_REJECTED", onRejected);
+      socket.off("ORDER_PENDING_APPROVAL", onNewOrder);
+      socket.off("ORDER_APPROVED", onOrderApproved);
+      socket.off("ORDER_REJECTED", onOrderRejected);
     };
   }, [user, dispatch]);
 };
