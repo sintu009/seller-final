@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Search, ListFilter as Filter, Upload, CreditCard as Edit3, Trash2, Eye, Clock, CheckCircle, Circle as XCircle, Image as ImageIcon, Package, AlertTriangle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useGetSupplierProductsQuery, useCreateProductMutation, useDeleteProductMutation } from '../../store/slices/apiSlice';
@@ -10,9 +10,9 @@ import { socket } from '../../socket';
 
 const SupplierProductManagement = () => {
     const { user } = useAppSelector((state) => state.auth);
-    const { data: productsData, isLoading: loading,refetch } = useGetSupplierProductsQuery(undefined, {
+    const { data: productsData, isLoading: loading, refetch } = useGetSupplierProductsQuery(undefined, {
         refetchOnMountOrArgChange: true,
-      });
+    });
     const [createProduct] = useCreateProductMutation();
     const [deleteProduct] = useDeleteProductMutation();
 
@@ -36,18 +36,18 @@ const SupplierProductManagement = () => {
     const categories = ['all', 'Electronics', 'Office', 'Accessories', 'Health', 'Gaming', 'Home', 'Fashion'];
 
 
-     useEffect(() => {
+    useEffect(() => {
         const handleProductChange = (product) => {
-        console.log('🔄 Product change detected:', product);
-        refetch();
+            console.log('🔄 Product change detected:', product);
+            refetch();
         };
 
         socket.on('PRODUCT_APPROVED', handleProductChange);
         socket.on('PRODUCT_REJECTED', handleProductChange);
 
         return () => {
-        socket.off('PRODUCT_APPROVED', handleProductChange);
-        socket.off('PRODUCT_REJECTED', handleProductChange);
+            socket.off('PRODUCT_APPROVED', handleProductChange);
+            socket.off('PRODUCT_REJECTED', handleProductChange);
         };
     }, [refetch]);
 
@@ -180,7 +180,7 @@ const SupplierProductManagement = () => {
     };
 
     return (
-        <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
+        <div className="space-y-6 bg-gray-50 min-h-screen">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
@@ -279,7 +279,7 @@ const SupplierProductManagement = () => {
                                     <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                                         <td className="py-4 px-6">
                                             <div className="flex items-center">
-                                               <ProductImage
+                                                <ProductImage
                                                     blobName={product.images?.[0]}
                                                     alt={product.name}
                                                 />

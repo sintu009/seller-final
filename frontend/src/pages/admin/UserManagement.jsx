@@ -17,7 +17,8 @@ import {
     Mail,
     MapPin,
     Trash2,
-   RotateCcw 
+    RotateCcw,
+    X
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import {
@@ -31,6 +32,8 @@ const UserManagement = () => {
     const [activeTab, setActiveTab] = useState('sellers');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [showUserModal, setShowUserModal] = useState(false);
 
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
@@ -91,7 +94,7 @@ const UserManagement = () => {
     const tabs = [
         { id: 'sellers', label: 'Sellers', count: sellers.length },
         { id: 'suppliers', label: 'Suppliers', count: suppliers.length },
-        { id: 'admins', label: 'Admin Staff', count: enrichedUsers.filter(u => u.role === 'admin').length }
+        // { id: 'admins', label: 'Admin Staff', count: enrichedUsers.filter(u => u.role === 'admin').length }
     ];
 
     const statuses = ['all', 'Active', 'Pending', 'Blocked', 'Rejected'];
@@ -218,7 +221,7 @@ const UserManagement = () => {
     };
 
     const handleResetPassword = async (id) => {
-       try {
+        try {
             const result = await showAlert({
                 type: 'warning',
                 title: 'Reset Password?',
@@ -397,7 +400,12 @@ const UserManagement = () => {
                                                 </button>
                                             )}
 
-                                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors"
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedUser(seller);
+                                                    setShowUserModal(true);
+                                                }}
+                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors"
                                                 title="View Seller">
                                                 <Eye className="w-4 h-4" />
                                             </button>
@@ -411,7 +419,7 @@ const UserManagement = () => {
                                                 onClick={() => handleResetPassword(seller._id)}
                                                 className="p-2 text-orange-500 hover:text-orange-700 hover:bg-orange-50 rounded-md transition-colors"
                                                 title="Reset Password">
-                                                <RotateCcw  className="w-4 h-4" />
+                                                <RotateCcw className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </td>
@@ -551,7 +559,12 @@ const UserManagement = () => {
                                                     <UserCheck className="w-4 h-4" />
                                                 </button>
                                             )}
-                                            <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors">
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedUser(supplier);
+                                                    setShowUserModal(true);
+                                                }}
+                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-mdg transition-colors">
                                                 <Eye className="w-4 h-4" />
                                             </button>
                                             <button
@@ -560,11 +573,11 @@ const UserManagement = () => {
                                                 title="Delete Supplier">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
-                                            <button                   
+                                            <button
                                                 onClick={() => handleResetPassword(supplier._id)}
                                                 className="p-2 text-orange-500 hover:text-orange-700 hover:bg-orange-50 rounded-md transition-colors"
                                                 title="Reset Password">
-                                                <RotateCcw  className="w-4 h-4" />
+                                                <RotateCcw className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </td>
@@ -656,11 +669,133 @@ const UserManagement = () => {
             {/* Tab Content */}
             {activeTab === 'sellers' && renderSellersTab()}
             {activeTab === 'suppliers' && renderSuppliersTab()}
-            {activeTab === 'admins' && (
+            {/* {activeTab === 'admins' && (
                 <div className="bg-white rounded-md p-12 shadow-sm border border-gray-100 text-center">
                     <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-600 mb-2">Admin Management</h3>
                     <p className="text-gray-500">Admin user management coming soon</p>
+                </div>
+            )} */}
+
+            {/* User Details Modal */}
+            {showUserModal && selectedUser && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                {selectedUser.role === 'seller' ? 'Seller' : 'Supplier'} Details
+                            </h2>
+                            <button
+                                onClick={() => setShowUserModal(false)}
+                                className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-6">
+                            {/* Basic Info */}
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3">Basic Information</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-600">Name</label>
+                                        <p className="text-gray-900">{selectedUser.name || selectedUser.companyName}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-600">User ID</label>
+                                        <p className="text-gray-900">#{selectedUser.id}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-600">Email</label>
+                                        <p className="text-gray-900">{selectedUser.email}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-600">Phone</label>
+                                        <p className="text-gray-900">{selectedUser.phone}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-600">Address</label>
+                                        <p className="text-gray-900">{selectedUser.address}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-600">Join Date</label>
+                                        <p className="text-gray-900">{selectedUser.joinDate}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Status Info */}
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3">Status Information</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-600">Account Status</label>
+                                        <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(selectedUser.status)}`}>
+                                            {selectedUser.status}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-600">KYC Status</label>
+                                        <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${getKycStatusColor(selectedUser.kycStatus)}`}>
+                                            {getKycStatusIcon(selectedUser.kycStatus)}
+                                            <span className="ml-2">{selectedUser.kycStatus}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Performance Info */}
+                            {selectedUser.role === 'seller' && (
+                                <div className="bg-gray-50 rounded-lg p-4">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Performance</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-600">Wallet Balance</label>
+                                            <p className="text-xl font-bold text-green-600">₹{selectedUser.walletBalance?.toLocaleString() || 0}</p>
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-600">Total Orders</label>
+                                            <p className="text-xl font-bold text-blue-600">{selectedUser.totalOrders || 0}</p>
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-600">Total Revenue</label>
+                                            <p className="text-xl font-bold text-purple-600">₹{selectedUser.totalRevenue?.toLocaleString() || 0}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {selectedUser.role === 'supplier' && (
+                                <div className="bg-gray-50 rounded-lg p-4">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Business Performance</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-600">Total Products</label>
+                                            <p className="text-xl font-bold text-green-600">{selectedUser.totalProducts || 0}</p>
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-600">Total Orders</label>
+                                            <p className="text-xl font-bold text-blue-600">{selectedUser.totalOrders || 0}</p>
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-600">Total Revenue</label>
+                                            <p className="text-xl font-bold text-purple-600">₹{selectedUser.totalRevenue?.toLocaleString() || 0}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex justify-end mt-6">
+                            <button
+                                onClick={() => setShowUserModal(false)}
+                                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

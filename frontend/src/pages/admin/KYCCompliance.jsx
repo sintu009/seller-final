@@ -14,7 +14,9 @@ import {
     Building,
     Mail,
     Phone,
-    Crown
+    Crown,
+    ChevronDown,
+    ChevronUp
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -26,6 +28,23 @@ const KYCCompliance = () => {
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState(null);
     const [selectedPlans, setSelectedPlans] = useState({});
+    const [expandedPlans, setExpandedPlans] = useState({});
+
+    // Add CSS animation styles
+    React.useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-fadeIn {
+                animation: fadeIn 0.3s ease-in-out forwards;
+            }
+        `;
+        document.head.appendChild(style);
+        return () => document.head.removeChild(style);
+    }, []);
 
     const { data: kycData, isLoading: loading, refetch } = useGetAllKYCQuery();
     const [approveKYC] = useApproveKYCMutation();
@@ -161,6 +180,10 @@ const KYCCompliance = () => {
 
     const handlePlanSelect = (userId, plan) => {
         setSelectedPlans(prev => ({ ...prev, [userId]: plan }));
+    };
+
+    const togglePlanExpansion = (userId) => {
+        setExpandedPlans(prev => ({ ...prev, [userId]: !prev[userId] }));
     };
 
     const handleReject = async () => {
@@ -416,41 +439,55 @@ const KYCCompliance = () => {
                                             <Crown className="w-5 h-5 text-orange-600 mr-2" />
                                             <h4 className="font-semibold text-orange-800">Select Plan for Seller</h4>
                                         </div>
-                                        {selectedPlans[submission._id] && (
-                                            <div className="flex items-center">
-                                                <span className="text-sm text-gray-600 mr-2">Selected:</span>
-                                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedPlans[submission._id] === 'starter' ? 'bg-blue-100 text-blue-800' :
-                                                    selectedPlans[submission._id] === 'growth' ? 'bg-green-100 text-green-800' :
-                                                        selectedPlans[submission._id] === 'scale' ? 'bg-purple-100 text-purple-800' :
-                                                            'bg-gray-100 text-gray-800'
-                                                    }`}>
-                                                    <Crown className="w-3 h-3 mr-1" />
-                                                    {selectedPlans[submission._id].charAt(0).toUpperCase() + selectedPlans[submission._id].slice(1)} Plan
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                        {planOptions.map((plan) => (
+                                        <div className="flex items-center space-x-3">
+                                            {selectedPlans[submission._id] && (
+                                                <div className="flex items-center">
+                                                    <span className="text-sm text-gray-600 mr-2">Selected:</span>
+                                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedPlans[submission._id] === 'starter' ? 'bg-blue-100 text-blue-800' :
+                                                        selectedPlans[submission._id] === 'growth' ? 'bg-green-100 text-green-800' :
+                                                            selectedPlans[submission._id] === 'scale' ? 'bg-purple-100 text-purple-800' :
+                                                                'bg-gray-100 text-gray-800'
+                                                        }`}>
+                                                        <Crown className="w-3 h-3 mr-1" />
+                                                        {selectedPlans[submission._id].charAt(0).toUpperCase() + selectedPlans[submission._id].slice(1)} Plan
+                                                    </span>
+                                                </div>
+                                            )}
                                             <button
-                                                key={plan.id}
-                                                onClick={() => handlePlanSelect(submission._id, plan.id)}
-                                                className={`p-3 rounded-md border-2 transition-all text-left ${selectedPlans[submission._id] === plan.id
-                                                    ? 'border-orange-500 bg-orange-50'
-                                                    : 'border-gray-200 bg-white hover:border-gray-300'
-                                                    }`}
+                                                onClick={() => togglePlanExpansion(submission._id)}
+                                                className="flex items-center text-orange-600 hover:text-orange-700 transition-colors"
                                             >
-                                                <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${plan.color}`}>
-                                                    {plan.name}
-                                                </div>
-                                                <div className="text-xs text-gray-600 space-y-1">
-                                                    {plan.features.map((feature, index) => (
-                                                        <div key={index}>{feature}</div>
-                                                    ))}
-                                                </div>
+                                                {expandedPlans[submission._id] ? (
+                                                    <ChevronUp className="w-5 h-5" />
+                                                ) : (
+                                                    <ChevronDown className="w-5 h-5" />
+                                                )}
                                             </button>
-                                        ))}
+                                        </div>
                                     </div>
+                                    {expandedPlans[submission._id] && (
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 transition-all duration-300 ease-in-out opacity-0 animate-fadeIn">
+                                            {planOptions.map((plan) => (
+                                                <button
+                                                    key={plan.id}
+                                                    onClick={() => handlePlanSelect(submission._id, plan.id)}
+                                                    className={`p-3 rounded-md border-2 transition-all text-left ${selectedPlans[submission._id] === plan.id
+                                                        ? 'border-orange-500 bg-orange-50'
+                                                        : 'border-gray-200 bg-white hover:border-gray-300'
+                                                        }`}
+                                                >
+                                                    <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${plan.color}`}>
+                                                        {plan.name}
+                                                    </div>
+                                                    <div className="text-xs text-gray-600 space-y-1">
+                                                        {plan.features.map((feature, index) => (
+                                                            <div key={index}>{feature}</div>
+                                                        ))}
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

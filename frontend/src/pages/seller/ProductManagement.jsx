@@ -23,6 +23,7 @@ const ProductManagement = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [pushQuantity, setPushQuantity] = useState(1);
   const [pushNotes, setPushNotes] = useState("");
+  const [viewProduct, setViewProduct] = useState(null);
 
   const { data: productsData, isLoading: loading } =
     useGetSellerProductsQuery();
@@ -97,7 +98,7 @@ const ProductManagement = () => {
   };
 
   return (
-    <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
+    <div className="space-y-6 bg-gray-50 min-h-screen">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Browse Products</h1>
@@ -170,30 +171,49 @@ const ProductManagement = () => {
           {filteredProducts.map((product) => (
             <div
               key={product._id}
-              className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group"
+              className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300"
             >
               <div className="relative">
-                <ProductImage
-                  blobName={product.images?.[0]}
-                  alt={product.name}
-                />
+                {/* top-left checkbox */}
+                <label className="absolute left-3 top-3 z-20">
+                  <input
+                    type="checkbox"
+                    className="w-5 h-5 rounded border-gray-200 bg-white shadow-sm"
+                  />
+                </label>
+
+                {/* image */}
+                <div className="w-full h-64 bg-gray-100 overflow-hidden">
+                  <ProductImage
+                    blobName={product.images?.[0]}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {/* top-right badge */}
+                <div className="absolute right-3 top-3 z-20">
+                  <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/90 text-xs text-gray-700 border border-gray-100">
+                    <span className="mr-2 text-sm">ⓘ</span>
+                    <span>Not Synced</span>
+                  </div>
+                </div>
+
+                {/* stock pill (bottom-left over image) */}
                 <div
-                  className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${
-                    product.stock > 10
-                      ? "bg-green-100 text-green-800"
-                      : product.stock > 0
+                  className={`absolute left-3 bottom-3 px-3 py-1 rounded-full text-xs font-semibold ${product.stock > 10
+                    ? "bg-green-100 text-green-800"
+                    : product.stock > 0
                       ? "bg-yellow-100 text-yellow-800"
                       : "bg-red-100 text-red-800"
-                  }`}
+                    }`}
                 >
-                  {product.stock > 0
-                    ? `${product.stock} in stock`
-                    : "Out of stock"}
+                  {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
                 </div>
               </div>
 
-              <div className="p-6">
-                <h3 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+              <div className="p-4">
+                <h3 className="font-semibold text-gray-900 text-base mb-1 line-clamp-2">
                   {product.name}
                 </h3>
 
@@ -201,45 +221,33 @@ const ProductManagement = () => {
                   {product.description}
                 </p>
 
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <div className="text-sm text-gray-500 line-through">
-                        ₹{product.price.toLocaleString()}
-                      </div>
-                      <div className="text-2xl font-bold text-green-600">
-                        ₹
-                        {product.finalPrice
-                          ? product.finalPrice.toLocaleString()
-                          : product.price.toLocaleString()}
-                      </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-md font-bold text-green-600">
+                      ₹{(product.finalPrice || product.price).toLocaleString()}
                     </div>
-                    <div className="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
-                      {product.category}
-                    </div>
+                    <div className="text-xs text-gray-500 mt-0.5">{product.category}</div>
                   </div>
-                  {product.margin > 0 && (
-                    <div className="text-xs text-gray-500 mb-1">
-                      (Includes ₹{product.margin.toLocaleString()} platform fee)
-                    </div>
-                  )}
-                  {/* <div className="text-xs text-gray-600">
-                    Supplier: {product.supplier?.businessName || product.supplier?.name || 'Unknown'}
-                  </div> */}
-                </div>
 
-                <button
-                  onClick={() => handlePushClick(product)}
-                  disabled={product.stock === 0}
-                  className={`w-full py-3 px-4 rounded-md font-semibold transition-all duration-300 flex items-center justify-center ${
-                    product.stock > 0
-                      ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-                >
-                  <Send className="w-4 h-4 mr-2" />
-                  {product.stock > 0 ? "Push" : "Out of Stock"}
-                </button>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => setViewProduct(product)}
+                      className="flex items-center px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-700 bg-white hover:shadow-sm"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      View
+                    </button>
+
+                    <button
+                      onClick={() => handlePushClick(product)}
+                      disabled={product.stock === 0}
+                      className={`flex items-center px-3 py-2 rounded-md text-sm text-white ${product.stock > 0 ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      Push
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
@@ -295,12 +303,12 @@ const ProductManagement = () => {
                       {selectedProduct.stock} available
                     </span>
                   </div>
-                  {selectedProduct.margin > 0 && (
+                  {/* {selectedProduct.margin > 0 && (
                     <div className="text-xs text-gray-500 mt-1">
                       Base: ₹{selectedProduct.price.toLocaleString()} + Platform
                       Fee: ₹{selectedProduct.margin.toLocaleString()}
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
 
@@ -388,6 +396,100 @@ const ProductManagement = () => {
                     </>
                   )}
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Product View Modal */}
+      {viewProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-md max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-gray-900">Product Details</h3>
+                <button
+                  onClick={() => setViewProduct(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                  <div className="aspect-square bg-gray-100 rounded-md overflow-hidden mb-4">
+                    <ProductImage
+                      blobName={viewProduct.images?.[0]}
+                      alt={viewProduct.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  {viewProduct.images?.length > 1 && (
+                    <div className="grid grid-cols-4 gap-2">
+                      {viewProduct.images.slice(1, 5).map((image, index) => (
+                        <div key={index} className="aspect-square bg-gray-100 rounded-md overflow-hidden">
+                          <ProductImage
+                            blobName={image}
+                            alt={`${viewProduct.name} ${index + 2}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">{viewProduct.name}</h1>
+                    <div className="flex items-center space-x-4 mb-4">
+                      <span className="text-3xl font-bold text-green-600">
+                        ₹{(viewProduct.finalPrice || viewProduct.price).toLocaleString()}
+                      </span>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${viewProduct.stock > 10 ? 'bg-green-100 text-green-800' :
+                          viewProduct.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                        }`}>
+                        {viewProduct.stock > 0 ? `${viewProduct.stock} in stock` : 'Out of stock'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
+                    <p className="text-gray-600 leading-relaxed">{viewProduct.description}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-4 rounded-md">
+                      <div className="text-sm text-gray-600 mb-1">Category</div>
+                      <div className="font-semibold text-gray-900">{viewProduct.category}</div>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-md">
+                      <div className="text-sm text-gray-600 mb-1">GST</div>
+                      <div className="font-semibold text-gray-900">{viewProduct.gstPercentage}%</div>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => {
+                        setViewProduct(null);
+                        handlePushClick(viewProduct);
+                      }}
+                      disabled={viewProduct.stock === 0}
+                      className={`flex-1 flex items-center justify-center px-6 py-3 rounded-md text-white font-semibold ${viewProduct.stock > 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-300 cursor-not-allowed'
+                        }`}
+                    >
+                      <Send className="w-5 h-5 mr-2" />
+                      Push to Admin
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
