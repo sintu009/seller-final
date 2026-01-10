@@ -28,6 +28,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useGetAdminDashboardCountsQuery } from "../../store/slices/apiSlice";
+import AdminPayment from "./AdminPayment";
+import AdminNotification from "./AdminNotification";
 
 const AdminDashboard = () => {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -104,6 +106,18 @@ const AdminDashboard = () => {
       badge: pendingKyc > 0 ? pendingKyc.toString() : undefined,
     },
     {
+      id: "payment",
+      label: "Payment",
+      icon: FileCheck,
+      path: "/admin/payment",
+    },
+    {
+      id: "notification",
+      label: "Notification",
+      icon: FileCheck,
+      path: "/admin/notification",
+    },
+    {
       id: "support",
       label: "Support & Helpdesk",
       icon: HeadphonesIcon,
@@ -128,6 +142,8 @@ const AdminDashboard = () => {
         <Route path="/finance" element={<FinanceWallet />} />
         <Route path="/margins" element={<PlatformMargins />} />
         <Route path="/kyc" element={<KYCCompliance />} />
+        <Route path="/payment" element={<AdminPayment />} />
+        <Route path="/notification" element={<AdminNotification />} />
         <Route path="/support" element={<SupportHelpdesk />} />
         <Route path="/settings" element={<AdminSettings />} />
         <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
