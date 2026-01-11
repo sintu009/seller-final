@@ -49,12 +49,12 @@ const SellerDashboard = () => {
       icon: Truck,
       path: "/seller/Delivery",
     },
-    {
-      id: "payments",
-      label: "Payments",
-      icon: Wallet,
-      path: "/seller/payments",
-    },
+    // {
+    //   id: "payments",
+    //   label: "Payments",
+    //   icon: Wallet,
+    //   path: "/seller/payments",
+    // },
     {
       id: "notifications",
       label: "Notifications",
@@ -78,7 +78,7 @@ const SellerDashboard = () => {
         <Route path="/orders" element={<OrderManagement />} />
         <Route path="/store" element={<MyStores />} />
         <Route path="/Delivery" element={<ManageDelivery />} />
-        <Route path="/payments" element={<PaymentsWallet />} />
+        {/* <Route path="/payments" element={<PaymentsWallet />} /> */}
         <Route path="/notifications" element={<SellerNotifications />} />
         <Route path="/settings" element={<AccountSettings />} />
         <Route path="/" element={<Navigate to="/seller/dashboard" replace />} />
