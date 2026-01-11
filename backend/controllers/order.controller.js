@@ -1,6 +1,7 @@
 const Order = require("../models/order.model");
 const Product = require("../models/product.model");
 const User = require("../models/user.model");
+const Payout = require("../models/payout.model");
 const { createNotification } = require("../utils/notification.helper");
 
 const generateOrderNumber = () => {
@@ -199,13 +200,41 @@ const getOrdersForSupplier = async (req, res) => {
     if (status) filter.status = status;
 
     const orders = await Order.find(filter)
-      .populate("product", "name price images")
+      .populate({
+        path: "product",
+        select: "name price margin finalPrice images",
+      })
       .populate("seller", "name email phone")
       .sort({ createdAt: -1 });
 
+    // 🔐 Adjust price for supplier view
+    const formattedOrders = orders.map((order) => {
+      const product = order.product;
+
+      // Step 1: unit price for supplier
+      const supplierUnitPrice =
+        typeof product.price === "number"
+          ? product.price
+          : product.finalPrice - product.margin;
+
+      // Step 2: total price
+      const supplierTotalPrice = supplierUnitPrice * order.quantity;
+
+      return {
+        ...order.toObject(),
+        product: {
+          _id: product._id,
+          name: product.name,
+          images: product.images,
+          unitPrice: supplierUnitPrice,
+        },
+        supplierTotalPrice,
+      };
+    });
+
     res.status(200).json({
       success: true,
-      data: orders,
+      data: formattedOrders,
     });
   } catch (error) {
     res.status(500).json({
@@ -285,7 +314,11 @@ const getOrderById = async (req, res) => {
 const adminApproveOrder = async (req, res) => {
   try {
     const { notes } = req.body;
-    const order = await Order.findById(req.params.id);
+
+    const order = await Order.findById(req.params.id)
+      .populate("product", "price margin finalPrice name")
+      .populate("seller", "name email")
+      .populate("supplier", "name email");
 
     if (!order) {
       return res.status(404).json({
@@ -303,16 +336,50 @@ const adminApproveOrder = async (req, res) => {
     };
 
     await order.save();
-    await order.populate([
-      { path: "product", select: "name price" },
-      { path: "supplier", select: "name email" },
-      { path: "seller", select: "name email" },
-    ]);
 
+    const quantity = order.quantity;
+    const product = order.product;
+
+    // Seller payable (seller-facing price)
+    const sellerUnitPrice =
+      typeof product.finalPrice === "number"
+        ? product.finalPrice
+        : product.price + (product.margin || 0);
+
+    const sellerPayableAmount = sellerUnitPrice * quantity;
+
+    const supplierUnitPrice = product.price;
+    const supplierPayableAmount = supplierUnitPrice * quantity;
+
+    const adminId = req.user._id;
+
+    // Seller payout
+    await Payout.create({
+      order: order._id,
+      payer: adminId,
+      payee: order.seller,
+      payeeRole: "seller",
+      payableAmount: sellerPayableAmount,
+      paidAmount: 0,
+      payoutStatus: "pending",
+      processedBy: adminId,
+    });
+
+    // Supplier payout
+    await Payout.create({
+      order: order._id,
+      payer: adminId,
+      payee: order.supplier,
+      payeeRole: "supplier",
+      payableAmount: supplierPayableAmount,
+      paidAmount: 0,
+      payoutStatus: "pending",
+      processedBy: adminId,
+    });
     await createNotification({
       user: order.seller,
       title: "Order Approved",
-      message: `Your order for "${order.product.name}" has been approved.`,
+      message: `Your order for "${product.name}" has been approved.`,
       type: "success",
       entityType: "order",
       entityId: order._id,
@@ -321,23 +388,27 @@ const adminApproveOrder = async (req, res) => {
     await createNotification({
       user: order.supplier,
       title: "Order Approved",
-      message: `Your order for "${order.product.name}" has been approved.`,
+      message: `Your order for "${product.name}" has been approved.`,
       type: "success",
       entityType: "order",
       entityId: order._id,
     });
 
-    if (req.user.role !== "seller" && global.io) {
+    if (global.io) {
       global.io.emit("ORDER_APPROVED", {
         id: order._id,
-        name: order.product.name,
+        name: product.name,
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Order approved successfully",
-      data: order,
+      message: "Order approved and payouts created successfully",
+      data: {
+        orderId: order._id,
+        sellerPayableAmount,
+        supplierPayableAmount,
+      },
     });
   } catch (error) {
     res.status(500).json({

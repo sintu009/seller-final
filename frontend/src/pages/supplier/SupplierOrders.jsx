@@ -39,7 +39,7 @@ const SupplierOrders = () => {
   });
 
   const orders = ordersData?.data || [];
-
+  console.log("Fetched Orders:", orders);
   const getStatusIcon = (status) => {
     switch (status) {
       case "admin_review":
@@ -328,7 +328,7 @@ const SupplierOrders = () => {
                     </td>
                     <td className="py-4 px-6">
                       <div className="font-semibold text-emerald-600">
-                        ₹{order.totalPrice?.toLocaleString() || "0"}
+                        ₹{order.supplierTotalPrice?.toLocaleString() || "0"}
                       </div>
                     </td>
                     <td className="py-4 px-6">
