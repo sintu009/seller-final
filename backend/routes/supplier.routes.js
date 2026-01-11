@@ -14,6 +14,7 @@ const {
 const {
   getSupplierDashboardCounts,
 } = require("../controllers/dashboard.controller");
+const { getMyPayouts } = require("../controllers/payout.controller");
 
 router.use(protect);
 router.use(authorize("supplier", "admin"));
@@ -26,5 +27,7 @@ router.get("/products/:id", getProductById);
 router.put("/products/:id", updateProduct);
 router.delete("/products/:id", deleteProduct);
 router.put("/products/:id/notify", notifyProductToSellers);
+
+router.get("/payouts", getMyPayouts);
 
 module.exports = router;

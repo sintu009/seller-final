@@ -14,7 +14,7 @@ const baseQuery = fetchBaseQuery({
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Product', 'User', 'KYC', 'Order', 'Notification', 'Settings', 'ApiKey', 'Role'],
+  tagTypes: ['Product', 'User', 'KYC', 'Order', 'Notification', 'Settings', 'ApiKey', 'Role', 'Payout'],
   endpoints: (builder) => ({
     //Dashbaord Counts
      getAdminDashboardCounts: builder.query({
