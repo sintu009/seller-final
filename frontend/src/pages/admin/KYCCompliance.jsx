@@ -16,7 +16,13 @@ import {
     Phone,
     Crown,
     ChevronDown,
-    ChevronUp
+    ChevronUp,
+    ShoppingBag,
+    Package,
+    ShoppingCart,
+    Store,
+    Shirt,
+    Check
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -29,6 +35,7 @@ const KYCCompliance = () => {
     const [selectedUserId, setSelectedUserId] = useState(null);
     const [selectedPlans, setSelectedPlans] = useState({});
     const [expandedPlans, setExpandedPlans] = useState({});
+    const [selectedStores, setSelectedStores] = useState({});
 
     // Add CSS animation styles
     React.useEffect(() => {
@@ -57,6 +64,24 @@ const KYCCompliance = () => {
     if (kycSubmissions.length > 0) {
         console.log('First submission data:', kycSubmissions[0]);
     }
+
+    const storeOptions = [
+        { id: 'amazon', name: 'Amazon', icon: ShoppingBag },
+        { id: 'flipkart', name: 'Flipkart', icon: Package },
+        { id: 'meesho', name: 'Meesho', icon: ShoppingCart },
+        { id: 'shopify', name: 'Shopify', icon: Store },
+        { id: 'myntra', name: 'Myntra', icon: Shirt },
+        { id: 'ajio', name: 'Ajio', icon: Shirt }
+    ];
+
+    const getMaxStoresForPlan = (plan) => {
+        switch (plan) {
+            case 'starter': return 1;
+            case 'growth': return 2;
+            case 'scale': return 6;
+            default: return 0;
+        }
+    };
 
     const planOptions = [
 
@@ -145,19 +170,35 @@ const KYCCompliance = () => {
     const handleApprove = async (id, role) => {
         if (role === 'seller') {
             const selectedPlan = selectedPlans[id];
+            const selectedStoresList = selectedStores[id] || [];
+            
             if (!selectedPlan) {
                 alert('Please select a plan before approving seller KYC');
                 return;
             }
+            
+            if (selectedStoresList.length === 0) {
+                alert('Please select at least one store before approving seller KYC');
+                return;
+            }
 
             try {
-                await approveKYC({ id, plan: selectedPlan }).unwrap();
+                await approveKYC({ 
+                    id, 
+                    plan: selectedPlan,
+                    stores: selectedStoresList
+                }).unwrap();
                 setSelectedPlans(prev => {
                     const newPlans = { ...prev };
                     delete newPlans[id];
                     return newPlans;
                 });
-                alert(`Seller KYC approved with plan: ${selectedPlan}`);
+                setSelectedStores(prev => {
+                    const newStores = { ...prev };
+                    delete newStores[id];
+                    return newStores;
+                });
+                alert(`Seller KYC approved with plan: ${selectedPlan} and stores: ${selectedStoresList.map(s => storeOptions.find(opt => opt.id === s)?.name).join(', ')}`);
                 await refetch();
             } catch (error) {
                 console.error('Error approving seller KYC:', error);
@@ -178,8 +219,30 @@ const KYCCompliance = () => {
     };
 
 
+    const handleStoreSelect = (userId, storeId) => {
+        const userPlan = selectedPlans[userId];
+        const maxStores = getMaxStoresForPlan(userPlan);
+        const currentStores = selectedStores[userId] || [];
+        
+        if (currentStores.includes(storeId)) {
+            // Remove store
+            setSelectedStores(prev => ({
+                ...prev,
+                [userId]: currentStores.filter(id => id !== storeId)
+            }));
+        } else if (currentStores.length < maxStores) {
+            // Add store
+            setSelectedStores(prev => ({
+                ...prev,
+                [userId]: [...currentStores, storeId]
+            }));
+        }
+    };
+
     const handlePlanSelect = (userId, plan) => {
         setSelectedPlans(prev => ({ ...prev, [userId]: plan }));
+        // Reset stores when plan changes
+        setSelectedStores(prev => ({ ...prev, [userId]: [] }));
     };
 
     const togglePlanExpansion = (userId) => {
@@ -386,8 +449,8 @@ const KYCCompliance = () => {
                                         <>
                                             <button
                                                 onClick={() => handleApprove(submission._id, submission.role)}
-                                                disabled={submission.role === 'seller' && !selectedPlans[submission._id]}
-                                                className={`px-4 py-2 rounded-md transition-colors flex items-center ${submission.role === 'seller' && !selectedPlans[submission._id]
+                                                disabled={submission.role === 'seller' && (!selectedPlans[submission._id] || !selectedStores[submission._id]?.length)}
+                                                className={`px-4 py-2 rounded-md transition-colors flex items-center ${submission.role === 'seller' && (!selectedPlans[submission._id] || !selectedStores[submission._id]?.length)
                                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                                     : 'bg-green-600 text-white hover:bg-green-700'
                                                     }`}
@@ -466,26 +529,84 @@ const KYCCompliance = () => {
                                         </div>
                                     </div>
                                     {expandedPlans[submission._id] && (
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 transition-all duration-300 ease-in-out opacity-0 animate-fadeIn">
-                                            {planOptions.map((plan) => (
-                                                <button
-                                                    key={plan.id}
-                                                    onClick={() => handlePlanSelect(submission._id, plan.id)}
-                                                    className={`p-3 rounded-md border-2 transition-all text-left ${selectedPlans[submission._id] === plan.id
-                                                        ? 'border-orange-500 bg-orange-50'
-                                                        : 'border-gray-200 bg-white hover:border-gray-300'
-                                                        }`}
-                                                >
-                                                    <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${plan.color}`}>
-                                                        {plan.name}
+                                        <div className="space-y-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 transition-all duration-300 ease-in-out opacity-0 animate-fadeIn">
+                                                {planOptions.map((plan) => (
+                                                    <button
+                                                        key={plan.id}
+                                                        onClick={() => handlePlanSelect(submission._id, plan.id)}
+                                                        className={`p-3 rounded-md border-2 transition-all text-left ${selectedPlans[submission._id] === plan.id
+                                                            ? 'border-orange-500 bg-orange-50'
+                                                            : 'border-gray-200 bg-white hover:border-gray-300'
+                                                            }`}
+                                                    >
+                                                        <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-2 ${plan.color}`}>
+                                                            {plan.name}
+                                                        </div>
+                                                        <div className="text-xs text-gray-600 space-y-1">
+                                                            {plan.features.map((feature, index) => (
+                                                                <div key={index}>{feature}</div>
+                                                            ))}
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            
+                                            {selectedPlans[submission._id] && (
+                                                <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                                                    <h5 className="font-semibold text-blue-800 mb-3">
+                                                        Select Stores ({selectedStores[submission._id]?.length || 0}/{getMaxStoresForPlan(selectedPlans[submission._id])})
+                                                    </h5>
+                                                    <div className="grid grid-cols-3 gap-4">
+                                                        {storeOptions.map((store) => {
+                                                            const isSelected = selectedStores[submission._id]?.includes(store.id);
+                                                            const isDisabled = !isSelected && (selectedStores[submission._id]?.length >= getMaxStoresForPlan(selectedPlans[submission._id]));
+                                                            const IconComponent = store.icon;
+                                                            
+                                                            return (
+                                                                <label
+                                                                    key={store.id}
+                                                                    className={`flex items-center p-2 rounded-md border cursor-pointer transition-all ${
+                                                                        isDisabled && !isSelected
+                                                                            ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                                                                            : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                                                                    }`}
+                                                                >
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={isSelected}
+                                                                        onChange={() => handleStoreSelect(submission._id, store.id)}
+                                                                        disabled={isDisabled && !isSelected}
+                                                                        className="sr-only"
+                                                                    />
+                                                                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center mr-2 ${
+                                                                        isSelected
+                                                                            ? 'bg-blue-600 border-blue-600'
+                                                                            : 'border-gray-300'
+                                                                    }`}>
+                                                                        {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                                                                    </div>
+                                                                    <IconComponent className={`w-4 h-4 mr-2 ${
+                                                                        isDisabled && !isSelected ? 'text-gray-400' : 'text-gray-600'
+                                                                    }`} />
+                                                                    <span className={`text-sm font-medium ${
+                                                                        isDisabled && !isSelected ? 'text-gray-400' : 'text-gray-700'
+                                                                    }`}>
+                                                                        {store.name}
+                                                                    </span>
+                                                                </label>
+                                                            );
+                                                        })}
                                                     </div>
-                                                    <div className="text-xs text-gray-600 space-y-1">
-                                                        {plan.features.map((feature, index) => (
-                                                            <div key={index}>{feature}</div>
-                                                        ))}
-                                                    </div>
-                                                </button>
-                                            ))}
+                                                    {selectedStores[submission._id]?.length > 0 && (
+                                                        <div className="mt-3 text-sm text-blue-700">
+                                                            Selected: {selectedStores[submission._id].map(id => 
+                                                                storeOptions.find(s => s.id === id)?.name
+                                                            ).join(', ')}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>

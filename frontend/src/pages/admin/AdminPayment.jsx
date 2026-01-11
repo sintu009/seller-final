@@ -44,10 +44,21 @@ const AdminPayment = () => {
     const [rejectProduct] = useRejectProductMutation();
     const [showApproveModal, setShowApproveModal] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
+    const [showEditPaymentModal, setShowEditPaymentModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [margin, setMargin] = useState('');
     const [rejectionReason, setRejectionReason] = useState('');
     const [actionLoading, setActionLoading] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [paymentNote, setPaymentNote] = useState('');
+    const [editedAmount, setEditedAmount] = useState('');
+
+    const paymentMethods = [
+        { id: 'upi', name: 'UPI' },
+        { id: 'bank_transfer', name: 'Bank Transfer' },
+        { id: 'gpay', name: 'Google Pay' },
+        { id: 'phonepe', name: 'PhonePe' }
+    ];
 
     const products = productsData?.data || [];
     const statuses = ['all', 'pending', 'approved', 'rejected'];
@@ -93,6 +104,43 @@ const AdminPayment = () => {
             case 'pending': return 'Pending Approval';
             case 'rejected': return 'Rejected';
             default: return status;
+        }
+    };
+
+    const handleEditPayment = (product) => {
+        setSelectedProduct(product);
+        setPaymentMethod('');
+        setPaymentNote('');
+        setEditedAmount(product.finalPrice || product.price);
+        setShowEditPaymentModal(true);
+    };
+
+    const handlePaymentSubmit = async () => {
+        if (!paymentMethod) {
+            toast.error('Please select a payment method');
+            return;
+        }
+        
+        if (!editedAmount || parseFloat(editedAmount) <= 0) {
+            toast.error('Please enter a valid amount');
+            return;
+        }
+
+        try {
+            setActionLoading(true);
+            // Add your payment update API call here
+            // await updatePayment({ id: selectedProduct._id, method: paymentMethod, amount: editedAmount, note: paymentNote }).unwrap();
+            
+            toast.success('Payment updated successfully!');
+            setShowEditPaymentModal(false);
+            setPaymentMethod('');
+            setPaymentNote('');
+            setEditedAmount('');
+        } catch (error) {
+            console.error('Error updating payment:', error);
+            toast.error('Failed to update payment');
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -338,6 +386,14 @@ const AdminPayment = () => {
                                     <td className="py-4 px-6">
                                         <div className="flex items-center space-x-2">
                                             <button
+                                                onClick={() => handleEditPayment(product)}
+                                                className="p-2 text-orange-600 hover:bg-orange-50 rounded-md transition-colors"
+                                                title="Edit Payment"
+                                            >
+                                                <Edit3 className="w-4 h-4" />
+                                            </button>
+
+                                            <button
                                                 className="p-2 text-green-600 hover:bg-green-50 rounded-mdg transition-colors"
                                                 title="Unblock Supplier"
                                             >
@@ -366,6 +422,99 @@ const AdminPayment = () => {
                     </div>
                 )}
             </div>
+
+            {/* Edit Payment Modal */}
+            {showEditPaymentModal && selectedProduct && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-md p-8 max-w-md w-full mx-4">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-2xl font-bold text-gray-900">Edit Payment Method</h3>
+                            <button
+                                onClick={() => setShowEditPaymentModal(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="mb-6">
+                            <div className="text-sm text-gray-600 mb-2">Order</div>
+                            <div className="font-medium text-gray-900">{selectedProduct.name}</div>
+                            <div className="text-sm text-gray-500">Original Amount: ₹{selectedProduct.finalPrice || selectedProduct.price}</div>
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Payment Amount (₹) <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={editedAmount}
+                                onChange={(e) => setEditedAmount(e.target.value)}
+                                placeholder="Enter payment amount"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Payment Method <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                value={paymentMethod}
+                                onChange={(e) => setPaymentMethod(e.target.value)}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            >
+                                <option value="">Select payment method</option>
+                                {paymentMethods.map((method) => (
+                                    <option key={method.id} value={method.id}>
+                                        {method.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Note (Optional)
+                            </label>
+                            <textarea
+                                value={paymentNote}
+                                onChange={(e) => setPaymentNote(e.target.value)}
+                                placeholder="Add any payment notes..."
+                                rows={3}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            />
+                        </div>
+
+                        <div className="flex space-x-3">
+                            <button
+                                onClick={() => setShowEditPaymentModal(false)}
+                                disabled={actionLoading}
+                                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handlePaymentSubmit}
+                                disabled={actionLoading || !paymentMethod || !editedAmount}
+                                className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                            >
+                                {actionLoading ? (
+                                    <>Processing...</>
+                                ) : (
+                                    <>
+                                        <CheckCircle className="w-4 h-4 mr-2" />
+                                        Submit
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Approve Modal */}
             {showApproveModal && selectedProduct && (

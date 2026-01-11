@@ -62,6 +62,7 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
 
   const notifications = data?.data ? mapNotificationsForUI(data.data) : [];
   const notificationCount = notifications.filter((n) => !n.isRead).length;
+  const [activeStore, setActiveStore] = useState("store-1");
   const connectedStores = [
     {
       id: "store-1",
@@ -192,32 +193,53 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
                   {connectedStores.map((store) => (
                     <div
                       key={store.id}
-                      className="bg-gray-50 rounded-mdg p-4 border border-gray-200"
+                      onClick={() => setActiveStore(store.id)}
+                      className={`rounded-md p-4 border cursor-pointer transition-all ${
+                        activeStore === store.id
+                          ? "bg-blue-50 border-blue-200 ring-1 ring-blue-200"
+                          : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <h4
-                          className="text-sm font-medium text-gray-900 flex-1 mr-2"
-                          title={store.url}
-                        >
-                          {store.url.length > 12
-                            ? `${store.url.substring(0, 12)}...`
-                            : store.url}
-                        </h4>
+                        <div className="flex items-center flex-1 mr-2">
+                          {activeStore === store.id && (
+                            <Check className="w-3 h-3 text-blue-600 mr-2 flex-shrink-0" />
+                          )}
+                          <h4
+                            className={`text-sm font-medium flex-1 ${
+                              activeStore === store.id ? "text-blue-900" : "text-gray-900"
+                            }`}
+                            title={store.url}
+                          >
+                            {store.url.length > 12
+                              ? `${store.url.substring(0, 12)}...`
+                              : store.url}
+                          </h4>
+                        </div>
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                            store.status === "Active"
+                            activeStore === store.id
+                              ? "bg-blue-100 text-blue-800"
+                              : store.status === "Active"
                               ? "bg-green-100 text-green-800"
                               : "bg-gray-100 text-gray-800"
                           }`}
                         >
-                          {store.status}
+                          {activeStore === store.id ? "Active" : store.status}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <p className="text-xs text-gray-500">Connected </p>
+                        <p className={`text-xs ${
+                          activeStore === store.id ? "text-blue-600" : "text-gray-500"
+                        }`}>
+                          Connected
+                        </p>
                         <button
-                          onClick={() => onDeleteStore(store.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteStore(store.id);
+                          }}
                           className="p-1 rounded-md text-red-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                         >
                           <Trash2 className="w-3 h-3" />

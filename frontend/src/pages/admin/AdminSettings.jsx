@@ -14,20 +14,52 @@ import {
     CheckCircle,
     Edit3,
     Plus,
-    Trash2
+    Trash2,
+    Store,
+    ChevronDown,
+    X
 } from 'lucide-react';
 
 const AdminSettings = () => {
     const [activeTab, setActiveTab] = useState('platform');
     const [showApiModal, setShowApiModal] = useState(false);
+    const [showStoreModal, setShowStoreModal] = useState(false);
+    const [selectedStore, setSelectedStore] = useState('');
+    const [showStoreDropdown, setShowStoreDropdown] = useState(false);
 
     const tabs = [
         { id: 'platform', label: 'Platform Settings', icon: Globe },
         { id: 'commission', label: 'Commission & Fees', icon: DollarSign },
         { id: 'api', label: 'API Configuration', icon: Key },
+        { id: 'stores', label: 'Store Connections', icon: Store },
         { id: 'notifications', label: 'Notifications', icon: Bell },
         { id: 'roles', label: 'Role Management', icon: Users },
         { id: 'security', label: 'Security', icon: Shield }
+    ];
+
+    const storeOptions = [
+        { id: 'amazon', name: 'Amazon', logo: '🛒' },
+        { id: 'flipkart', name: 'Flipkart', logo: '🛍️' },
+        { id: 'meesho', name: 'Meesho', logo: '🏪' }
+    ];
+
+    const connectedStores = [
+        {
+            id: 1,
+            platform: 'Amazon',
+            storeName: 'My Amazon Store',
+            storeUrl: 'my-store.amazon.com',
+            status: 'Connected',
+            lastSync: '2024-01-15 10:30 AM'
+        },
+        {
+            id: 2,
+            platform: 'Flipkart',
+            storeName: 'My Flipkart Store',
+            storeUrl: 'my-store.flipkart.com',
+            status: 'Error',
+            lastSync: '2024-01-14 02:15 PM'
+        }
     ];
 
     // Mock platform settings
@@ -514,6 +546,89 @@ const AdminSettings = () => {
         </div>
     );
 
+    const renderStoresTab = () => (
+        <div className="space-y-6">
+            <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900">Store Connections</h3>
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowStoreDropdown(!showStoreDropdown)}
+                            className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md font-medium transition-colors flex items-center"
+                        >
+                            <Store className="w-4 h-4 mr-2" />
+                            Connect Store
+                            <ChevronDown className="w-4 h-4 ml-2" />
+                        </button>
+                        
+                        {showStoreDropdown && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                                {storeOptions.map((store) => (
+                                    <button
+                                        key={store.id}
+                                        onClick={() => {
+                                            setSelectedStore(store.name);
+                                            setShowStoreModal(true);
+                                            setShowStoreDropdown(false);
+                                        }}
+                                        className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center transition-colors"
+                                    >
+                                        <span className="text-xl mr-3">{store.logo}</span>
+                                        {store.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th className="text-left py-3 px-4 font-semibold text-gray-900">Platform</th>
+                                <th className="text-left py-3 px-4 font-semibold text-gray-900">Store Name</th>
+                                <th className="text-left py-3 px-4 font-semibold text-gray-900">Store URL</th>
+                                <th className="text-left py-3 px-4 font-semibold text-gray-900">Status</th>
+                                <th className="text-left py-3 px-4 font-semibold text-gray-900">Last Sync</th>
+                                <th className="text-left py-3 px-4 font-semibold text-gray-900">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {connectedStores.map((store) => (
+                                <tr key={store.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="py-3 px-4 font-medium text-gray-900">{store.platform}</td>
+                                    <td className="py-3 px-4 text-gray-600">{store.storeName}</td>
+                                    <td className="py-3 px-4 text-gray-600">{store.storeUrl}</td>
+                                    <td className="py-3 px-4">
+                                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                                            store.status === 'Connected' 
+                                                ? 'bg-green-100 text-green-800' 
+                                                : 'bg-red-100 text-red-800'
+                                        }`}>
+                                            {store.status}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 px-4 text-gray-600">{store.lastSync}</td>
+                                    <td className="py-3 px-4">
+                                        <div className="flex items-center space-x-2">
+                                            <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
+                                                <Edit3 className="w-4 h-4" />
+                                            </button>
+                                            <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors">
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+
     const renderSecurityTab = () => (
         <div className="text-center py-12">
             <Shield className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -565,6 +680,7 @@ const AdminSettings = () => {
             {activeTab === 'platform' && renderPlatformTab()}
             {activeTab === 'commission' && renderCommissionTab()}
             {activeTab === 'api' && renderApiTab()}
+            {activeTab === 'stores' && renderStoresTab()}
             {activeTab === 'notifications' && renderNotificationsTab()}
             {activeTab === 'roles' && renderRolesTab()}
             {activeTab === 'security' && renderSecurityTab()}
@@ -610,6 +726,115 @@ const AdminSettings = () => {
                                 </button>
                                 <button className="flex-1 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-md font-semibold transition-colors">
                                     Add API Key
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Store Connection Modal */}
+            {showStoreModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-md p-8 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center">
+                                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-4">
+                                    <Store className="w-6 h-6 text-orange-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Connect {selectedStore} Store</h3>
+                                    <p className="text-gray-600">Enter your store credentials to connect</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowStoreModal(false)}
+                                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-6">
+                            {/* Store Information */}
+                            <div className="bg-gray-50 p-4 rounded-md">
+                                <h4 className="font-semibold text-gray-900 mb-3">Store Information</h4>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Store Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="My Store"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Store URL
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder={selectedStore === 'Amazon' ? 'your-store.amazon.com' : 
+                                                       selectedStore === 'Flipkart' ? 'your-store.flipkart.com' :
+                                                       'your-store.meesho.com'}
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            You can enter your .{selectedStore.toLowerCase()}.com domain or the full admin URL
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Store Access Credentials */}
+                            <div className="bg-gray-50 p-4 rounded-md">
+                                <h4 className="font-semibold text-gray-900 mb-3">Store Access Credentials</h4>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Access Token
+                                        </label>
+                                        <input
+                                            type="password"
+                                            placeholder="shpat_xxxxx..."
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Admin API Key
+                                        </label>
+                                        <input
+                                            type="password"
+                                            placeholder="Enter Admin API Key"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Admin API Secret
+                                        </label>
+                                        <input
+                                            type="password"
+                                            placeholder="Enter Admin API Secret"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex space-x-3 pt-4">
+                                <button
+                                    onClick={() => setShowStoreModal(false)}
+                                    className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button className="flex-1 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-md font-semibold transition-colors">
+                                    Connect Store
                                 </button>
                             </div>
                         </div>

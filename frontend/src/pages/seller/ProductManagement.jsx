@@ -21,6 +21,8 @@ const ProductManagement = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showPushModal, setShowPushModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedStore, setSelectedStore] = useState([]);
+  const [customPrice, setCustomPrice] = useState("");
   const [pushQuantity, setPushQuantity] = useState(1);
   const [pushNotes, setPushNotes] = useState("");
   const [viewProduct, setViewProduct] = useState(null);
@@ -45,13 +47,26 @@ const ProductManagement = () => {
 
   const handlePushClick = (product) => {
     setSelectedProduct(product);
+    setSelectedStore([]);
+    setCustomPrice(product.finalPrice || product.price);
     setPushQuantity(1);
     setPushNotes("");
     setShowPushModal(true);
   };
 
-  const handlePushToAdmin = async () => {
-    if (!selectedProduct) return;
+  const handleStoreToggle = (store) => {
+    setSelectedStore(prev => 
+      prev.includes(store) 
+        ? prev.filter(s => s !== store)
+        : [...prev, store]
+    );
+  };
+
+  const handlePushToStore = async () => {
+    if (!selectedProduct || selectedStore.length === 0) {
+      toast.error("Please select at least one store");
+      return;
+    }
 
     if (pushQuantity <= 0) {
       toast.error("Please enter a valid quantity");
@@ -63,16 +78,35 @@ const ProductManagement = () => {
       return;
     }
 
-    try {
-      const result = await createOrder({
-        productId: selectedProduct._id,
-        quantity: pushQuantity,
-        notes: pushNotes,
-      }).unwrap();
+    if (!customPrice || customPrice <= 0) {
+      toast.error("Please enter a valid price");
+      return;
+    }
 
-      toast.success("Product pushed to admin for approval!");
+    try {
+      const promises = selectedStore.map(store => 
+        createOrder({
+          productId: selectedProduct._id,
+          quantity: pushQuantity,
+          notes: pushNotes,
+          targetStore: store,
+          customPrice: parseFloat(customPrice),
+          requiresApproval: customPrice !== (selectedProduct.finalPrice || selectedProduct.price)
+        }).unwrap()
+      );
+
+      await Promise.all(promises);
+      
+      const priceChanged = customPrice !== (selectedProduct.finalPrice || selectedProduct.price);
+      const message = priceChanged 
+        ? `Product pushed to ${selectedStore.length} store(s) with custom price. Awaiting admin approval!`
+        : `Product pushed to ${selectedStore.length} store(s) successfully!`;
+      
+      toast.success(message);
       setShowPushModal(false);
       setSelectedProduct(null);
+      setSelectedStore([]);
+      setCustomPrice("");
       setPushQuantity(1);
       setPushNotes("");
     } catch (error) {
@@ -268,7 +302,7 @@ const ProductManagement = () => {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-gray-900">
-                  Push to Admin
+                  Push Product to Store
                 </h3>
                 <button
                   onClick={() => setShowPushModal(false)}
@@ -313,6 +347,62 @@ const ProductManagement = () => {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Select Stores * (You can select multiple)
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: "amazon", label: "Amazon" },
+                    { value: "flipkart", label: "Flipkart" },
+                    { value: "meesho", label: "Meesho" },
+                    { value: "shopify", label: "Shopify" },
+                    { value: "myntra", label: "Myntra" },
+                    { value: "ajio", label: "Ajio" }
+                  ].map((store) => (
+                    <label key={store.value} className="flex items-center p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50">
+                      <input
+                        type="checkbox"
+                        checked={selectedStore.includes(store.value)}
+                        onChange={() => handleStoreToggle(store.value)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="ml-3 text-sm font-medium text-gray-700">{store.label}</span>
+                    </label>
+                  ))}
+                </div>
+                {selectedStore.length > 0 && (
+                  <div className="mt-2 text-sm text-blue-600">
+                    Selected: {selectedStore.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(", ")}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Custom Price * (₹)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={customPrice}
+                    onChange={(e) => setCustomPrice(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter custom price"
+                  />
+                </div>
+                {customPrice && customPrice !== (selectedProduct.finalPrice || selectedProduct.price) && (
+                  <div className="mt-1 text-sm text-amber-600 bg-amber-50 p-2 rounded">
+                    ⚠️ Price change requires admin approval
+                  </div>
+                )}
+                <div className="mt-1 text-xs text-gray-500">
+                  Original price: ₹{(selectedProduct.finalPrice || selectedProduct.price).toLocaleString()}
+                </div>
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Quantity *
                 </label>
@@ -346,10 +436,7 @@ const ProductManagement = () => {
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Unit Price:</span>
                   <span className="font-semibold">
-                    ₹
-                    {(
-                      selectedProduct.finalPrice || selectedProduct.price
-                    ).toLocaleString()}
+                    ₹{parseFloat(customPrice || 0).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
@@ -362,11 +449,7 @@ const ProductManagement = () => {
                       Total Amount:
                     </span>
                     <span className="text-2xl font-bold text-green-600">
-                      ₹
-                      {(
-                        (selectedProduct.finalPrice || selectedProduct.price) *
-                        pushQuantity
-                      ).toLocaleString()}
+                      ₹{(parseFloat(customPrice || 0) * pushQuantity).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -380,8 +463,8 @@ const ProductManagement = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handlePushToAdmin}
-                  disabled={pushing}
+                  onClick={handlePushToStore}
+                  disabled={pushing || selectedStore.length === 0}
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
                   {pushing ? (
@@ -392,7 +475,7 @@ const ProductManagement = () => {
                   ) : (
                     <>
                       <Send className="w-5 h-5 mr-2" />
-                      Push to Admin
+                      Push to {selectedStore.length} Store{selectedStore.length !== 1 ? 's' : ''}
                     </>
                   )}
                 </button>

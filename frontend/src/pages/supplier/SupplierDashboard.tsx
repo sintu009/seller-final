@@ -3,14 +3,14 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import { useGetUnreadNotificationCountQuery } from "../../store/slices/apiSlice";
-import { useGetSupplierDashboardCountsQuery } 
-  from "../../store/slices/dashboardApiSlice";
+import { useGetSupplierDashboardCountsQuery } from "../../store/slices/dashboardApiSlice";
 
 import DashboardLayout from "../../components/DashboardLayout.jsx";
 import SupplierOverview from "./SupplierOverview.jsx";
 import SupplierProductManagement from "./SupplierProductManagement.jsx";
 import SupplierOrders from "./SupplierOrders.jsx";
 import SupplierWallet from "./SupplierWallet.jsx";
+import SupplierPayment from "./SupplierPayment.jsx";
 import SupplierSettings from "./SupplierSettings.jsx";
 import SupplierNotifications from "./SupplierNotifications.jsx";
 import {
@@ -59,11 +59,17 @@ const SupplierDashboard = () => {
       path: "/supplier/orders",
       badge: pendingOrders > 0 ? pendingOrders.toString() : "",
     },
+    // {
+    //   id: "wallet",
+    //   label: "Wallet & Payments",
+    //   icon: Wallet,
+    //   path: "/supplier/wallet",
+    // },
     {
-      id: "wallet",
-      label: "Wallet & Payments",
+      id: "payments",
+      label: "Payments",
       icon: Wallet,
-      path: "/supplier/wallet",
+      path: "/supplier/payments",
     },
     {
       id: "notifications",
@@ -87,6 +93,7 @@ const SupplierDashboard = () => {
         <Route path="/products" element={<SupplierProductManagement />} />
         <Route path="/orders" element={<SupplierOrders />} />
         <Route path="/wallet" element={<SupplierWallet />} />
+        <Route path="/payments" element={<SupplierPayment />} />
         <Route path="/notifications" element={<SupplierNotifications />} />
         <Route path="/settings" element={<SupplierSettings />} />
         <Route
