@@ -42,6 +42,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+require("./cron/payoutDueReminder");
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/files", fileRoutes);
