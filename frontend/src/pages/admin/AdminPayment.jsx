@@ -43,6 +43,32 @@ const AdminPayment = () => {
   const [updatePayout] = useUpdatePayoutMutation();
   const payouts = data?.data || [];
 
+  const paymentSummary = payouts.reduce(
+    (acc, payout) => {
+      const paid = Number(payout.paidAmount || 0);
+      const payable = Number(payout.payableAmount || 0);
+      const margin = Number(payout.totalMargin || 0);
+
+      if (payout.payoutStatus === "paid") {
+        acc.totalEarnings += paid;
+      } else {
+        acc.pendingPayments += payable - paid;
+      }
+
+      acc.totalDeductions += margin;
+
+      return acc;
+    },
+    {
+      totalEarnings: 0,
+      totalDeductions: 0,
+      pendingPayments: 0,
+    }
+  );
+
+  const netBalance =
+    paymentSummary.totalEarnings - paymentSummary.totalDeductions;
+
   useEffect(() => {
     socket.on("PAYOUT_UPDATED", refetch);
     return () => socket.off("PAYOUT_UPDATED", refetch);
@@ -163,22 +189,30 @@ const AdminPayment = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Total Earnings</div>
-          <div className="text-2xl font-bold text-green-600">₹500</div>
+          <div className="text-2xl font-bold text-green-600">
+            ₹{paymentSummary.totalEarnings.toFixed(2)}
+          </div>
           <div className="text-xs text-gray-500 mt-1">Completed payments</div>
         </div>
         <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Total Deductions</div>
-          <div className="text-2xl font-bold text-red-600">₹10</div>
+          <div className="text-2xl font-bold text-red-600">
+            ₹{paymentSummary.totalDeductions.toFixed(2)}
+          </div>
           <div className="text-xs text-gray-500 mt-1">Platform fees</div>
         </div>
         <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Pending Payments</div>
-          <div className="text-2xl font-bold text-yellow-600">₹500</div>
+          <div className="text-2xl font-bold text-yellow-600">
+            ₹{paymentSummary.pendingPayments.toFixed(2)}
+          </div>
           <div className="text-xs text-gray-500 mt-1">Processing</div>
         </div>
         <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
           <div className="text-sm text-gray-600 mb-1">Net Balance</div>
-          <div className="text-2xl font-bold text-blue-600">₹20</div>
+          <div className="text-2xl font-bold text-blue-600">
+            ₹{netBalance.toFixed(2)}
+          </div>
           <div className="text-xs text-gray-500 mt-1">Available balance</div>
         </div>
       </div>

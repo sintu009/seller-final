@@ -91,27 +91,40 @@ const getAllPayouts = async (req, res) => {
       })
       .populate({
         path: "order",
-        select: "_id product",
+        select: "_id product quantity totalPrice",
         populate: {
           path: "product",
-          select: "name",
+          select: "name margin price",
         },
       })
       .sort({ createdAt: -1 });
 
-    // 🔹 Shape response
-    const formattedPayouts = payouts.map((payout) => ({
-      payoutId: payout._id,
-      orderId: payout.order?._id || null,
-      productName: payout.order?.product?.name || "N/A",
-      userName: payout.payee?.name || "N/A",
-      userRole: payout.payeeRole,
-      payoutStatus: payout.payoutStatus,
-      payableAmount: payout.payableAmount,
-      paidAmount: payout.paidAmount,
-      dueDate: payout.dueDate,
-      createdAt: payout.createdAt,
-    }));
+    const formattedPayouts = payouts.map((payout) => {
+      const product = payout.order?.product;
+      const quantity = payout.order?.quantity || 0;
+
+      const marginPerUnit = product?.margin || 0;
+      const totalMargin = marginPerUnit * quantity;
+
+      return {
+        payoutId: payout._id,
+        orderId: payout.order?._id || null,
+        productName: product?.name || "N/A",
+        userName: payout.payee?.name || "N/A",
+        userRole: payout.payeeRole,
+
+        payoutStatus: payout.payoutStatus,
+
+        payableAmount: payout.payableAmount,
+        paidAmount: payout.paidAmount,
+
+        marginPerUnit,
+        totalMargin, // ✅ IMPORTANT
+
+        dueDate: payout.dueDate,
+        createdAt: payout.createdAt,
+      };
+    });
 
     res.status(200).json({
       success: true,

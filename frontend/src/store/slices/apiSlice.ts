@@ -78,10 +78,10 @@ export const apiSlice = createApi({
       providesTags: ['KYC'],
     }),
     approveKYC: builder.mutation({
-      query: ({ id, plan }) => ({
+      query: ({ id, plan, stores }) => ({
         url: `/kyc/approve/${id}`,
         method: 'PUT',
-        body: { plan },
+        body: { plan, stores },
       }),
       invalidatesTags: ['KYC'],
     }),

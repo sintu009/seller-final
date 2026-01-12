@@ -1,20 +1,20 @@
-const User = require('../models/user.model');
+const User = require("../models/user.model");
 
 const getPendingKYC = async (req, res) => {
   try {
     const pendingUsers = await User.find({
-      kycStatus: 'pending',
-      role: { $in: ['seller', 'supplier'] }
-    }).select('-password');
+      kycStatus: "pending",
+      role: { $in: ["seller", "supplier"] },
+    }).select("-password");
 
     res.status(200).json({
       success: true,
-      data: pendingUsers
+      data: pendingUsers,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -22,7 +22,7 @@ const getPendingKYC = async (req, res) => {
 const getAllKYC = async (req, res) => {
   try {
     const { status, role } = req.query;
-    const filter = { role: { $in: ['seller', 'supplier'] } };
+    const filter = { role: { $in: ["seller", "supplier"] } };
 
     if (status) {
       filter.kycStatus = status;
@@ -31,80 +31,83 @@ const getAllKYC = async (req, res) => {
       filter.role = role;
     }
 
-    const users = await User.find(filter).select('-password').sort({ createdAt: -1 });
+    const users = await User.find(filter)
+      .select("-password")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
-      data: users
+      data: users,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
 
 const getKYCById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password');
+    const user = await User.findById(req.params.id).select("-password");
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: "User not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: user
+      data: user,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
 
 const approveKYC = async (req, res) => {
   try {
-    const { plan } = req.body;
+    const { plan, stores } = req.body;
     const user = await User.findById(req.params.id);
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: "User not found",
       });
     }
 
-    if (user.role === 'admin') {
+    if (user.role === "admin") {
       return res.status(400).json({
         success: false,
-        message: 'Cannot modify admin KYC status'
+        message: "Cannot modify admin KYC status",
       });
     }
 
-    user.kycStatus = 'approved';
+    user.kycStatus = "approved";
     user.kycRejectionReason = undefined;
-    
-    if (user.role === 'seller') {
+
+    if (user.role === "seller") {
       user.plan = plan;
+      user.stores = stores;
     }
-    
+
     await user.save();
 
     res.status(200).json({
       success: true,
-      message: 'KYC approved successfully',
-      data: user
+      message: "KYC approved successfully",
+      data: user,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -116,7 +119,7 @@ const rejectKYC = async (req, res) => {
     if (!reason) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a rejection reason'
+        message: "Please provide a rejection reason",
       });
     }
 
@@ -125,30 +128,30 @@ const rejectKYC = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: "User not found",
       });
     }
 
-    if (user.role === 'admin') {
+    if (user.role === "admin") {
       return res.status(400).json({
         success: false,
-        message: 'Cannot modify admin KYC status'
+        message: "Cannot modify admin KYC status",
       });
     }
 
-    user.kycStatus = 'rejected';
+    user.kycStatus = "rejected";
     user.kycRejectionReason = reason;
     await user.save();
 
     res.status(200).json({
       success: true,
-      message: 'KYC rejected successfully',
-      data: user
+      message: "KYC rejected successfully",
+      data: user,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -163,39 +166,39 @@ const updateKYCDocuments = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: "User not found",
       });
     }
 
-    if (user.role === 'admin') {
+    if (user.role === "admin") {
       return res.status(400).json({
         success: false,
-        message: 'Admin users do not need KYC'
+        message: "Admin users do not need KYC",
       });
     }
 
     user.kycDocuments = {
       ...user.kycDocuments,
-      ...kycData.kycDocuments
+      ...kycData.kycDocuments,
     };
 
     if (kycData.phone) user.phone = kycData.phone;
     if (kycData.address) user.address = { ...user.address, ...kycData.address };
 
-    user.kycStatus = 'pending';
+    user.kycStatus = "pending";
     user.kycRejectionReason = undefined;
 
     await user.save();
 
     res.status(200).json({
       success: true,
-      message: 'KYC documents updated successfully',
-      data: user
+      message: "KYC documents updated successfully",
+      data: user,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -203,8 +206,8 @@ const updateKYCDocuments = async (req, res) => {
 const getPendingKycCount = async (req, res) => {
   try {
     const count = await User.countDocuments({
-      role: { $in: ['seller', 'supplier'] },
-      kycStatus: 'pending',
+      role: { $in: ["seller", "supplier"] },
+      kycStatus: "pending",
     });
 
     res.status(200).json({
@@ -226,5 +229,5 @@ module.exports = {
   approveKYC,
   rejectKYC,
   updateKYCDocuments,
-  getPendingKycCount
+  getPendingKycCount,
 };
