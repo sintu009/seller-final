@@ -31,6 +31,13 @@ import { notificationApiSlice } from "../store/slices/notificationApiSlice";
 
 import { mapNotificationsForUI } from "../utils/mapNotifications.js";
 import { socket } from "../socket.js";
+import { toast } from "react-toastify";
+
+import {
+  useGetMyStoresQuery,
+  useDeleteStoreMutation,
+  useActivateStoreMutation,
+} from "../store/slices/storeApiSlice";
 
 const DashboardLayout = ({ children, sidebarItems, title }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -42,6 +49,9 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
   const { data: profileData } = useGetProfileQuery(undefined, { skip: !user });
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [activateStore, { isLoading: activatingStore }] =
+    useActivateStoreMutation();
 
   useEffect(() => {
     if (profileData?.user && user) {
@@ -62,36 +72,50 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
 
   const notifications = data?.data ? mapNotificationsForUI(data.data) : [];
   const notificationCount = notifications.filter((n) => !n.isRead).length;
-  const [activeStore, setActiveStore] = useState("store-1");
-  const connectedStores = [
-    {
-      id: "store-1",
-      url: "03qsqz-pn.myshopify.com",
-      status: "Active",
-      connectedDate: "8/22/2025",
-    },
-    {
-      id: "store-2",
-      url: "demo-fashion-store.myshopify.com",
-      status: "Active",
-      connectedDate: "7/15/2025",
-    },
-  ];
+  const {
+    data: storeResponse,
+    isLoading: storesLoading,
+    refetch: refetchStores,
+  } = useGetMyStoresQuery(undefined, {
+    skip: user?.role !== "seller",
+  });
 
-  const onRefreshStores = () => {
-    alert("Refreshing stores...");
-    // Add your refresh logic here
+  const [deleteStore] = useDeleteStoreMutation();
+
+  const connectedStores = storeResponse?.data || [];
+  const [activeStore, setActiveStore] = useState(null);
+
+  const onRefreshStores = async () => {
+    try {
+      await refetchStores();
+      toast.success("Stores refreshed successfully");
+    } catch (err) {
+      toast.error("Failed to refresh stores");
+    }
   };
 
-  const onAddStore = () => {
-    alert("Adding new store...");
-    // Add your add store logic here
+  const handleActivateStore = async (storeId) => {
+    try {
+      setActiveStore(storeId);
+
+      const res = await activateStore(storeId).unwrap();
+
+      toast.success(res?.message || "Store activated successfully");
+
+      refetchStores();
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to activate store");
+    }
   };
 
-  const onDeleteStore = (storeId) => {
-    alert("Deleting store:", storeId);
+  const onDeleteStore = async (storeId) => {
+    try {
+      const res = await deleteStore(storeId).unwrap();
 
-    // Add your delete logic here
+      toast.success(res?.message || "Store deleted successfully");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to delete store");
+    }
   };
 
   const handleLogout = async () => {
@@ -179,74 +203,85 @@ const DashboardLayout = ({ children, sidebarItems, title }) => {
                   >
                     <RefreshCw className="w-4 h-4" />
                   </button>
-                  <button
-                    onClick={onAddStore}
-                    className="p-1.5 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
 
-              {connectedStores && connectedStores.length > 0 ? (
-                <div className="space-y-3">
-                  {connectedStores.map((store) => (
-                    <div
-                      key={store.id}
-                      onClick={() => setActiveStore(store.id)}
-                      className={`rounded-md p-4 border cursor-pointer transition-all ${
-                        activeStore === store.id
-                          ? "bg-blue-50 border-blue-200 ring-1 ring-blue-200"
-                          : "bg-gray-50 border-gray-200 hover:bg-gray-100"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center flex-1 mr-2">
-                          {activeStore === store.id && (
-                            <Check className="w-3 h-3 text-blue-600 mr-2 flex-shrink-0" />
-                          )}
-                          <h4
-                            className={`text-sm font-medium flex-1 ${
-                              activeStore === store.id ? "text-blue-900" : "text-gray-900"
-                            }`}
-                            title={store.url}
-                          >
-                            {store.url.length > 12
-                              ? `${store.url.substring(0, 12)}...`
-                              : store.url}
-                          </h4>
-                        </div>
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                            activeStore === store.id
-                              ? "bg-blue-100 text-blue-800"
-                              : store.status === "Active"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
-                        >
-                          {activeStore === store.id ? "Active" : store.status}
-                        </span>
-                      </div>
+              {storesLoading ? (
+                <p className="text-sm text-gray-500">Loading stores...</p>
+              ) : connectedStores.length > 0 ? (
+                <div className="space-y-3 max-h-[175px] overflow-y-auto pr-1">
+                  {connectedStores.map((store) => {
+                    const isDisabled = store.isActive;
+                    const isSelected =
+                      store.isActive || activeStore === store._id;
 
-                      <div className="flex items-center justify-between">
-                        <p className={`text-xs ${
-                          activeStore === store.id ? "text-blue-600" : "text-gray-500"
-                        }`}>
-                          Connected
-                        </p>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onDeleteStore(store.id);
-                          }}
-                          className="p-1 rounded-md text-red-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
+                    return (
+                      <div
+                        key={store._id}
+                        onClick={() => {
+                          if (!isDisabled) {
+                            handleActivateStore(store._id);
+                          }
+                        }}
+                        className={`rounded-md p-4 border cursor-pointer transition-all ${
+                          store.isActive || isSelected
+                            ? "bg-blue-50 border-blue-200 ring-1 ring-blue-200"
+                            : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center flex-1 mr-2">
+                            {(store.isActive || isSelected) && (
+                              <Check className="w-3 h-3 text-blue-600 mr-2" />
+                            )}
+                            <h4
+                              className={`text-sm font-medium truncate ${
+                                isSelected ? "text-blue-900" : "text-gray-900"
+                              }`}
+                              title={store.storeUrl}
+                            >
+                              {store.storeUrl}
+                            </h4>
+                          </div>
+
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                              store.isActive
+                                ? "bg-green-100 text-green-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {store.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <p
+                            className={`text-xs ${
+                              isSelected ? "text-blue-600" : "text-gray-500"
+                            }`}
+                          >
+                            Connected
+                          </p>
+
+                          <button
+                            disabled={store.isActive}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!store.isActive) onDeleteStore(store._id);
+                            }}
+                            className={`p-1 rounded-md ${
+                              store.isActive
+                                ? "text-gray-300 cursor-not-allowed"
+                                : "text-red-400 hover:text-red-500 hover:bg-red-50"
+                            }`}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-8">

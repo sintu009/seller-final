@@ -42,8 +42,13 @@ export const payoutApiSlice = apiSlice.injectEndpoints({
        SELLER / SUPPLIER PAYOUT APIs
        ========================= */
 
-    getMyPayouts: builder.query({
-      query: () => "/payouts/my",
+    getSellerPayouts: builder.query({
+      query: () => "/seller/payouts/",
+      providesTags: ["Payout"],
+    }),
+
+    getSupplierPayouts: builder.query({
+      query: () => "/supplier/payouts/",
       providesTags: ["Payout"],
     }),
   }),
@@ -56,5 +61,6 @@ export const {
   useCreatePayoutMutation,
   useUpdatePayoutMutation,
   useDeletePayoutMutation,
-  useGetMyPayoutsQuery,
+  useGetSellerPayoutsQuery,
+  useGetSupplierPayoutsQuery,
 } = payoutApiSlice;

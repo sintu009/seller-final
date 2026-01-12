@@ -9,7 +9,7 @@ export const notificationApiSlice = apiSlice.injectEndpoints({
 
     markNotificationAsRead: builder.mutation({
       query: (id) => ({
-        url: `/notifications/read/${id}`,
+        url: `/notifications/single-read/${id}`,
         method: "PATCH",
       }),
       invalidatesTags: ["Notification"],

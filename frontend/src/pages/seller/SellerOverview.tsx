@@ -38,7 +38,7 @@ const SellerOverview = () => {
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/api/auth/profile`, {
+      const response = await fetch(`${API_URL}/auth/profile`, {
         credentials: "include",
       });
       const result = await response.json();

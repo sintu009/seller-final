@@ -32,6 +32,8 @@ const {
   updatePayout,
 } = require("../controllers/payout.controller");
 
+const { getAllStores } = require("../controllers/store.controller");
+
 // Debug route without auth
 router.get("/debug", (req, res) => {
   res.json({
@@ -93,7 +95,10 @@ router.put("/orders/:id/reject", adminRejectOrder);
 router.post("/payouts", createPayout);
 router.get("/payouts", getAllPayouts);
 router.get("/payouts/:id", getPayoutById);
-router.delete("/payouts/:id", updatePayout);
-router.put("/payouts/:id", deletePayout);
+router.put("/payouts/:id", updatePayout);
+router.delete("/payouts/:id", deletePayout);
+
+//Admin store
+router.get("/all", getAllStores);
 
 module.exports = router;

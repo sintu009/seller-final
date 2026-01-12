@@ -33,11 +33,11 @@ const AdminPayment = () => {
   });
 
   const paymentMethods = [
-    { id: 'gpay', name: 'Google Pay' },
-    { id: 'upi', name: 'UPI' },
-    { id: 'cash', name: 'Cash' },
-    { id: 'phonepe', name: 'PhonePe' },
-    { id: 'cheque', name: 'Cheque' }
+    { id: "gpay", name: "Google Pay" },
+    { id: "upi", name: "UPI" },
+    { id: "cash", name: "Cash" },
+    { id: "phonepe", name: "PhonePe" },
+    { id: "cheque", name: "Cheque" },
   ];
 
   const [updatePayout] = useUpdatePayoutMutation();
@@ -70,41 +70,42 @@ const AdminPayment = () => {
   const handleEditPayment = (payout) => {
     setSelectedPayout(payout);
     setEditedAmount(payout.payableAmount);
-    setPaymentMethod('');
-    setTransactionId('');
-    setComment('');
+    setPaymentMethod("");
+    setTransactionId("");
+    setComment("");
     setShowEditModal(true);
   };
 
   const handleSubmitEdit = async () => {
     if (!paymentMethod) {
-      toast.error('Please select a payment method');
+      toast.error("Please select a payment method");
       return;
     }
 
     if (!editedAmount || parseFloat(editedAmount) <= 0) {
-      toast.error('Please enter a valid amount');
+      toast.error("Please enter a valid amount");
       return;
     }
 
     try {
       setActionLoading(true);
+
       await updatePayout({
         id: selectedPayout.payoutId,
         paidAmount: parseFloat(editedAmount),
         payoutMode: paymentMethod,
-        transactionId: transactionId,
-        comment: comment
+        referenceNumber: transactionId, // ✅ FIX
+        remarks: comment, // ✅ FIX
       }).unwrap();
 
-      toast.success('Payment updated successfully!');
+      toast.success("Payment updated successfully!");
       setShowEditModal(false);
-      setEditedAmount('');
-      setPaymentMethod('');
-      setTransactionId('');
-      setComment('');
+      setEditedAmount("");
+      setPaymentMethod("");
+      setTransactionId("");
+      setComment("");
     } catch (error) {
-      toast.error(error?.data?.message || 'Failed to update payment');
+      toast.error(error?.data?.message || "Failed to update payment");
     } finally {
       setActionLoading(false);
     }
@@ -135,9 +136,10 @@ const AdminPayment = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Payments</h1>
-            <p className="text-gray-600 mt-1">Track your earnings and payment history</p>
+            <p className="text-gray-600 mt-1">
+              Track your earnings and payment history
+            </p>
           </div>
-
         </div>
 
         <div className="flex gap-3">
@@ -152,13 +154,9 @@ const AdminPayment = () => {
           </select>
           <div className="flex items-center space-x-3">
             <div className="relative w-64">
-              <DatePicker
-                value={dateRange}
-                onChange={setDateRange}
-              />
+              <DatePicker value={dateRange} onChange={setDateRange} />
             </div>
           </div>
-
         </div>
       </div>
 
@@ -263,18 +261,20 @@ const AdminPayment = () => {
                   {/* STATUS + DUE DATE */}
                   <td className="px-6 py-4">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${payout.payoutStatus === "paid"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                        }`}
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        payout.payoutStatus === "paid"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
                     >
                       {payout.payoutStatus}
                     </span>
 
                     {payout.dueDate && (
                       <div
-                        className={`text-xs mt-1 flex items-center gap-1 ${isOverdue ? "text-red-600" : "text-gray-500"
-                          }`}
+                        className={`text-xs mt-1 flex items-center gap-1 ${
+                          isOverdue ? "text-red-600" : "text-gray-500"
+                        }`}
                       >
                         {isOverdue && <AlertTriangle className="w-3 h-3" />}
                         Due: {new Date(payout.dueDate).toLocaleDateString()}
@@ -321,9 +321,15 @@ const AdminPayment = () => {
 
             <div className="mb-6">
               <div className="text-sm text-gray-600 mb-2">Order Details</div>
-              <div className="font-medium text-gray-900">{selectedPayout.productName}</div>
-              <div className="text-sm text-gray-500">Order ID: {selectedPayout.orderId}</div>
-              <div className="text-sm text-gray-500">User: {selectedPayout.userName}</div>
+              <div className="font-medium text-gray-900">
+                {selectedPayout.productName}
+              </div>
+              <div className="text-sm text-gray-500">
+                Order ID: {selectedPayout.orderId}
+              </div>
+              <div className="text-sm text-gray-500">
+                User: {selectedPayout.userName}
+              </div>
             </div>
 
             <div className="mb-6">

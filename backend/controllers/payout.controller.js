@@ -184,6 +184,8 @@ const updatePayout = async (req, res) => {
       });
     }
 
+    console.log("Request Body:", req.body);
+
     const { paidAmount, payoutMode, referenceNumber, remarks, proofImages } =
       req.body;
 
@@ -194,6 +196,7 @@ const updatePayout = async (req, res) => {
     if (proofImages) payout.proofImages = proofImages;
 
     payout.processedBy = admin._id;
+    payout.isDeleted = false; // Ensure it's not marked deleted
 
     await payout.save();
 

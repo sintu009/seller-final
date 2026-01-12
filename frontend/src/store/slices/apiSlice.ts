@@ -14,7 +14,7 @@ const baseQuery = fetchBaseQuery({
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Product', 'User', 'KYC', 'Order', 'Notification', 'Settings', 'ApiKey', 'Role', 'Payout'],
+  tagTypes: ['Product', 'User', 'KYC', 'Order', 'Notification', 'Settings', 'ApiKey', 'Role', 'Payout','Store'],
   endpoints: (builder) => ({
     //Dashbaord Counts
      getAdminDashboardCounts: builder.query({
@@ -231,10 +231,10 @@ export const apiSlice = createApi({
     }),
 
     markNotificationsRead: builder.mutation({
-      query: (ids) => ({
-        url: '/notifications/mark-read',
+      query: (notificationIds) => ({
+        url: '/notifications/read',
         method: 'PUT',
-        body: { ids },
+        body: { notificationIds },
       }),
       invalidatesTags: ['Notification'],
     }),
