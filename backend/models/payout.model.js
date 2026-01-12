@@ -92,6 +92,10 @@ const payoutSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    reminderSent: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
