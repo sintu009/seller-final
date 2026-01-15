@@ -1,10 +1,10 @@
 import { io } from 'socket.io-client';
 
 // 🔥 Backend base URL (NOT frontend 5173)
-const SOCKET_URL = 'https://seller-final-2.onrender.com';
+//const SOCKET_URL = 'https://seller-final-2.onrender.com';
 
 // 🔥 Create ONE global socket instance
-export const socket = io(SOCKET_URL, {
+export const socket = io('https://seller-final-2.onrender.com', {
   withCredentials: true,
   autoConnect: true,
 });

@@ -5,7 +5,7 @@ let io;
 export const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: ["https://seller-final.vercel.app/"],
+      origin: ["https://seller-final.vercel.app"],
       credentials: true,
     },
   });

@@ -1,8 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl:
-    import.meta.env.VITE_API_URL || "https://seller-final-2.onrender.com/api",
+  baseUrl: "https://seller-final-2.onrender.com/api",
   credentials: "include",
   prepareHeaders: (headers, { endpoint }) => {
     if (endpoint !== "createProduct") {
