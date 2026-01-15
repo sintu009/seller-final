@@ -4,6 +4,10 @@ const baseQuery = fetchBaseQuery({
   baseUrl: "https://seller-final-2.onrender.com/api",
   credentials: "include",
   prepareHeaders: (headers, { endpoint }) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
     if (endpoint !== "createProduct") {
       headers.set("Content-Type", "application/json");
     }
