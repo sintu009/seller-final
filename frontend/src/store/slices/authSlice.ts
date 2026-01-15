@@ -7,7 +7,6 @@ interface User {
   role: "admin" | "supplier" | "seller" | "super-admin";
   kycStatus?: string;
   plan?: string;
-  token?: string;
 }
 
 interface AuthState {
@@ -31,9 +30,6 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       console.log("Storing user in localStorage:", action.payload);
       localStorage.setItem("user", JSON.stringify(action.payload));
-      if (action.payload.token) {
-        localStorage.setItem("token", action.payload.token);
-      }
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
@@ -45,7 +41,6 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
       localStorage.removeItem("user");
-      localStorage.removeItem("token");
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;

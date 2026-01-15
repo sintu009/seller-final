@@ -178,7 +178,8 @@ const SignupPage = () => {
           formDataToSend.append("cancelledCheque", files.cancelledCheque);
       }
 
-      const API_URL = "https://seller-final-2.onrender.com/api";
+      const API_URL =
+        import.meta.env.VITE_API_URL || "http://localhost:5000/api";
       const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         credentials: "include",

@@ -25,7 +25,7 @@ import {
   Bar,
 } from "recharts";
 
-const API_URL = "https://seller-final-2.onrender.com/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const SellerOverview = () => {
   const [userData, setUserData] = useState(null);

@@ -33,7 +33,7 @@ const LoginPage = () => {
     try {
       const result = await loginMutation({ email, password }).unwrap();
       if (result.success) {
-        dispatch(setCredentials({ ...result.data, token: result.token }));
+        dispatch(setCredentials(result.data));
         toast.success("Login successful!");
         navigate(`/${role}/dashboard`);
       }

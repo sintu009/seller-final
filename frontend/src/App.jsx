@@ -12,7 +12,6 @@ import SellerDashboard from './pages/seller/SellerDashboard';
 import SupplierDashboard from './pages/supplier/SupplierDashboard';
 import SuperAdminDashboard from './pages/supperAdmin/SupperAdminDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import useSocketEvents from './hooks/useSocketEvents';
@@ -78,7 +77,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </Router>

@@ -33,8 +33,7 @@ connectDB();
 
 app.use(
   cors({
-    // origin: ["http://localhost:5173", "http://localhost:5174"],
-    origin: ["https://seller-final.vercel.app"],
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -79,10 +78,7 @@ const server = http.createServer(app);
 // 🔥 Attach Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: [
-      "https://seller-final.vercel.app",
-      "http://localhost:5173"
-    ],
+    origin: "http://localhost:5173",
     credentials: true,
   },
 });

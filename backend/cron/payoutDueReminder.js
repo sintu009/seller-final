@@ -1,7 +1,7 @@
 const cron = require("node-cron");
 const Payout = require("../models/payout.model.js");
 const User = require("../models/user.model.js");
-const createNotification = require("../utils/notification.helper.js");
+const createNotification = require("../utils/createNotification.js");
 
 // Run every day at 10 AM
 cron.schedule("0 10 * * *", async () => {
