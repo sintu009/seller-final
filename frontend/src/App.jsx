@@ -13,6 +13,7 @@ import SupplierDashboard from './pages/supplier/SupplierDashboard';
 import SuperAdminDashboard from './pages/supperAdmin/SupperAdminDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import NotFound from './pages/NotFound';
 import { AuthProvider } from './context/AuthContext';
 import useSocketEvents from './hooks/useSocketEvents';
 
@@ -77,6 +78,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </Router>

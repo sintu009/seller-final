@@ -661,8 +661,8 @@ const KYCCompliance = () => {
                       </div>
                     </div>
                     {expandedPlans[submission._id] && (
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 transition-all duration-300 ease-in-out opacity-0 animate-fadeIn">
+                      <div className="space-y-4 animate-fadeIn">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                           {planOptions.map((plan) => (
                             <button
                               key={plan.id}
@@ -690,7 +690,7 @@ const KYCCompliance = () => {
                         </div>
 
                         {selectedPlans[submission._id] && (
-                          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 animate-fadeIn">
                             <h5 className="font-semibold text-blue-800 mb-3">
                               Select Stores (
                               {selectedStores[submission._id]?.length || 0}/
@@ -699,7 +699,7 @@ const KYCCompliance = () => {
                               )}
                               )
                             </h5>
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                               {storeOptions.map((store) => {
                                 const isSelected = selectedStores[
                                   submission._id

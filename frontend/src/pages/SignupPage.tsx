@@ -58,10 +58,11 @@ const SignupPage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    const formattedValue = name === "panNumber" ? value.toUpperCase() : value;
 
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: formattedValue,
     });
 
     if (name === "password") {
@@ -71,12 +72,12 @@ const SignupPage = () => {
         setPasswordError("Password must contain at least 1 letter");
       } else if (!/\d/.test(value)) {
         setPasswordError("Password must contain at least 1 number");
+      } else if (formData.confirmPassword && value !== formData.confirmPassword) {
+        setPasswordError("Passwords do not match");
       } else {
         setPasswordError("");
       }
     }
-
-    const formattedValue = name === "panNumber" ? value.toUpperCase() : value;
 
     if (name === "confirmPassword") {
       if (value !== formData.password) {
@@ -87,7 +88,7 @@ const SignupPage = () => {
     }
 
     if (name === "panNumber") {
-      if (!panRegex.test(formattedValue)) {
+      if (formattedValue && !panRegex.test(formattedValue)) {
         setPanError("PAN format should be ABCDE1234F");
       } else {
         setPanError("");
@@ -131,7 +132,7 @@ const SignupPage = () => {
     setLoading(true);
     setError("");
 
-    if (!panRegex.test(formData.panNumber)) {
+    if (role !== "admin" && formData.panNumber && !panRegex.test(formData.panNumber)) {
       setPanError("Invalid PAN number format");
       setLoading(false);
       return;
