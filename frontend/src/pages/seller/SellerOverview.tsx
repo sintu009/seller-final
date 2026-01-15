@@ -25,7 +25,7 @@ import {
   Bar,
 } from "recharts";
 
-const API_URL = "https://seller-final-2.onrender.com";
+const API_URL = "https://seller-final-2.onrender.com/api";
 
 const SellerOverview = () => {
   const [userData, setUserData] = useState(null);
