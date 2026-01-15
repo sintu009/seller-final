@@ -50,22 +50,39 @@ const SuperAdminLogin = () => {
     setError("");
     setLoading(true);
 
-  const pinString = formData.pin.join("");
+    const pinString = formData.pin.join("");
 
-  if (!formData.username || !formData.password || pinString.length !== 6) {
-    setError("Email, password and 6-digit PIN are required");
-    return;
-  }
+    if (!formData.username || !formData.password || pinString.length !== 6) {
+      setError("Email, password and 6-digit PIN are required");
+      setLoading(false);
+      return;
+    }
 
     try {
       const result = await loginMutation({ username: formData.username, password: formData.password, pin: pinString, role:"super-admin" }).unwrap();
       console.log("Login successful:", result);
-      dispatch(setCredentials(result.data));
+      console.log("Token received:", result.token);
+      console.log("User data:", result.data);
+      
+      // Store credentials
+      dispatch(setCredentials({ ...result.data, token: result.token }));
+      
+      // Verify storage
+      console.log("Token in localStorage:", localStorage.getItem('token'));
+      console.log("User in localStorage:", localStorage.getItem('user'));
+      
       toast.success("Super Admin login successful!");
-      navigate("/super-admin/dashboard");
+      
+      // Small delay to ensure state updates
+      setTimeout(() => {
+        navigate("/super-admin/dashboard");
+      }, 100);
     } catch (err: any) {
-      setError("Login failed");
-      toast.error("Login failed");
+      console.error("Login error:", err);
+      setError(err?.data?.message || "Login failed");
+      toast.error(err?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -174,7 +191,7 @@ const SuperAdminLogin = () => {
 
             <button
               type="submit"
-              disabled={false}
+              disabled={loading}
               className="w-full bg-[#ea9a39] text-white py-3 px-6 rounded-md font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
             >
               <Shield className="w-5 h-5 mr-2" />
