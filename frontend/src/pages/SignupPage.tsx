@@ -87,7 +87,7 @@ const SignupPage = () => {
     }
 
     if (name === "panNumber") {
-      if (!panRegex.test(formattedValue)) {
+      if (role !== "admin" && !panRegex.test(formattedValue)) {
         setPanError("PAN format should be ABCDE1234F");
       } else {
         setPanError("");
@@ -131,7 +131,7 @@ const SignupPage = () => {
     setLoading(true);
     setError("");
 
-    if (!panRegex.test(formData.panNumber)) {
+    if (role !== "admin" && !panRegex.test(formData.panNumber)) {
       setPanError("Invalid PAN number format");
       setLoading(false);
       return;
