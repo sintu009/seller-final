@@ -186,7 +186,7 @@ const KYCCompliance = () => {
 
     const handleViewDocument = (filepath) => {
         if (filepath) {
-            window.open(`http://localhost:5000/${filepath}`, '_blank');
+            window.open(`https://seller-final-2.onrender.com/${filepath}`, '_blank');
         }
     };
 
