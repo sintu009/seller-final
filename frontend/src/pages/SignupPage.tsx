@@ -179,7 +179,8 @@ const SignupPage = () => {
       }
 
       const API_URL =
-        import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        import.meta.env.VITE_API_URL ||
+        "https://seller-final-2.onrender.com/api";
       const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         credentials: "include",

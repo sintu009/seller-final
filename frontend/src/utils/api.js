@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://seller-final-2.onrender.com/api';
 
 const getAuthHeaders = () => {
   return {
@@ -27,21 +27,21 @@ export const apiClient = {
       credentials: 'include',
       headers: getAuthHeaders(),
     });
-    
+
     console.log('Response status:', response.status);
-    
+
     if (response.status === 401) {
       handleAuthError(response);
       throw new Error('Authentication failed');
     }
-    
+
     const text = await response.text();
     console.log('Response text preview:', text.substring(0, 100));
-    
+
     if (text.startsWith('<!DOCTYPE')) {
       throw new Error(`Server returned HTML instead of JSON. Status: ${response.status}`);
     }
-    
+
     try {
       const data = JSON.parse(text);
       if (!response.ok && data.message) {
@@ -61,12 +61,12 @@ export const apiClient = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    
+
     if (response.status === 401) {
       handleAuthError(response);
       throw new Error('Authentication failed');
     }
-    
+
     const result = await response.json();
     if (!response.ok && result.message) {
       throw new Error(result.message);
@@ -81,12 +81,12 @@ export const apiClient = {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    
+
     if (response.status === 401) {
       handleAuthError(response);
       throw new Error('Authentication failed');
     }
-    
+
     const result = await response.json();
     if (!response.ok && result.message) {
       throw new Error(result.message);
@@ -100,12 +100,12 @@ export const apiClient = {
       credentials: 'include',
       headers: getAuthHeaders(),
     });
-    
+
     if (response.status === 401) {
       handleAuthError(response);
       throw new Error('Authentication failed');
     }
-    
+
     const data = await response.json();
     if (!response.ok && data.message) {
       throw new Error(data.message);
@@ -120,12 +120,12 @@ export const apiClient = {
       headers: getAuthHeadersMultipart(),
       body: formData,
     });
-    
+
     if (response.status === 401) {
       handleAuthError(response);
       throw new Error('Authentication failed');
     }
-    
+
     const data = await response.json();
     if (!response.ok && data.message) {
       throw new Error(data.message);
