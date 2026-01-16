@@ -31,16 +31,17 @@ const storeRoutes = require("./routes/store.routes");
 const app = express();
 connectDB();
 
+app.set("trust proxy", 1);
+app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.VITE_API_URL,
+    origin: "https:seller-final-12.onrender.com",
     credentials: true,
   })
 );
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
