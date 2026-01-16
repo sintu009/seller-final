@@ -11,13 +11,13 @@ const getAuthHeadersMultipart = () => {
 };
 
 // Simple error handling for auth failures
-const handleAuthError = (response) => {
-  if (response.status === 401) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-  }
-};
+// const handleAuthError = (response) => {
+//   if (response.status === 401) {
+//     localStorage.removeItem("token");
+//     localStorage.removeItem("user");
+//     window.location.href = "/login";
+//   }
+// };
 
 export const apiClient = {
   async get(endpoint) {
@@ -31,8 +31,7 @@ export const apiClient = {
     console.log("Response status:", response.status);
 
     if (response.status === 401) {
-      handleAuthError(response);
-      throw new Error("Authentication failed");
+      throw new Error("Unauthorized");
     }
 
     const text = await response.text();
