@@ -1,44 +1,111 @@
-const authService = require('../services/auth.service');
-const { createNotification } = require('../utils/notification.helper');
-const User = require('../models/user.model');
+const authService = require("../services/auth.service");
+const { createNotification } = require("../utils/notification.helper");
+const User = require("../models/user.model");
+const { uploadKycDocuments } = require("../utils/azureUpload");
+
+const kycFileConfig = [
+  { field: "gstCertificate", target: "idProof" },
+  { field: "panCard", target: "addressProof" },
+  { field: "cancelledCheque", target: "bankDetails.cancelledChequeBlob" },
+];
 
 const register = async (req, res) => {
   try {
-    const { name, email, password, role, businessName, gstNumber, panNumber, phoneNumber, address } = req.body;
-    
-    console.log('Registration attempt:', { name, email, role });
+    const {
+      name,
+      email,
+      password,
+      role,
+      businessName,
+      gstNumber,
+      panNumber,
+      phoneNumber,
+      address,
+    } = req.body;
+
+    console.log("Registration attempt:", { name, email, role });
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide all required fields'
+        message: "Please provide all required fields",
       });
     }
 
-    if (!['admin', 'seller', 'supplier'].includes(role)) {
+    if (!["admin", "seller", "supplier"].includes(role)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid role specified'
+        message: "Invalid role specified",
       });
     }
 
+    //check here if same pan number or gst number is already registered
+    if (panNumber) {
+      const existingPanUser = await User.findOne({
+        "kycDocuments.businessRegistration": panNumber,
+        isDeleted: false,
+      });
+
+      if (existingPanUser) {
+        return res.status(400).json({
+          success: false,
+          message: "A user with this PAN number is already registered.",
+        });
+      }
+    }
+
+    if (gstNumber) {
+      const existingGstUser = await User.findOne({
+        "kycDocuments.taxId": gstNumber,
+        isDeleted: false,
+      });
+
+      if (existingGstUser) {
+        return res.status(400).json({
+          success: false,
+          message: "A user with this GST number is already registered.",
+        });
+      }
+    }
+
+    if (phoneNumber) {
+      const existingPhoneUser = await User.findOne({
+        phone: phoneNumber,
+        isDeleted: false,
+      });
+      if (existingPhoneUser) {
+        return res.status(400).json({
+          success: false,
+          message: "A user with this phone number is already registered.",
+        });
+      }
+    }
+
+    // 🔹 Upload KYC docs to Azure
+    let uploadedDocs = {};
+    if (req.files && Object.keys(req.files).length > 0) {
+      uploadedDocs = await uploadKycDocuments(req.files, role);
+    }
+
+    // 🔹 Build KYC document object dynamically (ARRAY BASED)
     const kycDocuments = {
       businessName,
       taxId: gstNumber,
-      businessRegistration: panNumber
+      businessRegistration: panNumber,
     };
 
-    if (req.files) {
-      if (req.files.gstCertificate && req.files.gstCertificate[0]) {
-        kycDocuments.idProof = req.files.gstCertificate[0].path;
-      }
-      if (req.files.panCard && req.files.panCard[0]) {
-        kycDocuments.addressProof = req.files.panCard[0].path;
-      }
-      if (req.files.cancelledCheque && req.files.cancelledCheque[0]) {
-        kycDocuments.bankDetails = {
-          cancelledChequePath: req.files.cancelledCheque[0].path
+    for (const cfg of kycFileConfig) {
+      const blobName = uploadedDocs[cfg.field];
+      if (!blobName) continue;
+
+      if (cfg.target.includes(".")) {
+        const [parent, child] = cfg.target.split(".");
+        kycDocuments[parent] = {
+          ...(kycDocuments[parent] || {}),
+          [child]: blobName,
         };
+      } else {
+        kycDocuments[cfg.target] = blobName;
       }
     }
 
@@ -49,26 +116,29 @@ const register = async (req, res) => {
       role,
       phone: phoneNumber,
       address: address ? JSON.parse(address) : undefined,
-      kycDocuments
+      kycDocuments,
     };
 
-    console.log('Creating user with data:', { ...userData, password: '[HIDDEN]' });
+    console.log("Creating user with data:", {
+      ...userData,
+      password: "[HIDDEN]",
+    });
     const user = await authService.registerUser(userData);
-    console.log('User created successfully:', user._id);
+    console.log("User created successfully:", user._id);
 
-    if (user.role === 'seller' && global.io) {
-      global.io.emit('NEW_SELLER_REGISTERED', {
+    if (user.role === "seller" && global.io) {
+      global.io.emit("NEW_SELLER_REGISTERED", {
         id: user._id,
         name: user.name,
         email: user.email,
       });
     }
 
-    if (role !== 'admin') {
+    if (role !== "admin") {
       const admins = await User.find({
-        role: 'admin',
+        role: "admin",
         isDeleted: false,
-      }).select('_id');
+      }).select("_id");
 
       await Promise.all(
         admins.map((admin) =>
@@ -76,26 +146,27 @@ const register = async (req, res) => {
             user: admin._id,
             title: `New ${role} registered`,
             message: `${name} (${email}) has registered and requires approval.`,
-            type: 'info',
-            entityType: 'user',
+            type: "info",
+            entityType: "user",
             entityId: user._id,
           })
         )
       );
     }
-    
+
     if (user.token) {
-      res.cookie('token', user.token, {
+      res.cookie("token", user.token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
     }
 
     res.status(201).json({
       success: true,
-      message: user.message || 'User registered successfully',
+      message: user.message || "User registered successfully",
       token: user.token,
       data: {
         _id: user._id,
@@ -103,14 +174,14 @@ const register = async (req, res) => {
         email: user.email,
         role: user.role,
         kycStatus: user.kycStatus,
-        requiresApproval: user.kycStatus === 'pending'
-      }
+        requiresApproval: user.kycStatus === "pending",
+      },
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
     res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -122,22 +193,23 @@ const login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password'
+        message: "Please provide email and password",
       });
     }
 
     const user = await authService.loginUser(email, password);
 
-    res.cookie('token', user.token, {
+    res.cookie("token", user.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
       success: true,
-      message: 'Login successful',
+      message: "Login successful",
       token: user.token,
       data: {
         _id: user._id,
@@ -145,32 +217,32 @@ const login = async (req, res) => {
         email: user.email,
         role: user.role,
         kycStatus: user.kycStatus,
-        plan: user.plan
-      }
+        plan: user.plan,
+      },
     });
   } catch (error) {
     res.status(401).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
 
 const logout = async (req, res) => {
   try {
-    res.cookie('token', '', {
+    res.cookie("token", "", {
       httpOnly: true,
-      expires: new Date(0)
+      expires: new Date(0),
     });
 
     res.status(200).json({
       success: true,
-      message: 'Logged out successfully'
+      message: "Logged out successfully",
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -181,12 +253,12 @@ const getProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: user
+      data: user,
     });
   } catch (error) {
     res.status(404).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
@@ -195,5 +267,5 @@ module.exports = {
   register,
   login,
   logout,
-  getProfile
+  getProfile,
 };

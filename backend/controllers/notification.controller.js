@@ -1,4 +1,4 @@
-const Notification = require('../models/notification.model');
+const Notification = require("../models/notification.model");
 
 // 🔔 Get logged-in user's notifications
 const getMyNotifications = async (req, res) => {
@@ -25,24 +25,28 @@ const getMyNotifications = async (req, res) => {
 // 🔔 Mark notification as read
 const markAsRead = async (req, res) => {
   try {
-    const notification = await Notification.findOne({
-      _id: req.params.id,
-      user: req.user.id,
-    });
+    const { notificationIds } = req.body;
+    console.log("Notification IDs to mark as read:", notificationIds);
 
-    if (!notification) {
-      return res.status(404).json({
+    if (!notificationIds || !notificationIds.length) {
+      return res.status(400).json({
         success: false,
-        message: 'Notification not found',
+        message: "No notification IDs provided",
       });
     }
 
-    notification.isRead = true;
-    await notification.save();
+    const result = await Notification.updateMany(
+      {
+        _id: { $in: notificationIds },
+        user: req.user.id,
+      },
+      { $set: { isRead: true } }
+    );
 
     res.json({
       success: true,
-      message: 'Notification marked as read',
+      message: "Notifications marked as read",
+      modifiedCount: result.modifiedCount,
     });
   } catch (error) {
     res.status(500).json({
@@ -62,7 +66,7 @@ const markAllAsRead = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'All notifications marked as read',
+      message: "All notifications marked as read",
     });
   } catch (error) {
     res.status(500).json({
@@ -91,9 +95,49 @@ const getUnreadNotificationCount = async (req, res) => {
   }
 };
 
+const markSingleNotificationAsRead = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const notification = await Notification.findOne({
+      _id: id,
+      user: req.user.id,
+    });
+
+    if (!notification) {
+      return res.status(404).json({
+        success: false,
+        message: "Notification not found",
+      });
+    }
+
+    if (notification.isRead) {
+      return res.json({
+        success: true,
+        message: "Notification already marked as read",
+      });
+    }
+
+    notification.isRead = true;
+    await notification.save();
+
+    res.json({
+      success: true,
+      message: "Notification marked as read",
+      data: notification,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getMyNotifications,
   markAsRead,
   markAllAsRead,
-  getUnreadNotificationCount
+  getUnreadNotificationCount,
+  markSingleNotificationAsRead,
 };

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useGetProductsQuery, useApproveProductMutation, useRejectProductMutation } from '../../store/slices/apiSlice';
+import React, { useState, useEffect } from 'react';
+import { useGetProductsQuery, useApproveProductMutation, useRejectProductMutation, useGetImageSasUrlQuery } from '../../store/slices/apiSlice';
 import {
     Search,
     Filter,
@@ -16,10 +16,18 @@ import {
     X
 } from 'lucide-react';
 
+import ProductImage from "../../components/ProductImage.jsx";
+import { toast } from 'react-toastify';
+import { socket } from '../../socket';
+
 const ProductManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
-    const { data: productsData, isLoading: loading } = useGetProductsQuery();
+    
+    const {data: productsData,isLoading: loading,refetch} = useGetProductsQuery(undefined, {
+  refetchOnMountOrArgChange: true,
+});
+
     const [approveProduct] = useApproveProductMutation();
     const [rejectProduct] = useRejectProductMutation();
     const [showApproveModal, setShowApproveModal] = useState(false);
@@ -40,6 +48,14 @@ const ProductManagement = () => {
 
         return matchesSearch && matchesStatus;
     });
+
+    useEffect(() => {
+        socket.on('NEW_PRODUCT_ADDED', () => {
+            refetch();
+        });
+
+        return () => socket.off('NEW_PRODUCT_ADDED');
+    }, [refetch]);
 
     const getStatusIcon = (status) => {
         switch (status) {
@@ -82,7 +98,7 @@ const ProductManagement = () => {
 
     const confirmApprove = async () => {
         if (!margin || parseFloat(margin) < 0) {
-            alert('Please enter a valid margin amount');
+            toast.error('Please enter a valid margin amount');
             return;
         }
 
@@ -93,12 +109,13 @@ const ProductManagement = () => {
                 margin: parseFloat(margin)
             }).unwrap();
 
-            alert('Product approved successfully!');
+            toast.success('Product approved successfully!');
             setShowApproveModal(false);
             setMargin('');
         } catch (error) {
             console.error('Error approving product:', error);
-            alert(error.data?.message || 'Failed to approve product');
+            const message = error.data?.message || 'Failed to approve product';
+            toast.error(message);
         } finally {
             setActionLoading(false);
         }
@@ -106,7 +123,7 @@ const ProductManagement = () => {
 
     const confirmReject = async () => {
         if (!rejectionReason.trim()) {
-            alert('Please provide a rejection reason');
+            toast.error('Please provide a rejection reason');
             return;
         }
 
@@ -117,12 +134,13 @@ const ProductManagement = () => {
                 reason: rejectionReason
             }).unwrap();
 
-            alert('Product rejected successfully!');
+            toast.success('Product rejected successfully!');
             setShowRejectModal(false);
             setRejectionReason('');
         } catch (error) {
             console.error('Error rejecting product:', error);
-            alert(error.data?.message || 'Failed to reject product');
+            const message = error.data?.message || 'Failed to reject product';
+            toast.error(message);
         } finally {
             setActionLoading(false);
         }
@@ -239,17 +257,10 @@ const ProductManagement = () => {
                                 <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                                     <td className="py-4 px-6">
                                         <div className="flex items-center">
-                                            {product.images && product.images[0] ? (
-                                                <img
-                                                    src={product.images[0]}
-                                                    alt={product.name}
-                                                    className="w-12 h-12 rounded-mdg object-cover mr-4"
-                                                />
-                                            ) : (
-                                                <div className="w-12 h-12 rounded-mdg bg-gray-200 mr-4 flex items-center justify-center">
-                                                    <Package className="w-6 h-6 text-gray-400" />
-                                                </div>
-                                            )}
+                                            <ProductImage
+                                                blobName={product.images?.[0]}
+                                                alt={product.name}
+                                            />
                                             <div>
                                                 <div className="font-medium text-gray-900">{product.name}</div>
                                                 <div className="text-sm text-gray-500 line-clamp-1">{product.description}</div>

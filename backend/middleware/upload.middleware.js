@@ -1,64 +1,41 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const multer = require("multer");
 
-const uploadDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Memory storage (NO local save)
+const storage = multer.memoryStorage();
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
+// File filter
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif|pdf/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const extname = allowedTypes.test(
+    file.originalname.toLowerCase().split(".").pop()
+  );
   const mimetype = allowedTypes.test(file.mimetype);
 
   if (mimetype && extname) {
-    return cb(null, true);
+    cb(null, true);
   } else {
-    cb(new Error('Only images and PDF files are allowed'));
+    cb(new Error("Only images and PDF files are allowed"));
   }
 };
 
+// Base upload instance
 const upload = multer({
-  storage: storage,
+  storage,
   limits: {
-    fileSize: 5 * 1024 * 1024
+    fileSize: 5 * 1024 * 1024 // 5MB
   },
-  fileFilter: fileFilter
+  fileFilter
 });
 
+// ================= SELLER DOCUMENT UPLOAD =================
 const uploadDocuments = upload.fields([
-  { name: 'gstCertificate', maxCount: 1 },
-  { name: 'panCard', maxCount: 1 },
-  { name: 'cancelledCheque', maxCount: 1 }
+  { name: "gstCertificate", maxCount: 1 },
+  { name: "panCard", maxCount: 1 },
+  { name: "cancelledCheque", maxCount: 1 }
 ]);
 
-const uploadProductImages = (req, res, next) => {
-  console.log('Upload middleware called');
-  const uploadHandler = upload.array('images', 5);
-  
-  uploadHandler(req, res, (err) => {
-    if (err) {
-      console.error('Upload error:', err);
-      return res.status(400).json({
-        success: false,
-        message: err.message
-      });
-    }
-    console.log('Upload successful, files:', req.files);
-    next();
-  });
-};
+// ================= PRODUCT IMAGE UPLOAD =================
+const uploadProductImages = upload.array("images", 5);
 
 module.exports = {
   upload,

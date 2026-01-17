@@ -1,58 +1,104 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { protect, authorize } = require('../middleware/auth.middleware');
-const { approveProduct, rejectProduct, getAllProducts, getPendingProducts } = require('../controllers/product.controller');
-const { getAllUsers, approveUser, rejectUser, blockUser,unBlockUser,deleteUser,resetUserPassword } = require('../controllers/user.controller');
-const { getOrdersForAdmin, adminApproveOrder, adminRejectOrder } = require('../controllers/order.controller');
-const { getAdminDashboardCounts } = require('../controllers/dashboard.controller');
+const { protect, authorize } = require("../middleware/auth.middleware");
+const {
+  approveProduct,
+  rejectProduct,
+  getAllProducts,
+  getPendingProducts,
+} = require("../controllers/product.controller");
+const {
+  getAllUsers,
+  approveUser,
+  rejectUser,
+  blockUser,
+  unBlockUser,
+  deleteUser,
+  resetUserPassword,
+} = require("../controllers/user.controller");
+const {
+  getOrdersForAdmin,
+  adminApproveOrder,
+  adminRejectOrder,
+} = require("../controllers/order.controller");
+const {
+  getAdminDashboardCounts,
+} = require("../controllers/dashboard.controller");
+const {
+  getAllPayouts,
+  createPayout,
+  getPayoutById,
+  deletePayout,
+  updatePayout,
+} = require("../controllers/payout.controller");
+
+const { getAllStores } = require("../controllers/store.controller");
 
 // Debug route without auth
-router.get('/debug', (req, res) => {
+router.get("/debug", (req, res) => {
   res.json({
     success: true,
-    message: 'Admin debug route working - no auth required',
-    timestamp: new Date().toISOString()
+    message: "Admin debug route working - no auth required",
+    timestamp: new Date().toISOString(),
   });
 });
 
 // Test route with minimal auth
-router.get('/test', protect, (req, res) => {
+router.get("/test", protect, (req, res) => {
   res.json({
     success: true,
-    message: 'Admin test route with auth working',
+    message: "Admin test route with auth working",
     user: req.user ? { id: req.user.id, role: req.user.role } : null,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
 // Orders route with detailed logging
-router.get('/orders', protect, authorize('admin', 'superadmin'), (req, res, next) => {
-  console.log('Admin orders route hit!');
-  console.log('User:', req.user ? { id: req.user.id, role: req.user.role } : 'No user');
-  getOrdersForAdmin(req, res, next);
-});
+router.get(
+  "/orders",
+  protect,
+  authorize("admin", "superadmin"),
+  (req, res, next) => {
+    console.log("Admin orders route hit!");
+    console.log(
+      "User:",
+      req.user ? { id: req.user.id, role: req.user.role } : "No user"
+    );
+    getOrdersForAdmin(req, res, next);
+  }
+);
 
 // Apply auth middleware to remaining routes
 router.use(protect);
-router.use(authorize('admin', 'superadmin'));
+router.use(authorize("admin", "superadmin"));
 
-router.get('/dashboard-counts', getAdminDashboardCounts);
+router.get("/dashboard-counts", getAdminDashboardCounts);
 
-router.get('/users', getAllUsers);
-router.put('/users/:id/approve', approveUser);
-router.put('/users/:id/reject', rejectUser);
-router.put('/users/:id/block', blockUser);
-router.put('/users/:id/unblock', unBlockUser);
-router.delete('/users/:id', deleteUser);
-router.post('/users/:id/reset-password', resetUserPassword);
+router.get("/users", getAllUsers);
+router.put("/users/:id/approve", approveUser);
+router.put("/users/:id/reject", rejectUser);
+router.put("/users/:id/block", blockUser);
+router.put("/users/:id/unblock", unBlockUser);
+router.delete("/users/:id", deleteUser);
+router.post("/users/:id/reset-password", resetUserPassword);
 
-router.get('/products/pending', getPendingProducts);
+router.get("/products/pending", getPendingProducts);
 
-router.get('/products', getAllProducts);
-router.put('/products/:id/approve', approveProduct);
-router.put('/products/:id/reject', rejectProduct);
+router.get("/products", getAllProducts);
+router.put("/products/:id/approve", approveProduct);
+router.put("/products/:id/reject", rejectProduct);
 
-router.put('/orders/:id/approve', adminApproveOrder);
-router.put('/orders/:id/reject', adminRejectOrder);
+router.put("/orders/:id/approve", adminApproveOrder);
+router.put("/orders/:id/reject", adminRejectOrder);
+
+//Admin Payout
+router.post("/payouts", createPayout);
+router.get("/payouts", getAllPayouts);
+router.get("/payouts/:id", getPayoutById);
+router.put("/payouts/:id", updatePayout);
+router.delete("/payouts/:id", deletePayout);
+
+//Admin store
+router.get("/all", getAllStores);
 
 module.exports = router;

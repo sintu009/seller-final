@@ -87,7 +87,7 @@ const SignupPage = () => {
     }
 
     if (name === "panNumber") {
-      if (!panRegex.test(formattedValue)) {
+      if (role !== "admin" && !panRegex.test(formattedValue)) {
         setPanError("PAN format should be ABCDE1234F");
       } else {
         setPanError("");
@@ -131,7 +131,7 @@ const SignupPage = () => {
     setLoading(true);
     setError("");
 
-    if (!panRegex.test(formData.panNumber)) {
+    if (role !== "admin" && !panRegex.test(formData.panNumber)) {
       setPanError("Invalid PAN number format");
       setLoading(false);
       return;
@@ -179,7 +179,7 @@ const SignupPage = () => {
       }
 
       const API_URL =
-        import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        import.meta.env.VITE_API_URL;
       const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         credentials: "include",

@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseUrl: import.meta.env.VITE_API_URL,
   credentials: 'include',
   prepareHeaders: (headers, { endpoint }) => {
     if (endpoint !== 'createProduct') {
@@ -14,12 +14,12 @@ const baseQuery = fetchBaseQuery({
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['Product', 'User', 'KYC', 'Order', 'Notification', 'Settings', 'ApiKey', 'Role'],
+  tagTypes: ['Product', 'User', 'KYC', 'Order', 'Notification', 'Settings', 'ApiKey', 'Role', 'Payout','Store'],
   endpoints: (builder) => ({
     //Dashbaord Counts
      getAdminDashboardCounts: builder.query({
       query: () => '/admin/dashboard-counts',
-      providesTags: ['User', 'Product', 'KYC'],
+      providesTags: ['User', 'Product', 'KYC','Order'],
     }),
 
     // Products
@@ -78,10 +78,10 @@ export const apiSlice = createApi({
       providesTags: ['KYC'],
     }),
     approveKYC: builder.mutation({
-      query: ({ id, plan }) => ({
+      query: ({ id, plan, stores }) => ({
         url: `/kyc/approve/${id}`,
         method: 'PUT',
-        body: { plan },
+        body: { plan, stores },
       }),
       invalidatesTags: ['KYC'],
     }),
@@ -231,10 +231,10 @@ export const apiSlice = createApi({
     }),
 
     markNotificationsRead: builder.mutation({
-      query: (ids) => ({
-        url: '/notifications/mark-read',
+      query: (notificationIds) => ({
+        url: '/notifications/read',
         method: 'PUT',
-        body: { ids },
+        body: { notificationIds },
       }),
       invalidatesTags: ['Notification'],
     }),
@@ -340,6 +340,16 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Role'],
     }),
+    getImageSasUrl: builder.query<
+      { sasUrl: string },
+      string
+    >({
+      query: (blobName) => ({
+        url: `/files/sas`,
+        params: { blobName },
+      }),
+    }),
+    
   }),
 });
 
@@ -394,4 +404,6 @@ export const {
   useCreateAdminRoleMutation,
   useUpdateAdminRoleMutation,
   useDeleteAdminRoleMutation,
+  useGetImageSasUrlQuery,
+  useLazyGetImageSasUrlQuery
 } = apiSlice;
